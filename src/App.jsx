@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, X, Phone, Mail, MapPin, Instagram, Facebook, Twitter } from 'lucide-react';
+import { ShoppingBag, Menu, X, Phone, Mail, MapPin, Instagram, Facebook, MessageCircle, IceCream } from 'lucide-react';
 
 // Product data with availability
 const mysteryBoxOptions = [
@@ -13,6 +13,7 @@ const giftBoxProducts = [
     id: 'gift-1',
     name: 'Eternal Bloom Ring',
     image: '/assets/ring01.png',
+    images: ['/assets/ring01.png', '/assets/1ring01.png', '/assets/2ring01.png', '/assets/3ring01.png'],
     price: 299,
     colors: ['Red', 'Pink', 'Blue', 'Yellow'],
     availableColors: ['Red', 'Blue', 'Yellow'], // Pink unavailable
@@ -22,6 +23,7 @@ const giftBoxProducts = [
     id: 'gift-2',
     name: 'Premium Flower Band',
     image: '/assets/flowerband01.png',
+    images: ['/assets/flowerband01.png', '/assets/1flowerband01.png', '/assets/2flowerband01.png', '/assets/3flowerband01.png'],
     price: 349,
     colors: ['Red', 'Pink', 'Green', 'Blue'],
     availableColors: ['Red', 'Pink', 'Green', 'Blue'],
@@ -31,6 +33,7 @@ const giftBoxProducts = [
     id: 'gift-3',
     name: 'Heritage Earring & Locket',
     image: '/assets/earring&locket01.png',
+    images: ['/assets/earring&locket01.png', '/assets/earring&locket02.png', '/assets/earring&locket03.png', '/assets/earring&locket11.png'],
     price: 599,
     colors: ['Red', 'Pink', 'Yellow'],
     availableColors: ['Red', 'Pink', 'Yellow'],
@@ -40,6 +43,7 @@ const giftBoxProducts = [
     id: 'gift-4',
     name: 'Celestial Ring',
     image: '/assets/1ring01.png',
+    images: ['/assets/1ring01.png', '/assets/ring01.png', '/assets/2ring01.png', '/assets/4ring01.png'],
     price: 449,
     colors: ['Red', 'Blue', 'Yellow'],
     availableColors: ['Red', 'Blue'], // Yellow unavailable
@@ -49,6 +53,7 @@ const giftBoxProducts = [
     id: 'gift-5',
     name: 'Garden Blossom Band',
     image: '/assets/1flowerband01.png',
+    images: ['/assets/1flowerband01.png', '/assets/flowerband01.png', '/assets/2flowerband01.png', '/assets/3flowerband01.png'],
     price: 389,
     colors: ['Pink', 'Green', 'Blue'],
     availableColors: ['Pink', 'Green', 'Blue'],
@@ -58,6 +63,7 @@ const giftBoxProducts = [
     id: 'gift-6',
     name: 'Vintage Elegance Set',
     image: '/assets/earring&locket02.png',
+    images: ['/assets/earring&locket02.png', '/assets/earring&locket01.png', '/assets/earring&locket03.png', '/assets/1earring&locket11.png'],
     price: 649,
     colors: ['Red', 'Pink', 'Green', 'Yellow'],
     availableColors: ['Red', 'Pink', 'Green', 'Yellow'],
@@ -67,6 +73,7 @@ const giftBoxProducts = [
     id: 'gift-7',
     name: 'Modern Romance Ring',
     image: '/assets/2ring01.png',
+    images: ['/assets/2ring01.png', '/assets/ring01.png', '/assets/1ring01.png', '/assets/3ring01.png'],
     price: 329,
     colors: ['Red', 'Pink', 'Blue'],
     availableColors: ['Red', 'Pink', 'Blue'],
@@ -76,6 +83,7 @@ const giftBoxProducts = [
     id: 'gift-8',
     name: 'Botanical Dreams Band',
     image: '/assets/2flowerband01.png',
+    images: ['/assets/2flowerband01.png', '/assets/flowerband01.png', '/assets/1flowerband01.png', '/assets/3flowerband01.png'],
     price: 419,
     colors: ['Pink', 'Green', 'Yellow'],
     availableColors: ['Green'], // Pink and Yellow unavailable
@@ -85,6 +93,7 @@ const giftBoxProducts = [
     id: 'gift-9',
     name: 'Royal Heritage Set',
     image: '/assets/earring&locket03.png',
+    images: ['/assets/earring&locket03.png', '/assets/earring&locket01.png', '/assets/earring&locket02.png', '/assets/earring&locket11.png'],
     price: 699,
     colors: ['Red', 'Blue', 'Green', 'Yellow'],
     availableColors: ['Red', 'Blue', 'Green', 'Yellow'],
@@ -94,6 +103,7 @@ const giftBoxProducts = [
     id: 'gift-10',
     name: 'Infinity Ring',
     image: '/assets/3ring01.png',
+    images: ['/assets/3ring01.png', '/assets/ring01.png', '/assets/1ring01.png', '/assets/2ring01.png'],
     price: 379,
     colors: ['Red', 'Pink', 'Blue'],
     availableColors: ['Red', 'Pink', 'Blue'],
@@ -103,6 +113,7 @@ const giftBoxProducts = [
     id: 'gift-11',
     name: 'Enchanted Garden Band',
     image: '/assets/3flowerband01.png',
+    images: ['/assets/3flowerband01.png', '/assets/flowerband01.png', '/assets/1flowerband01.png', '/assets/2flowerband01.png'],
     price: 429,
     colors: ['Green', 'Blue', 'Yellow'],
     availableColors: ['Green', 'Blue', 'Yellow'],
@@ -112,6 +123,7 @@ const giftBoxProducts = [
     id: 'gift-12',
     name: 'Premium Eternity Ring',
     image: '/assets/4ring01.png',
+    images: ['/assets/4ring01.png', '/assets/ring01.png', '/assets/1ring01.png', '/assets/2ring01.png'],
     price: 549,
     colors: ['Red', 'Pink', 'Green', 'Blue', 'Yellow'],
     availableColors: ['Red', 'Pink', 'Green', 'Blue', 'Yellow'],
@@ -155,32 +167,34 @@ function App() {
   // Gift Box Modal state
   const [giftBoxColor, setGiftBoxColor] = useState('Red');
   const [giftBoxQuantity, setGiftBoxQuantity] = useState(1);
+  const [selectedGalleryImage, setSelectedGalleryImage] = useState(0);
 
   // Hero slides data
+  // TO CHANGE IMAGES: Replace the image paths below with your own images from /assets/ folder
   const heroSlides = [
     {
       title: "Timeless Elegance",
       headline: "Discover Hidden Treasures",
       description: "Experience the thrill of mystery with our curated collection of surprise boxes, custom gift sets, and enchanted color cups.",
-      image: "/assets/hero1.jpg",
+      image: "/assets/ring01.png",
     },
     {
       title: "Luxury Redefined",
       headline: "Exquisite Craftsmanship",
       description: "Each piece is meticulously handcrafted by master artisans, ensuring unparalleled quality and timeless beauty.",
-      image: "/assets/hero2.jpg",
+      image: "/assets/earring&locket01.png",
     },
     {
       title: "Premium Collection",
       headline: "Curated Perfection",
       description: "From mystery boxes to elegant jewelry, every item is carefully selected to exceed your expectations.",
-      image: "/assets/hero3.jpg",
+      image: "/assets/2ring01.png",
     },
     {
       title: "Exclusive Gifts",
       headline: "Moments of Wonder",
       description: "Create unforgettable memories with our unique gift collections designed for those who appreciate luxury.",
-      image: "/assets/hero4.jpg",
+      image: "/assets/earring&locket11.png",
     },
   ];
 
@@ -197,7 +211,7 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000); // Change slide every 5 seconds
+    }, 3000); // Change slide every 3 seconds
     return () => clearInterval(interval);
   }, [heroSlides.length]);
 
@@ -365,7 +379,7 @@ function App() {
     const total = calculateTotal();
     const message = `Hello! I'd like to place an order:\n\n${orderDetails}\n\nTotal: $${total.toFixed(2)}`;
 
-    const whatsappNumber = '8801341630469';
+    const whatsappNumber = '8801335156146';
     const encodedMessage = encodeURIComponent(message);
     const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
@@ -377,37 +391,35 @@ function App() {
     setSelectedGiftBox(product);
     setGiftBoxColor(product.availableColors[0] || product.colors[0]);
     setGiftBoxQuantity(1);
+    setSelectedGalleryImage(0);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#9a8c98] to-[#4a4e69]">
+    <div className="min-h-screen bg-gradient-to-br from-[#22223b] via-[#4a4e69] to-[#2b2d42]">
       {/* Announcement Bar */}
-      <div className="bg-gradient-to-r from-surface to-[#c5a880] text-white py-3 px-4 text-center">
-        <p className="text-sm font-sans tracking-wide" style={{ color: '#eedfe3' }}>
-          Complimentary Shipping on Orders Over $200 | Free Gift Wrapping Available
+      <div className="bg-gradient-to-r from-[#ad8d60ff] via-[#c5a883] to-[#ad8d60ff] py-3 px-4 text-center">
+        <p className="text-sm font-sans font-semibold tracking-wide" style={{ color: '#e9e3eaff' }}>
+          Free Gift with 3000 Tk+ Shopping | Happy Shopping
         </p>
       </div>
 
       {/* Navbar */}
-      <nav className={`sticky top-0 z-50 transition-all duration-300 bg-white/10 backdrop-blur-xl border-b border-white/20`}>
+      <nav className={`sticky top-0 z-50 transition-all duration-300 border-b border-white/20 bg-gradient-to-r from-[#eedfe3] via-[#d4c5cc] to-[#9a8c98]`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
-            <div className="flex-shrink-0 flex items-center gap-3 cursor-pointer" onClick={() => {
+            <div className="flex-shrink-0 flex items-center cursor-pointer" onClick={() => {
               setShowGiftBoxCollection(false);
               scrollToSection('home');
             }}>
               <img
                 src="/assets/YUMORA.png"
                 alt="Yumora Logo"
-                className="h-12 w-12 object-contain"
+                className="h-16 w-auto object-contain"
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
               />
-              <h1 className="text-4xl font-display font-bold" style={{ color: '#eedfe3' }}>
-                Yumora
-              </h1>
             </div>
 
             {/* Desktop Navigation */}
@@ -420,7 +432,7 @@ function App() {
                     scrollToSection(item.toLowerCase());
                   }}
                   className="font-sans font-medium transition-colors hover:text-[#c5a880]"
-                  style={{ color: '#eedfe3' }}
+                  style={{ color: '#22223b' }}
                 >
                   {item}
                 </button>
@@ -428,7 +440,7 @@ function App() {
               <button
                 onClick={() => setIsPrivacyOpen(true)}
                 className="font-sans font-medium transition-colors hover:text-[#c5a880]"
-                style={{ color: '#eedfe3' }}
+                style={{ color: '#22223b' }}
               >
                 Privacy
               </button>
@@ -439,7 +451,7 @@ function App() {
               <button
                 onClick={() => setIsCartOpen(true)}
                 className="relative p-2 transition-colors hover:text-[#c5a880]"
-                style={{ color: '#eedfe3' }}
+                style={{ color: '#22223b' }}
               >
                 <ShoppingBag className="w-6 h-6" />
                 {cartItems.length > 0 && (
@@ -453,7 +465,7 @@ function App() {
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="md:hidden p-2 transition-colors hover:text-[#c5a880]"
-                style={{ color: '#eedfe3' }}
+                style={{ color: '#22223b' }}
               >
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -471,7 +483,7 @@ function App() {
                     scrollToSection(item.toLowerCase());
                   }}
                   className="block w-full text-left px-4 py-2 hover:bg-white/10 rounded-sm transition-colors font-sans font-medium"
-                  style={{ color: '#eedfe3' }}
+                  style={{ color: '#22223b' }}
                 >
                   {item}
                 </button>
@@ -482,7 +494,7 @@ function App() {
                   setIsMobileMenuOpen(false);
                 }}
                 className="block w-full text-left px-4 py-2 hover:bg-white/10 rounded-sm transition-colors font-sans font-medium"
-                style={{ color: '#eedfe3' }}
+                style={{ color: '#22223b' }}
               >
                 Privacy Policy
               </button>
@@ -539,7 +551,7 @@ function App() {
                             onClick={(e) => {
                               e.preventDefault();
                               setShowGiftBoxCollection(false);
-                              scrollToSection('products');
+                              scrollToSection('shop');
                             }}
                             className="px-10 py-4 font-sans font-semibold rounded-sm transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105"
                             style={{ backgroundColor: '#c5a880', color: '#fff' }}
@@ -590,7 +602,7 @@ function App() {
           </section>
 
           {/* Products Section */}
-      <section id="products" className="py-20">
+      <section id="shop" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
           <div className="text-center mb-16">
@@ -610,7 +622,8 @@ function App() {
             <div className="bg-white/10 backdrop-blur-xl rounded-sm p-10 md:p-14 border border-white/20 shadow-xl hover:shadow-2xl transition-shadow duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
-                  <h4 className="text-3xl md:text-4xl font-display font-bold" style={{ color: '#eedfe3' }}>
+                  <h4 className="text-3xl md:text-4xl font-display font-bold flex items-center gap-3" style={{ color: '#eedfe3' }}>
+                    <IceCream className="w-10 h-10" style={{ color: '#c5a880' }} />
                     Charm Mystery Box
                   </h4>
 
@@ -639,8 +652,11 @@ function App() {
                             ? { backgroundColor: '#c5a880' }
                             : { backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#eedfe3' }}
                         >
-                          <div className="text-2xl font-display">{option.scoops}</div>
-                          <div className="text-xs mt-1 opacity-80">${option.price}</div>
+                          <div className="flex items-center justify-center gap-1 text-2xl font-display">
+                            <IceCream className="w-6 h-6" />
+                            {option.scoops}
+                          </div>
+                          <div className="text-xm mt-1 opacity-80">Tk {option.price}</div>
                         </button>
                       ))}
                     </div>
@@ -649,7 +665,7 @@ function App() {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setIsCustomScoops(!isCustomScoops)}
-                        className={`px-4 py-2 rounded-sm font-sans font-semibold transition-all border-2 ${
+                        className={`px-4 py-2 rounded-sm font-sans font-semibold transition-all border-2 flex items-center gap-2 ${
                           isCustomScoops
                             ? 'text-white border-[#c5a880]'
                             : 'border-white/20 hover:border-[#c5a880]'
@@ -658,6 +674,7 @@ function App() {
                           ? { backgroundColor: '#c5a880' }
                           : { backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#eedfe3' }}
                       >
+                        <IceCream className="w-4 h-4" />
                         Custom
                       </button>
                       {isCustomScoops && (
@@ -715,11 +732,11 @@ function App() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
                   <h4 className="text-3xl md:text-4xl font-display font-bold" style={{ color: '#eedfe3' }}>
-                    Custom Gift Box Gallery
+                    Custom Gift Box
                   </h4>
 
                   <p className="font-sans leading-relaxed text-base" style={{ color: '#eedfe3', opacity: 0.8 }}>
-                    Explore our exquisite collection of handcrafted jewelry. Each piece is carefully curated to create the perfect gift.
+                    Explore our exquisite collection of Gift Products. Each product is carefully curated to create the perfect gift.
                   </p>
 
                   {/* View Collection Button */}
@@ -732,7 +749,7 @@ function App() {
                         }, 100);
                       }}
                       className="w-full lg:w-auto px-10 py-3.5 text-white font-sans font-semibold rounded-sm transition-all duration-300 shadow-md hover:shadow-lg hover:opacity-90"
-                      style={{ backgroundColor: '#c5a880' }}
+                      style={{ backgroundColor: '#b1946aff' }}
                     >
                       View Collection
                     </button>
@@ -783,7 +800,7 @@ function App() {
                     Choose your perfect shade from our vibrant collection. Each color tells a different story.
                   </p>
 
-                  <p className="font-display font-bold text-3xl" style={{ color: '#c5a880' }}>$12</p>
+                  <p className="font-display font-bold text-5xl" style={{ color: '#c5a880' }}>$12</p>
 
                   {/* Color Selector */}
                   <div className="space-y-4">
@@ -932,7 +949,7 @@ function App() {
               <button
                 onClick={() => {
                   setShowGiftBoxCollection(false);
-                  setTimeout(() => scrollToSection('products'), 100);
+                  setTimeout(() => scrollToSection('shop'), 100);
                 }}
                 className="flex items-center gap-2 px-6 py-3 font-sans font-semibold rounded-sm border-2 border-white/20 hover:border-[#c5a880] transition-all duration-300 shadow-sm hover:shadow-md"
                 style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#eedfe3' }}
@@ -950,7 +967,7 @@ function App() {
                 Our Collection
               </p>
               <h3 className="text-4xl md:text-5xl font-display font-bold mb-4" style={{ color: '#eedfe3' }}>
-                Custom Gift Box Gallery
+                Custom Gift Box
               </h3>
               <p className="font-sans text-lg max-w-2xl mx-auto" style={{ color: '#eedfe3', opacity: 0.8 }}>
                 Explore our exquisite collection and customize your perfect gift
@@ -985,8 +1002,8 @@ function App() {
                       }}
                     />
                     {!product.inStock && (
-                      <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
-                        <span className="font-sans font-bold text-sm" style={{ color: 'rgba(0, 0, 0, 0.6)' }}>SOLD OUT</span>
+                      <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+                        <span className="font-sans font-bold text-sm" style={{ color: 'rgba(0, 0, 0, 0.8)' }}>SOLD OUT</span>
                       </div>
                     )}
                   </div>
@@ -1002,28 +1019,27 @@ function App() {
       )}
 
       {/* Footer */}
-      <footer className="mt-20 bg-surface text-white py-16">
+      <footer className="mt-20 bg-gradient-to-br from-[#eedfe3] via-[#c5a880] to-[#9a8c98] py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center">
                 <img
                   src="/assets/YUMORA.png"
                   alt="Yumora Logo"
-                  className="h-20 w-20 object-contain"
+                  className="h-32 w-auto object-contain"
                   onError={(e) => {
                     e.target.style.display = 'none';
                   }}
                 />
-                <h5 className="text-2xl font-display font-bold" style={{ color: '#c5a880' }}>Yumora</h5>
               </div>
-              <p className="font-sans text-sm leading-relaxed" style={{ color: '#eedfe3', opacity: 0.7 }}>
-                Crafting timeless elegance since 1985. Premium jewelry for those who appreciate the finer things.
+              <p className="font-sans text-sm leading-relaxed" style={{ color: '#22223b', opacity: 0.8 }}>
+                Crafting timeless elegance since 2025. Premium Gifts for those who appreciate the finer things.
               </p>
             </div>
 
             <div>
-              <h6 className="font-sans font-semibold text-lg mb-4" style={{ color: '#eedfe3' }}>Quick Links</h6>
+              <h6 className="font-sans font-semibold text-lg mb-4" style={{ color: '#22223b' }}>Quick Links</h6>
               <ul className="space-y-2 font-sans text-sm">
                 {['Home', 'Shop', 'About'].map((item) => (
                   <li key={item}>
@@ -1032,8 +1048,8 @@ function App() {
                         setShowGiftBoxCollection(false);
                         setTimeout(() => scrollToSection(item.toLowerCase()), 100);
                       }}
-                      className="transition-colors hover:text-[#c5a880]"
-                      style={{ color: '#eedfe3', opacity: 0.7 }}
+                      className="transition-colors hover:text-[#4a4e69]"
+                      style={{ color: '#22223b', opacity: 0.8 }}
                     >
                       {item}
                     </button>
@@ -1042,8 +1058,8 @@ function App() {
                 <li>
                   <button
                     onClick={() => setIsPrivacyOpen(true)}
-                    className="transition-colors hover:text-[#c5a880]"
-                    style={{ color: '#eedfe3', opacity: 0.7 }}
+                    className="transition-colors hover:text-[#4a4e69]"
+                    style={{ color: '#22223b', opacity: 0.8 }}
                   >
                     Privacy Policy
                   </button>
@@ -1052,45 +1068,82 @@ function App() {
             </div>
 
             <div>
-              <h6 className="font-sans font-semibold text-lg mb-4" style={{ color: '#eedfe3' }}>Contact</h6>
+              <h6 className="font-sans font-semibold text-lg mb-4" style={{ color: '#22223b' }}>Contact</h6>
               <ul className="space-y-3 font-sans text-sm">
-                <li className="flex items-start space-x-3" style={{ color: '#eedfe3', opacity: 0.7 }}>
-                  <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#c5a880' }} />
-                  <span>123 Luxury Avenue, New York, NY 10001</span>
+                <li className="flex items-start space-x-3" style={{ color: '#22223b', opacity: 0.8 }}>
+                  <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#4a4e69' }} />
+                  <span>Dhaka, Bangladesh</span>
                 </li>
-                <li className="flex items-center space-x-3" style={{ color: '#eedfe3', opacity: 0.7 }}>
-                  <Phone className="w-5 h-5 flex-shrink-0" style={{ color: '#c5a880' }} />
-                  <span>+880 1341 630469</span>
+                <li className="flex items-center space-x-3" style={{ color: '#22223b', opacity: 0.8 }}>
+                  <Phone className="w-5 h-5 flex-shrink-0" style={{ color: '#4a4e69' }} />
+                  <span>+880 1335 156146</span>
                 </li>
-                <li className="flex items-center space-x-3" style={{ color: '#eedfe3', opacity: 0.7 }}>
-                  <Mail className="w-5 h-5 flex-shrink-0" style={{ color: '#c5a880' }} />
-                  <span>hello@yumora.com</span>
+                <li className="flex items-center space-x-3" style={{ color: '#22223b', opacity: 0.8 }}>
+                  <Mail className="w-5 h-5 flex-shrink-0" style={{ color: '#4a4e69' }} />
+                  <span>yumorabd@gmail.com</span>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h6 className="font-sans font-semibold text-lg mb-4" style={{ color: '#eedfe3' }}>Follow Us</h6>
+              <h6 className="font-sans font-semibold text-lg mb-4" style={{ color: '#22223b' }}>Connect With Us</h6>
               <div className="flex space-x-4">
-                {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                  <a
-                    key={i}
-                    href="#"
-                    className="w-10 h-10 rounded-sm bg-white/10 flex items-center justify-center transition-colors"
-                    style={{ color: '#eedfe3' }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c5a880'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
-                  >
-                    <Icon className="w-5 h-5" />
-                  </a>
-                ))}
+                {/* Instagram - UPDATE YOUR INSTAGRAM LINK HERE */}
+                <a
+                  href="https://www.instagram.com/yumorabd/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-sm bg-[#22223b]/20 flex items-center justify-center transition-colors"
+                  style={{ color: '#22223b' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b52c67ff'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(34, 34, 59, 0.2)'}
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+
+                {/* Facebook - UPDATE YOUR FACEBOOK LINK HERE */}
+                <a
+                  href="https://www.facebook.com/yumorabd"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-sm bg-[#22223b]/20 flex items-center justify-center transition-colors"
+                  style={{ color: '#22223b' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3f4eb1ff'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(34, 34, 59, 0.2)'}
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+
+                {/* WhatsApp - Connected to your WhatsApp number */}
+                <a
+                  href="https://wa.me/8801335156146"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-sm bg-[#22223b]/20 flex items-center justify-center transition-colors"
+                  style={{ color: '#22223b' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#20b758ff'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(34, 34, 59, 0.2)'}
+                >
+                  <MessageCircle className="w-5 h-5" />
+                </a>
+
+                {/* Email - Connected to your email */}
+                <a
+                  href="mailto:yumorabd@gmail.com"
+                  className="w-10 h-10 rounded-sm bg-[#22223b]/20 flex items-center justify-center transition-colors"
+                  style={{ color: '#22223b' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c62828ff'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(34, 34, 59, 0.2)'}
+                >
+                  <Mail className="w-5 h-5" />
+                </a>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-white/10 pt-8 text-center">
-            <p className="font-sans text-sm" style={{ color: '#eedfe3', opacity: 0.5 }}>
-              © 2024 Yumora. All rights reserved. Crafted with excellence.
+          <div className="border-t border-[#22223b]/20 pt-8 text-center">
+            <p className="font-sans text-sm" style={{ color: '#040405ff', opacity: 0.6 }}>
+              © 2025 Yumora by <a href="https://github.com/msabrin" target="_blank" rel="noopener noreferrer"> <strong>Mirza Sabrin</strong></a> .All rights reserved. Crafted with excellence.
             </p>
           </div>
         </div>
@@ -1108,20 +1161,49 @@ function App() {
             </button>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 p-10">
-              {/* Left - Image */}
-              <div className="aspect-square rounded-sm overflow-hidden border border-primary/20 shadow-lg">
-                <img
-                  src={selectedGiftBox.image}
-                  alt={selectedGiftBox.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    const fallback = document.createElement('div');
-                    fallback.className = 'w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10';
-                    fallback.innerHTML = `<span class="text-surface font-display text-6xl font-bold">${selectedGiftBox.name[0]}</span>`;
-                    e.target.parentElement.appendChild(fallback);
-                  }}
-                />
+              {/* Left - Image Gallery */}
+              <div className="space-y-4">
+                {/* Main Image */}
+                <div className="aspect-square rounded-sm overflow-hidden border border-primary/20 shadow-lg">
+                  <img
+                    src={selectedGiftBox.images ? selectedGiftBox.images[selectedGalleryImage] : selectedGiftBox.image}
+                    alt={selectedGiftBox.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      const fallback = document.createElement('div');
+                      fallback.className = 'w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10';
+                      fallback.innerHTML = `<span class="text-surface font-display text-6xl font-bold">${selectedGiftBox.name[0]}</span>`;
+                      e.target.parentElement.appendChild(fallback);
+                    }}
+                  />
+                </div>
+
+                {/* Thumbnails */}
+                {selectedGiftBox.images && selectedGiftBox.images.length > 1 && (
+                  <div className="grid grid-cols-4 gap-2">
+                    {selectedGiftBox.images.map((img, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedGalleryImage(index)}
+                        className={`aspect-square rounded-sm overflow-hidden border-2 transition-all ${
+                          selectedGalleryImage === index
+                            ? 'border-primary shadow-lg'
+                            : 'border-primary/20 hover:border-primary/50'
+                        }`}
+                      >
+                        <img
+                          src={img}
+                          alt={`${selectedGiftBox.name} view ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Right - Details */}
@@ -1361,7 +1443,7 @@ function App() {
             </div>
 
             <div className="px-8 py-6 overflow-y-auto max-h-[calc(90vh-100px)] font-sans text-surface/70 space-y-6">
-              <p className="text-sm text-surface/60">Last updated: December 2024</p>
+              <p className="text-sm text-surface/60">Last updated: December 2025</p>
 
               {[
                 {
@@ -1394,7 +1476,7 @@ function App() {
                 },
                 {
                   title: '8. Contact Us',
-                  content: 'If you have any questions about this privacy policy or our data practices, please contact us at privacy@yumora.com or call us at +880 1341 630469.'
+                  content: 'If you have any questions about this privacy policy or our data practices, please contact us at privacy@yumora.com or call us at +880 1335 156146.'
                 }
               ].map((section, i) => (
                 <div key={i} className="space-y-3">
