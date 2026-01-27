@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
 import { ShoppingBag, Menu, X, Phone, Mail, MapPin, Instagram, Facebook, MessageCircle, IceCream } from 'lucide-react';
 
+// ============================================
+// DISCOUNT CODES - UPDATE HERE TO CHANGE CODES
+// ============================================
+const VALID_CODES = {
+  'SAVE10': 0.10,    // 10% discount
+  'GIFT20': 0.20,    // 20% discount
+  'WELCOME15': 0.15, // 15% discount
+  'VIP25': 0.25      // 25% discount
+};
+// ============================================
+
 // Product data with availability
 const mysteryBoxOptions = [
   { scoops: 1, price: 15 },
@@ -12,6 +23,7 @@ const giftBoxProducts = [
   {
     id: 'gift-1',
     name: 'Finger Ring',
+    description: 'Elegant and stylish finger ring perfect for any occasion. Features a delicate design that adds charm to your everyday look.',
     image: '/assets/ring01.png',
     images: ['/assets/ring01.png', '/assets/1ring01.png', '/assets/2ring01.png'],
     price: 40,
@@ -22,6 +34,7 @@ const giftBoxProducts = [
   {
     id: 'gift-2',
     name: 'Premium Earring',
+    description: 'Premium quality earrings with intricate details. Lightweight and comfortable for all-day wear, perfect for special events.',
     image: '/assets/earring.png',
     images: ['/assets/earring.png', '/assets/earring1.png', '/assets/Earring2.png'],
     price: 349,
@@ -32,6 +45,7 @@ const giftBoxProducts = [
   {
     id: 'gift-3',
     name: 'Earring & Locket Set',
+    description: 'Beautiful matching earring and locket set. Coordinated design that creates a sophisticated and cohesive look.',
     image: '/assets/earringlocket.png',
     images: ['/assets/earringlocket.png', '/assets/earringlocket1.png', '/assets/earringlocket2.png', '/assets/earringlocket3.png', '/assets/earringlocket4.png', '/assets/earringlocket5.png', '/assets/earringlocket6.png', '/assets/earringlocket7.png', '/assets/earringlocket8.png'],
     price: 599,
@@ -42,6 +56,7 @@ const giftBoxProducts = [
   {
     id: 'gift-4',
     name: 'Stone Earring & Locket Set',
+    description: 'Stunning stone-studded earring and locket set. Features premium quality stones that sparkle and shine beautifully.',
     image: '/assets/stoneearringlocket.png',
     images: ['/assets/stoneearringlocket.png', '/assets/stoneearringlocket1.png', '/assets/stoneearringlocket2.png'],
     price: 449,
@@ -52,6 +67,7 @@ const giftBoxProducts = [
   {
     id: 'gift-5',
     name: 'Unique Erasser',
+    description: 'Creative and fun erasers in various unique designs. Perfect for students or as collectible items.',
     image: '/assets/eraser.jpg',
     images: ['/assets/eraser.jpg', '/assets/eraser1.png', '/assets/eraser2.png', '/assets/eraser3.png', '/assets/eraser4.png', '/assets/eraser5.png', '/assets/eraser6.png'],
     price: 389,
@@ -62,6 +78,7 @@ const giftBoxProducts = [
   {
     id: 'gift-6',
     name: 'Elegant Bag',
+    description: 'Stylish and practical bag with multiple compartments. Perfect for daily use with a touch of elegance.',
     image: '/assets/bag.png',
     images: ['/assets/bag.png', '/assets/bag1.jpg'],
     price: 649,
@@ -72,6 +89,7 @@ const giftBoxProducts = [
   {
     id: 'gift-7',
     name: 'Beauty Blender',
+    description: 'Professional-grade beauty blender for flawless makeup application. Soft, durable, and perfect for blending foundation and concealer.',
     image: '/assets/Beautyblander.png',
     images: ['/assets/Beautyblander.png', '/assets/Beautyblender1.png'],
     price: 329,
@@ -82,6 +100,7 @@ const giftBoxProducts = [
   {
     id: 'gift-8',
     name: 'Crunchy Hair Band',
+    description: 'Trendy and comfortable scrunchies that hold your hair gently without damage. Available in a variety of colors to match any outfit.',
     image: '/assets/Crunchy.png',
     images: ['/assets/Crunchy.png', '/assets/Chunchy1.png'],
     price: 419,
@@ -92,6 +111,7 @@ const giftBoxProducts = [
   {
     id: 'gift-9',
     name: 'Braclet',
+    description: 'Chic bracelet that adds a modern touch to any outfit. Adjustable and comfortable for everyday wear.',
     image: '/assets/braslet.png',
     images: ['/assets/braslet.png', '/assets/braclet1.png', '/assets/braclet2.png', '/assets/braclet3.png'],
     price: 699,
@@ -102,6 +122,7 @@ const giftBoxProducts = [
   {
     id: 'gift-10',
     name: 'Minicher Mug',
+    description: 'Adorable miniature mug charm perfect for keychains or decorative purposes. A cute and unique accessory.',
     image: '/assets/Charm.png',
     images: ['/assets/Charm.png'],
     price: 379,
@@ -112,6 +133,7 @@ const giftBoxProducts = [
   {
     id: 'gift-11',
     name: 'Hair CLips',
+    description: 'Decorative hair clips that securely hold your hair in place. Stylish and functional for various hairstyles.',
     image: '/assets/hairpin.png',
     images: ['/assets/hairpin.png', '/assets/hairpin1.png'],
     price: 429,
@@ -122,6 +144,7 @@ const giftBoxProducts = [
   {
     id: 'gift-12',
     name: 'Premium Lip Stick',
+    description: 'Long-lasting premium lipstick with rich color and smooth application. Moisturizing formula for beautiful, comfortable lips.',
     image: '/assets/Lipstick.png',
     images: ['/assets/Lipstick.png', '/assets/Lipstick1.png', '/assets/lipstick2.png', '/assets/2ring01.png'],
     price: 549,
@@ -132,6 +155,7 @@ const giftBoxProducts = [
   {
     id: 'gift-13',
     name: 'Floral Lip Gel',
+    description: 'Moisturizing lip gel infused with floral extracts. Provides a glossy finish while keeping your lips hydrated and soft.',
     image: '/assets/Lipgel.jpg',
     images: ['/assets/Lipgel.jpg'],
     price: 549,
@@ -142,6 +166,7 @@ const giftBoxProducts = [
   {
     id: 'gift-14',
     name: 'Beauty Lip Gloss',
+    description: 'High-shine lip gloss that adds volume and dimension to your lips. Non-sticky formula for comfortable all-day wear.',
     image: '/assets/Lipgloss.png',
     images: ['/assets/Lipgloss.png'],
     price: 549,
@@ -152,6 +177,7 @@ const giftBoxProducts = [
   {
     id: 'gift-15',
     name: 'Modern Nails',
+    description: 'Premium press-on nails with modern designs. Easy to apply and remove, perfect for a quick nail makeover.',
     image: '/assets/Fakenails.png',
     images: ['/assets/Fakenails.png'],
     price: 549,
@@ -162,6 +188,7 @@ const giftBoxProducts = [
   {
     id: 'gift-16',
     name: 'Face Mask',
+    description: 'Comfortable and breathable face mask in trendy colors. Washable and reusable for everyday protection.',
     image: '/assets/Facemask.png',
     images: ['/assets/Facemask.png'],
     price: 549,
@@ -172,6 +199,7 @@ const giftBoxProducts = [
   {
     id: 'gift-17',
     name: 'Mud Mask',
+    description: 'Purifying mud mask that deeply cleanses pores and removes impurities. Leaves skin feeling refreshed and revitalized.',
     image: '/assets/Mudmask.jpg',
     images: ['/assets/Mudmask.jpg'],
     price: 549,
@@ -182,6 +210,7 @@ const giftBoxProducts = [
   {
     id: 'gift-18',
     name: 'Candy Mask',
+    description: 'Sweet-scented beauty mask with nourishing ingredients. Treats your skin while providing a delightful aromatherapy experience.',
     image: '/assets/candymask.jpeg',
     images: ['/assets/candymask.jpeg', '/assets/candymask1.jpeg', '/assets/candymask2.jpeg'],
     price: 549,
@@ -192,6 +221,7 @@ const giftBoxProducts = [
   {
     id: 'gift-19',
     name: 'Mirror',
+    description: 'Compact handheld mirror perfect for on-the-go touch-ups. Clear reflection with an elegant design.',
     image: '/assets/Mirror.png',
     images: ['/assets/Mirror.png'],
     price: 549,
@@ -202,6 +232,7 @@ const giftBoxProducts = [
   {
     id: 'gift-20',
     name: 'Companion Mug',
+    description: 'Charming ceramic mug perfect for your favorite hot beverages. Comfortable handle and generous capacity.',
     image: '/assets/Mug.png',
     images: ['/assets/Mug.png', '/assets/mug1.png'],
     price: 549,
@@ -212,6 +243,7 @@ const giftBoxProducts = [
   {
     id: 'gift-21',
     name: 'Diary To Keep Your Secrets Secure',
+    description: 'Beautiful diary with lock and key to keep your thoughts private. Quality paper perfect for daily journaling.',
     image: '/assets/dairy.png',
     images: ['/assets/dairy.png', '/assets/dairy1.png'],
     price: 549,
@@ -222,6 +254,7 @@ const giftBoxProducts = [
   {
     id: 'gift-22',
     name: 'Washi Type',
+    description: 'Decorative washi tape perfect for crafts, journals, and gift wrapping. Easy to tear and reposition.',
     image: '/assets/Washitape.png',
     images: ['/assets/Washitape.png'],
     price: 549,
@@ -232,6 +265,7 @@ const giftBoxProducts = [
   {
     id: 'gift-23',
     name: 'Nail Sticker',
+    description: 'Easy-to-apply nail stickers in trendy designs. Long-lasting and perfect for quick nail art.',
     image: '/assets/Nailsticker.png',
     images: ['/assets/Nailsticker.png'],
     price: 549,
@@ -242,6 +276,7 @@ const giftBoxProducts = [
   {
     id: 'gift-24',
     name: 'High Lighter',
+    description: 'Vibrant highlighter markers perfect for studying and organizing notes. Chisel tip for both thick and thin lines.',
     image: '/assets/Highlighter.png',
     images: ['/assets/Highlighter.png', '/assets/Highlighter1.png'],
     price: 549,
@@ -252,6 +287,7 @@ const giftBoxProducts = [
   {
     id: 'gift-25',
     name: 'Tip',
+    description: 'Colorful decorative tip perfect for personalizing your stationery and accessories. Fun and creative design.',
     image: '/assets/Tip.png',
     images: ['/assets/Tip.png'],
     price: 549,
@@ -271,7 +307,7 @@ const colorStyles = {
   Blue: 'bg-blue-500',
   Purple: 'bg-purple-500',
   Yellow: 'bg-yellow-400',
-  Silver: 'bg-#146, 146, 148',
+  Silver: '',
   Golden: '',
   Rainbow: '',
   Orange: '',
@@ -292,6 +328,13 @@ function App() {
   const [scrolled, setScrolled] = useState(false);
   const [showGiftBoxCollection, setShowGiftBoxCollection] = useState(false);
 
+  // Discount state
+  const [discount, setDiscount] = useState(0); // Decimal value (e.g., 0.10 for 10%)
+  const [discountCode, setDiscountCode] = useState(''); // Applied discount code
+  const [discountInput, setDiscountInput] = useState(''); // Input field value in cart
+  const [showBuyNowModal, setShowBuyNowModal] = useState(false); // Buy Now discount popup
+  const [buyNowProduct, setBuyNowProduct] = useState(null); // Product for Buy Now popup
+
   // Hero Slider state
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -308,6 +351,7 @@ function App() {
   const [giftBoxColor, setGiftBoxColor] = useState('Red');
   const [giftBoxQuantity, setGiftBoxQuantity] = useState(1);
   const [selectedGalleryImage, setSelectedGalleryImage] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0); // Track which image is selected for cart/WhatsApp
 
   // Hero slides data
   // TO CHANGE IMAGES: Replace the image paths below with your own images from /assets/ folder
@@ -362,6 +406,28 @@ function App() {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setIsMobileMenuOpen(false);
     }
+  };
+
+  // Apply discount code function
+  const applyDiscountCode = (code) => {
+    const upperCode = code.toUpperCase().trim();
+
+    if (VALID_CODES[upperCode]) {
+      setDiscount(VALID_CODES[upperCode]);
+      setDiscountCode(upperCode);
+      alert(`Discount code "${upperCode}" applied! You save ${(VALID_CODES[upperCode] * 100).toFixed(0)}%`);
+      return true;
+    } else {
+      alert('Invalid discount code');
+      return false;
+    }
+  };
+
+  // Remove discount
+  const removeDiscount = () => {
+    setDiscount(0);
+    setDiscountCode('');
+    setDiscountInput('');
   };
 
   // Add to cart function
@@ -447,6 +513,11 @@ function App() {
       return;
     }
 
+    // Get the selected image URL from the product's images array
+    const selectedImage = selectedGiftBox.images && selectedGiftBox.images.length > 0
+      ? selectedGiftBox.images[selectedImageIndex]
+      : selectedGiftBox.image;
+
     const item = {
       id: `${selectedGiftBox.id}-${giftBoxColor}`,
       name: selectedGiftBox.name,
@@ -454,7 +525,8 @@ function App() {
       color: giftBoxColor,
       price: selectedGiftBox.price,
       quantity: giftBoxQuantity,
-      image: selectedGiftBox.image
+      image: selectedImage, // Use the selected image instead of default
+      selectedImageUrl: selectedImage // Store selected image URL for WhatsApp
     };
 
     addToCart(item);
@@ -462,20 +534,61 @@ function App() {
     alert('Added to cart!');
   };
 
-  // Buy Now functions
+  // Buy Now functions - Show discount popup
   const buyNowMysteryBox = () => {
-    addMysteryBoxToCart();
-    setTimeout(() => setIsCartOpen(true), 300);
+    const scoops = isCustomScoops ? parseInt(customScoops) : mysteryBoxScoops;
+    if (!scoops || scoops < 1) {
+      alert('Please select a valid number of scoops');
+      return;
+    }
+
+    let price;
+    if (scoops === 1) price = 15;
+    else if (scoops === 2) price = 28;
+    else if (scoops === 3) price = 40;
+    else price = scoops * 15;
+
+    setBuyNowProduct({
+      name: 'Charm Mystery Box',
+      price: price,
+      type: 'mystery-box'
+    });
+    setShowBuyNowModal(true);
   };
 
   const buyNowColorCup = () => {
-    addColorCupToCart();
-    setTimeout(() => setIsCartOpen(true), 300);
+    if (!availableCupColors.includes(cupColor)) {
+      alert('This color is currently unavailable');
+      return;
+    }
+
+    setBuyNowProduct({
+      name: 'Mystery Color Cup',
+      price: 12,
+      type: 'color-cup'
+    });
+    setShowBuyNowModal(true);
   };
 
   const buyNowGiftBox = () => {
-    addGiftBoxToCart();
-    setTimeout(() => setIsCartOpen(true), 300);
+    if (!selectedGiftBox) return;
+
+    if (!selectedGiftBox.inStock) {
+      alert('This product is currently sold out');
+      return;
+    }
+
+    if (!selectedGiftBox.availableColors.includes(giftBoxColor)) {
+      alert('This color is currently unavailable');
+      return;
+    }
+
+    setBuyNowProduct({
+      name: selectedGiftBox.name,
+      price: selectedGiftBox.price,
+      type: 'gift-box'
+    });
+    setShowBuyNowModal(true);
   };
 
   // Remove from cart
@@ -498,6 +611,12 @@ function App() {
 
   // Calculate total
   const calculateTotal = () => {
+    const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return subtotal * (1 - discount); // Apply discount formula: Total = Subtotal × (1 - Discount)
+  };
+
+  // Calculate subtotal (before discount)
+  const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
@@ -513,11 +632,27 @@ function App() {
       if (item.scoops) details += ` (${item.scoops} Scoops)`;
       if (item.color) details += ` (${item.color})`;
       details += ` - $${item.price * item.quantity}`;
+      // Add selected image URL if available
+      if (item.selectedImageUrl) {
+        details += `\nImage: ${item.selectedImageUrl}`;
+      }
       return details;
-    }).join('\n');
+    }).join('\n\n');
 
+    const subtotal = calculateSubtotal();
     const total = calculateTotal();
-    const message = `Hello! I'd like to place an order:\n\n${orderDetails}\n\nTotal: $${total.toFixed(2)}`;
+
+    // Build message with discount information
+    let message = `Hello! I'd like to place an order:\n\n${orderDetails}\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `Original Price: $${subtotal.toFixed(2)}\n`;
+
+    if (discount > 0 && discountCode) {
+      message += `Discount Code: ${discountCode} (-${(discount * 100).toFixed(0)}%)\n`;
+      message += `Discount Amount: -$${(subtotal * discount).toFixed(2)}\n`;
+    }
+
+    message += `Final Total: $${total.toFixed(2)}`;
 
     const whatsappNumber = '8801335156146';
     const encodedMessage = encodeURIComponent(message);
@@ -532,6 +667,7 @@ function App() {
     setGiftBoxColor(product.availableColors[0] || product.colors[0]);
     setGiftBoxQuantity(1);
     setSelectedGalleryImage(0);
+    setSelectedImageIndex(0); // Initialize with first image selected
   };
 
   return (
@@ -1325,8 +1461,11 @@ function App() {
                     {selectedGiftBox.images.map((img, index) => (
                       <button
                         key={index}
-                        onClick={() => setSelectedGalleryImage(index)}
-                        className={`aspect-square rounded-sm overflow-hidden border-2 transition-all ${
+                        onClick={() => {
+                          setSelectedGalleryImage(index);
+                          setSelectedImageIndex(index); // Also mark as selected
+                        }}
+                        className={`relative aspect-square rounded-sm overflow-hidden border-2 transition-all ${
                           selectedGalleryImage === index
                             ? 'border-primary shadow-lg'
                             : 'border-primary/20 hover:border-primary/50'
@@ -1340,6 +1479,14 @@ function App() {
                             e.target.style.display = 'none';
                           }}
                         />
+                        {/* Selected indicator */}
+                        {selectedImageIndex === index && (
+                          <div className="absolute top-1 right-1 bg-primary rounded-full p-1 shadow-lg">
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                            </svg>
+                          </div>
+                        )}
                       </button>
                     ))}
                   </div>
@@ -1359,6 +1506,12 @@ function App() {
                     {!selectedGiftBox.inStock && (
                       <p className="text-sm font-sans text-red-600 mt-2 font-semibold">
                         Currently Sold Out
+                      </p>
+                    )}
+                    {/* Product Description */}
+                    {selectedGiftBox.description && (
+                      <p className="text-sm font-sans text-surface/70 mt-4 leading-relaxed">
+                        {selectedGiftBox.description}
                       </p>
                     )}
                   </div>
@@ -1545,12 +1698,69 @@ function App() {
 
               {cartItems.length > 0 && (
                 <div className="border-t border-primary/20 px-6 py-6 space-y-4">
-                  <div className="flex justify-between items-center text-lg">
+                  {/* Discount Code Section */}
+                  <div className="space-y-2">
+                    <label className="text-surface font-sans font-semibold text-sm">Discount Code:</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={discountInput}
+                        onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
+                        placeholder="Enter code"
+                        disabled={!!discountCode}
+                        className="flex-1 px-4 py-2 rounded-sm border-2 border-primary/20 text-surface font-sans focus:outline-none focus:border-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      />
+                      {!discountCode ? (
+                        <button
+                          onClick={() => {
+                            if (applyDiscountCode(discountInput)) {
+                              setDiscountInput('');
+                            }
+                          }}
+                          className="px-6 py-2 bg-primary text-white font-sans font-semibold rounded-sm hover:bg-surface transition-colors"
+                        >
+                          Apply
+                        </button>
+                      ) : (
+                        <button
+                          onClick={removeDiscount}
+                          className="px-6 py-2 bg-red-500 text-white font-sans font-semibold rounded-sm hover:bg-red-600 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    {discountCode && (
+                      <p className="text-xs text-green-600 font-sans font-semibold">
+                        Code "{discountCode}" applied - {(discount * 100).toFixed(0)}% off
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Subtotal and Total */}
+                  {discount > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-sans text-surface/70">Subtotal:</span>
+                      <span className="font-sans text-surface/70">
+                        ${calculateSubtotal().toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                  {discount > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-sans text-surface/70">Discount ({(discount * 100).toFixed(0)}%):</span>
+                      <span className="font-sans text-green-600 font-semibold">
+                        -${(calculateSubtotal() * discount).toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center text-lg border-t border-primary/20 pt-4">
                     <span className="font-sans font-semibold text-surface">Total:</span>
                     <span className="font-display font-bold text-2xl text-primary">
                       ${calculateTotal().toFixed(2)}
                     </span>
                   </div>
+
                   <button
                     onClick={handleWhatsAppCheckout}
                     className="w-full py-4 bg-primary text-white font-sans font-bold rounded-sm hover:bg-surface transition-colors flex items-center justify-center gap-2"
@@ -1563,6 +1773,101 @@ function App() {
                   </p>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Buy Now Discount Code Modal */}
+      {showBuyNowModal && buyNowProduct && (
+        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4 bg-surface/70 backdrop-blur-lg">
+          <div className="relative bg-white rounded-sm shadow-2xl max-w-md w-full border-2 border-primary/20">
+            <button
+              onClick={() => {
+                setShowBuyNowModal(false);
+                setBuyNowProduct(null);
+              }}
+              className="absolute top-6 right-6 z-10 p-2 hover:bg-primary/10 rounded-sm transition-colors"
+            >
+              <X className="w-6 h-6 text-surface" />
+            </button>
+
+            <div className="p-8 space-y-6">
+              <div className="text-center">
+                <h3 className="text-2xl font-display font-bold text-surface mb-2">
+                  Quick Purchase
+                </h3>
+                <p className="text-sm font-sans text-surface/70">
+                  Do you have a discount code?
+                </p>
+              </div>
+
+              {/* Product Summary */}
+              <div className="bg-light/30 rounded-sm p-4 border border-primary/10">
+                <h4 className="font-sans font-semibold text-surface mb-2">
+                  {buyNowProduct.name}
+                </h4>
+                <p className="text-2xl font-display font-bold text-primary">
+                  ${buyNowProduct.price}
+                </p>
+              </div>
+
+              {/* Discount Code Input */}
+              <div className="space-y-2">
+                <label className="text-surface font-sans font-semibold text-sm">Discount Code (Optional):</label>
+                <input
+                  type="text"
+                  value={discountInput}
+                  onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
+                  placeholder="Enter discount code"
+                  className="w-full px-4 py-3 rounded-sm border-2 border-primary/20 text-surface font-sans focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    if (discountInput.trim()) {
+                      applyDiscountCode(discountInput);
+                    }
+                    // Add to cart and open cart
+                    if (buyNowProduct.type === 'mystery-box') {
+                      addMysteryBoxToCart();
+                    } else if (buyNowProduct.type === 'color-cup') {
+                      addColorCupToCart();
+                    } else if (buyNowProduct.type === 'gift-box') {
+                      addGiftBoxToCart();
+                    }
+                    setShowBuyNowModal(false);
+                    setBuyNowProduct(null);
+                    setDiscountInput('');
+                    setTimeout(() => setIsCartOpen(true), 300);
+                  }}
+                  className="w-full px-6 py-4 bg-primary text-white font-sans font-bold rounded-sm hover:bg-surface transition-colors"
+                >
+                  Submit & Continue
+                </button>
+                <button
+                  onClick={() => {
+                    // Skip discount and proceed
+                    if (buyNowProduct.type === 'mystery-box') {
+                      addMysteryBoxToCart();
+                    } else if (buyNowProduct.type === 'color-cup') {
+                      addColorCupToCart();
+                    } else if (buyNowProduct.type === 'gift-box') {
+                      addGiftBoxToCart();
+                    }
+                    setShowBuyNowModal(false);
+                    setBuyNowProduct(null);
+                    setDiscountInput('');
+                    setTimeout(() => setIsCartOpen(true), 300);
+                  }}
+                  className="w-full px-6 py-4 bg-white text-surface font-sans font-semibold rounded-sm border-2 border-primary/20 hover:border-primary transition-colors"
+                >
+                  Skip & Continue
+                </button>
+              </div>
             </div>
           </div>
         </div>
