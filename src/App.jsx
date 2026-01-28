@@ -300,24 +300,57 @@ const giftBoxProducts = [
 const colorOptions = ['Red', 'Pink', 'Green', 'Blue', 'Purple', 'Yellow'];
 const availableCupColors = ['Red', 'Green', 'Blue', 'Purple']; // Pink and Yellow unavailable
 
-const colorStyles = {
-  Red: 'bg-red-500',
-  Pink: 'bg-pink-400',
-  Green: 'bg-green-500',
-  Blue: 'bg-blue-500',
-  Purple: 'bg-purple-500',
-  Yellow: 'bg-yellow-400',
-  Silver: '',
-  Golden: '',
-  Rainbow: '',
-  Orange: '',
-  LightPink: '',
-  Cream: '',
-  Black: '',
-  LightBrown: '',
-  White: '',
-  Nude: '',
+// Color configuration with HEX codes and light/dark classification
+const colorConfig = {
+  Red: { bg: '#8bd0e0', isLight: true },      // Custom teal (light)
+  Pink: { bg: '#F472B6', isLight: false },
+  Green: { bg: '#22C55E', isLight: false },
+  Blue: { bg: '#3B82F6', isLight: false },
+  Purple: { bg: '#A855F7', isLight: false },
+  Yellow: { bg: '#FACC15', isLight: true },
+  Silver: { bg: '#C0C0C0', isLight: true },
+  Golden: { bg: '#D4AF37', isLight: false },
+  Rainbow: { bg: 'gradient', isLight: false },
+  Orange: { bg: '#F97316', isLight: false },
+  'Light Pink': { bg: '#FBB6CE', isLight: true },
+  Cream: { bg: '#FFFDD0', isLight: true },
+  Black: { bg: '#1F2937', isLight: false },
+  'Light Brown': { bg: '#A78B71', isLight: false },
+  White: { bg: '#F9FAFB', isLight: true },
+  Nude: { bg: '#E3BC9A', isLight: true },
+  Maroon: { bg: '#800020', isLight: false },
+  Marron: { bg: '#800020', isLight: false },
 };
+
+// Helper function to get color styles
+const getColorStyle = (colorName) => {
+  const config = colorConfig[colorName];
+  if (!config) return { bgClass: 'bg-gray-300', textClass: 'text-black' };
+
+  if (config.bg === 'gradient') {
+    return {
+      bgClass: 'bg-gradient-to-r from-[#FF0000] via-[#00FF00] to-[#0000FF]',
+      textClass: 'text-white'
+    };
+  }
+
+  const bgClass = colorName === 'White'
+    ? `bg-[${config.bg}] border border-gray-300`
+    : `bg-[${config.bg}]`;
+  const textClass = config.isLight ? 'text-gray-800' : 'text-white';
+
+  return { bgClass, textClass };
+};
+
+// Bangladeshi phone validation
+const validateBDPhone = (phone) => {
+  // Remove any spaces or dashes
+  const cleanPhone = phone.replace(/[\s-]/g, '');
+  // Check if it's exactly 11 digits and starts with valid BD prefixes
+  const bdPhoneRegex = /^(013|014|015|016|017|018|019)\d{8}$/;
+  return bdPhoneRegex.test(cleanPhone);
+};
+
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
@@ -340,6 +373,7 @@ function App() {
   const [confirmOrderProduct, setConfirmOrderProduct] = useState(null);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
   const [deliveryType, setDeliveryType] = useState('inside'); // 'inside' or 'outside'
   const [copiedNumber, setCopiedNumber] = useState(null);
@@ -593,6 +627,7 @@ function App() {
 
     setConfirmOrderProduct({
       name: 'Charm Mystery Box',
+      description: 'Unlock the unknown with our curated mystery collection. Each scoop reveals treasures beyond imagination.',
       price: price,
       type: 'mystery-box',
       scoops: scoops,
@@ -610,6 +645,7 @@ function App() {
 
     setConfirmOrderProduct({
       name: 'Mystery Color Cup',
+      description: 'Choose your perfect shade from our vibrant collection. Each color tells a different story.',
       price: 12,
       type: 'color-cup',
       color: cupColor,
@@ -638,6 +674,7 @@ function App() {
 
     setConfirmOrderProduct({
       name: selectedGiftBox.name,
+      description: selectedGiftBox.description,
       price: selectedGiftBox.price,
       type: 'gift-box',
       color: giftBoxColor,
@@ -668,6 +705,11 @@ function App() {
       return;
     }
 
+    if (!validateBDPhone(customerPhone)) {
+      alert('Please enter a valid 11-digit Bangladeshi phone number (starting with 013-019)');
+      return;
+    }
+
     if (!confirmOrderProduct) return;
 
     const deliveryFee = getDeliveryFee();
@@ -684,13 +726,14 @@ function App() {
       finalTotal = afterDiscount + deliveryFee;
 
       // Build detailed product list
-      productDetails = confirmOrderProduct.cartItems.map(item => {
-        let details = `• *${item.name}*`;
-        if (item.scoops) details += ` (${item.scoops} Scoops)`;
-        if (item.color) details += ` - ${item.color}`;
-        details += ` x${item.quantity} = ৳${item.price * item.quantity}`;
+      productDetails = confirmOrderProduct.cartItems.map((item, idx) => {
+        let details = `\n*${idx + 1}. ${item.name}*`;
+        if (item.scoops) details += `\n   🧊 Scoops: ${item.scoops}`;
+        if (item.color) details += `\n   🎨 Color: ${item.color}`;
+        details += `\n   📦 Qty: ${item.quantity}`;
+        details += `\n   💵 Price: ৳${item.price * item.quantity}`;
         if (item.selectedImageUrl) {
-          details += `\n  Image: ${item.selectedImageUrl}`;
+          details += `\n   🖼️ Image: ${item.selectedImageUrl}`;
         }
         return details;
       }).join('\n');
@@ -707,12 +750,16 @@ function App() {
       afterDiscount = productPrice - discountAmount;
       finalTotal = afterDiscount + deliveryFee;
 
-      productDetails = `*Product:* ${confirmOrderProduct.name}`;
-      if (confirmOrderProduct.scoops) productDetails += `\n*Scoops:* ${confirmOrderProduct.scoops}`;
-      if (confirmOrderProduct.color) productDetails += `\n*Color:* ${confirmOrderProduct.color}`;
-      productDetails += `\n*Quantity:* ${confirmOrderProduct.quantity}`;
+      productDetails = `*📌 Product Name:* ${confirmOrderProduct.name}`;
+      if (confirmOrderProduct.description) {
+        productDetails += `\n*📝 Description:* ${confirmOrderProduct.description}`;
+      }
+      if (confirmOrderProduct.scoops) productDetails += `\n*🧊 Scoops:* ${confirmOrderProduct.scoops}`;
+      if (confirmOrderProduct.color) productDetails += `\n*🎨 Color:* ${confirmOrderProduct.color}`;
+      productDetails += `\n*📦 Quantity:* ${confirmOrderProduct.quantity}`;
+      productDetails += `\n*💵 Unit Price:* ৳${confirmOrderProduct.price}`;
       if (confirmOrderProduct.selectedImageUrl) {
-        productDetails += `\n*Selected Image:* ${confirmOrderProduct.selectedImageUrl}`;
+        productDetails += `\n*🖼️ Selected Image:* ${confirmOrderProduct.selectedImageUrl}`;
       }
     }
 
@@ -764,6 +811,7 @@ function App() {
     setConfirmOrderProduct(null);
     setCustomerName('');
     setCustomerPhone('');
+    setPhoneError('');
     setCustomerAddress('');
     setDeliveryType('inside');
     setDiscount(0);
@@ -1020,7 +1068,7 @@ function App() {
           <section className="py-10 md:py-12" id='shopcategory'>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-6 md:mb-8">
-                <h2 className="text-xl md:text-5xl font-display font-bold" style={{ color: '#c5a880' }}>
+                <h2 className="text-2xl sm:text-3xl md:text-5xl font-display font-bold tracking-tight" style={{ color: '#c5a880' }}>
                   Shop by Category
                 </h2>
               </div>
@@ -1045,7 +1093,7 @@ function App() {
                       }}
                     />
                   </div>
-                  <span className="font-sans font-semibold text-xs md:text-sm lg:text-base text-center px-1" style={{ color: '#eedfe3' }}>
+                  <span className="font-sans font-medium text-sm md:text-base lg:text-lg text-center px-1 leading-tight" style={{ color: '#eedfe3' }}>
                     Charm Mystery Box
                   </span>
                 </button>
@@ -1069,7 +1117,7 @@ function App() {
                       }}
                     />
                   </div>
-                  <span className="font-sans font-semibold text-xs md:text-sm lg:text-base text-center px-1" style={{ color: '#eedfe3' }}>
+                  <span className="font-sans font-medium text-sm md:text-base lg:text-lg text-center px-1 leading-tight" style={{ color: '#eedfe3' }}>
                     Custom Gift Box
                   </span>
                 </button>
@@ -1093,7 +1141,7 @@ function App() {
                       }}
                     />
                   </div>
-                  <span className="font-sans font-semibold text-xs md:text-sm lg:text-base text-center px-1" style={{ color: '#eedfe3' }}>
+                  <span className="font-sans font-medium text-sm md:text-base lg:text-lg text-center px-1 leading-tight" style={{ color: '#eedfe3' }}>
                     Color Cup
                   </span>
                 </button>
@@ -1156,7 +1204,7 @@ function App() {
                             <IceCream className="w-6 h-6" />
                             {option.scoops}
                           </div>
-                          <div className="text-xm mt-1 opacity-80">Tk {option.price}</div>
+                          <div className="flex items-baseline justify-center text-sm mt-1 opacity-80"><span>৳</span><span>{option.price}</span></div>
                         </button>
                       ))}
                     </div>
@@ -1300,7 +1348,7 @@ function App() {
                     Choose your perfect shade from our vibrant collection. Each color tells a different story.
                   </p>
 
-                  <p className="font-display font-bold text-5xl" style={{ color: '#c5a880' }}>Tk.12</p>
+                  <p className="font-display font-bold text-5xl flex items-baseline" style={{ color: '#c5a880' }}><span>৳</span><span>12</span></p>
 
                   {/* Color Selector */}
                   <div className="space-y-4">
@@ -1308,6 +1356,7 @@ function App() {
                     <div className="grid grid-cols-3 gap-3">
                       {colorOptions.map(color => {
                         const isAvailable = availableCupColors.includes(color);
+                        const { bgClass, textClass } = getColorStyle(color);
                         return (
                           <button
                             key={color}
@@ -1315,7 +1364,7 @@ function App() {
                             disabled={!isAvailable}
                             className={`relative p-4 rounded-sm font-sans font-semibold transition-all ${
                               isAvailable
-                                ? `${colorStyles[color]} text-white hover:opacity-90 ${
+                                ? `${bgClass} ${textClass} hover:opacity-90 ${
                                     cupColor === color ? 'ring-4 ring-primary' : ''
                                   }`
                                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -1507,9 +1556,9 @@ function App() {
                       </div>
                     )}
                   </div>
-                  <div className="p-4">
-                    <h5 className="font-sans font-semibold text-sm truncate mb-1" style={{ color: '#eedfe3' }}>{product.name}</h5>
-                    <p className="font-display font-bold text-lg" style={{ color: '#c5a880' }}>৳{product.price}</p>
+                  <div className="p-3 md:p-4">
+                    <h5 className="font-sans font-medium text-base md:text-lg truncate mb-1 leading-tight" style={{ color: '#eedfe3' }}>{product.name}</h5>
+                    <p className="font-display font-bold text-xl md:text-2xl flex items-baseline" style={{ color: '#c5a880' }}><span className="text-lg md:text-xl">৳</span><span>{product.price}</span></p>
                   </div>
                 </div>
               ))}
@@ -1748,8 +1797,8 @@ function App() {
                     <h3 className="text-3xl font-display font-bold text-surface mb-2">
                       {selectedGiftBox.name}
                     </h3>
-                    <p className="text-4xl font-display font-bold text-primary">
-                      ৳{selectedGiftBox.price}
+                    <p className="text-4xl font-display font-bold text-primary flex items-baseline">
+                      <span className="text-3xl">৳</span><span>{selectedGiftBox.price}</span>
                     </p>
                     {!selectedGiftBox.inStock && (
                       <p className="text-sm font-sans text-red-600 mt-2 font-semibold">
@@ -1772,6 +1821,7 @@ function App() {
                     <div className="grid grid-cols-2 gap-3">
                       {selectedGiftBox.colors.map(color => {
                         const isAvailable = selectedGiftBox.availableColors.includes(color);
+                        const { bgClass, textClass } = getColorStyle(color);
                         return (
                           <button
                             key={color}
@@ -1779,7 +1829,7 @@ function App() {
                             disabled={!isAvailable || !selectedGiftBox.inStock}
                             className={`relative p-4 rounded-sm font-sans font-semibold transition-all ${
                               isAvailable && selectedGiftBox.inStock
-                                ? `${colorStyles[color]} text-white hover:opacity-90 ${
+                                ? `${bgClass} ${textClass} hover:opacity-90 ${
                                     giftBoxColor === color ? 'ring-4 ring-primary' : ''
                                   }`
                                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -2153,23 +2203,24 @@ function App() {
 
       {/* Confirm Order Modal */}
       {showConfirmOrder && confirmOrderProduct && (
-        <div className="fixed inset-0 z-50 overflow-y-auto flex items-start md:items-center justify-center p-4 bg-surface/70 backdrop-blur-lg">
-          <div className="relative bg-white rounded-sm shadow-2xl max-w-lg w-full border-2 border-primary/20 my-4 md:my-0 max-h-[95vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-start md:items-center justify-center px-3 py-4 sm:p-4 bg-surface/70 backdrop-blur-lg">
+          <div className="relative bg-white rounded-sm shadow-2xl max-w-lg w-full border-2 border-primary/20 my-2 md:my-0 max-h-[95vh] overflow-y-auto">
             <button
               onClick={() => {
                 setShowConfirmOrder(false);
                 setConfirmOrderProduct(null);
                 setCustomerName('');
                 setCustomerPhone('');
+                setPhoneError('');
                 setCustomerAddress('');
                 setDeliveryType('inside');
               }}
-              className="absolute top-4 right-4 z-10 p-2 hover:bg-primary/10 rounded-sm transition-colors bg-white/80"
+              className="absolute top-3 right-3 md:top-4 md:right-4 z-10 p-2 hover:bg-primary/10 rounded-sm transition-colors bg-white/80"
             >
-              <X className="w-6 h-6 text-surface" />
+              <X className="w-5 h-5 md:w-6 md:h-6 text-surface" />
             </button>
 
-            <div className="p-6 md:p-8 space-y-6">
+            <div className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
               {/* Header */}
               <div className="text-center">
                 <h3 className="text-2xl font-display font-bold text-surface mb-2">
@@ -2311,10 +2362,27 @@ function App() {
                   <input
                     type="tel"
                     value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+                      setCustomerPhone(value);
+                      if (value.length === 11 && !validateBDPhone(value)) {
+                        setPhoneError('Please enter a valid Bangladeshi number (01X-XXXXXXXX)');
+                      } else if (value.length > 0 && value.length < 11) {
+                        setPhoneError('Phone number must be 11 digits');
+                      } else {
+                        setPhoneError('');
+                      }
+                    }}
                     placeholder="01XXXXXXXXX"
-                    className="w-full px-4 py-3 rounded-sm border-2 border-primary/20 text-surface font-sans focus:outline-none focus:border-primary"
+                    maxLength={11}
+                    className={`w-full px-4 py-3 rounded-sm border-2 text-surface font-sans focus:outline-none ${
+                      phoneError ? 'border-red-400 focus:border-red-500' : 'border-primary/20 focus:border-primary'
+                    }`}
                   />
+                  {phoneError && (
+                    <p className="text-xs text-red-500 font-sans">{phoneError}</p>
+                  )}
+                  <p className="text-xs text-surface/50 font-sans">Valid prefixes: 013, 014, 015, 016, 017, 018, 019</p>
                 </div>
 
                 <div className="space-y-2">
@@ -2330,30 +2398,30 @@ function App() {
               </div>
 
               {/* Delivery Selection */}
-              <div className="space-y-3">
-                <h4 className="font-sans font-semibold text-surface border-b border-primary/20 pb-2">Delivery Location</h4>
-                <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2 sm:space-y-3">
+                <h4 className="font-sans font-semibold text-surface text-sm sm:text-base border-b border-primary/20 pb-2">Delivery Location</h4>
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <button
                     onClick={() => setDeliveryType('inside')}
-                    className={`p-4 rounded-sm border-2 transition-all ${
+                    className={`p-3 sm:p-4 rounded-sm border-2 transition-all ${
                       deliveryType === 'inside'
                         ? 'border-primary bg-primary/10'
                         : 'border-primary/20 hover:border-primary/50'
                     }`}
                   >
-                    <p className="font-sans font-semibold text-surface text-sm">Inside Dhaka</p>
-                    <p className="text-primary font-display font-bold text-lg">৳80</p>
+                    <p className="font-sans font-semibold text-surface text-xs sm:text-sm">Inside Dhaka</p>
+                    <p className="text-primary font-display font-bold text-base sm:text-lg">৳80</p>
                   </button>
                   <button
                     onClick={() => setDeliveryType('outside')}
-                    className={`p-4 rounded-sm border-2 transition-all ${
+                    className={`p-3 sm:p-4 rounded-sm border-2 transition-all ${
                       deliveryType === 'outside'
                         ? 'border-primary bg-primary/10'
                         : 'border-primary/20 hover:border-primary/50'
                     }`}
                   >
-                    <p className="font-sans font-semibold text-surface text-sm">Outside Dhaka</p>
-                    <p className="text-primary font-display font-bold text-lg">৳200</p>
+                    <p className="font-sans font-semibold text-surface text-xs sm:text-sm">Outside Dhaka</p>
+                    <p className="text-primary font-display font-bold text-base sm:text-lg">৳200</p>
                   </button>
                 </div>
               </div>
