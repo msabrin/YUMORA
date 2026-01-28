@@ -756,9 +756,9 @@ function App() {
                 className="relative p-2 transition-colors hover:text-[#c5a880]"
                 style={{ color: '#22223b' }}
               >
-                <ShoppingBag className="w-6 h-6" />
+                <ShoppingBag className="w-7 h-7" />
                 {cartItems.length > 0 && (
-                  <span className="absolute -top-1 -right-1 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center" style={{ backgroundColor: '#c5a880', color: '#fff' }}>
+                  <span className="absolute -top-1 -right-1 text-xm font-bold rounded-full h-6 w-6 flex items-center justify-center" style={{ backgroundColor: '#e63535ff', color: '#fff' }}>
                     {cartItems.reduce((total, item) => total + item.quantity, 0)}
                   </span>
                 )}
@@ -905,12 +905,12 @@ function App() {
           </section>
 
           {/* Quick Category Navigation */}
-          <section className="py-10 md:py-12">
+          <section className="py-10 md:py-12" id='shopcategory'>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-6 md:mb-8">
-                <h3 className="text-xl md:text-2xl font-display font-bold" style={{ color: '#c5a880' }}>
+                <h2 className="text-xl md:text-5xl font-display font-bold" style={{ color: '#c5a880' }}>
                   Shop by Category
-                </h3>
+                </h2>
               </div>
 
               <div className="grid grid-cols-3 gap-3 md:gap-6 lg:gap-8">
