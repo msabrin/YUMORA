@@ -297,50 +297,63 @@ const giftBoxProducts = [
   }
 ];
 
-const colorOptions = ['Red', 'Pink', 'Green', 'Blue', 'Purple', 'Yellow'];
-const availableCupColors = ['Red', 'Green', 'Blue', 'Purple']; // Pink and Yellow unavailable
+// ============================================
+// PRODUCT COLORS CONFIGURATION
+// Easy to add/modify colors - just add to this array
+// ============================================
+const PRODUCT_COLORS = [
+  { name: 'Sky Blue', hex: '#8bd0e0' },
+  { name: 'Pink', hex: '#F472B6' },
+  { name: 'Green', hex: '#22C55E' },
+  { name: 'Blue', hex: '#3B82F6' },
+  { name: 'Purple', hex: '#A855F7' },
+  { name: 'Yellow', hex: '#FACC15' },
+  { name: 'Silver', hex: '#C0C0C0' },
+  { name: 'Golden', hex: '#D4AF37' },
+  { name: 'Orange', hex: '#F97316' },
+  { name: 'Light Pink', hex: '#FBB6CE' },
+  { name: 'Cream', hex: '#FFFDD0' },
+  { name: 'Black', hex: '#1F2937' },
+  { name: 'Light Brown', hex: '#A78B71' },
+  { name: 'White', hex: '#FFFFFF' },
+  { name: 'Nude', hex: '#E3BC9A' },
+  { name: 'Maroon', hex: '#800020' },
+  { name: 'Red', hex: '#EF4444' },
+];
 
-// Color configuration with HEX codes and light/dark classification
-const colorConfig = {
-  Red: { bg: '#8bd0e0', isLight: true },      // Custom teal (light)
-  Pink: { bg: '#F472B6', isLight: false },
-  Green: { bg: '#22C55E', isLight: false },
-  Blue: { bg: '#3B82F6', isLight: false },
-  Purple: { bg: '#A855F7', isLight: false },
-  Yellow: { bg: '#FACC15', isLight: true },
-  Silver: { bg: '#C0C0C0', isLight: true },
-  Golden: { bg: '#D4AF37', isLight: false },
-  Rainbow: { bg: 'gradient', isLight: false },
-  Orange: { bg: '#F97316', isLight: false },
-  'Light Pink': { bg: '#FBB6CE', isLight: true },
-  Cream: { bg: '#FFFDD0', isLight: true },
-  Black: { bg: '#1F2937', isLight: false },
-  'Light Brown': { bg: '#A78B71', isLight: false },
-  White: { bg: '#F9FAFB', isLight: true },
-  Nude: { bg: '#E3BC9A', isLight: true },
-  Maroon: { bg: '#800020', isLight: false },
-  Marron: { bg: '#800020', isLight: false },
+// Colors available for Color Cup product (by name)
+const AVAILABLE_CUP_COLORS = ['Sky Blue', 'Green', 'Blue', 'Purple'];
+
+// Helper function to calculate brightness from HEX and determine if color is light
+const isLightColor = (hex) => {
+  // Remove # if present
+  const color = hex.replace('#', '');
+
+  // Convert to RGB
+  const r = parseInt(color.substr(0, 2), 16);
+  const g = parseInt(color.substr(2, 2), 16);
+  const b = parseInt(color.substr(4, 2), 16);
+
+  // Calculate perceived brightness using standard formula
+  // (0.299*R + 0.587*G + 0.114*B)
+  const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+
+  // Return true if light (threshold ~150-186 works well)
+  return brightness > 160;
 };
 
-// Helper function to get color styles
-const getColorStyle = (colorName) => {
-  const config = colorConfig[colorName];
-  if (!config) return { bgClass: 'bg-gray-300', textClass: 'text-black' };
-
-  if (config.bg === 'gradient') {
-    return {
-      bgClass: 'bg-gradient-to-r from-[#FF0000] via-[#00FF00] to-[#0000FF]',
-      textClass: 'text-white'
-    };
-  }
-
-  const bgClass = colorName === 'White'
-    ? `bg-[${config.bg}] border border-gray-300`
-    : `bg-[${config.bg}]`;
-  const textClass = config.isLight ? 'text-gray-800' : 'text-white';
-
-  return { bgClass, textClass };
+// Get contrasting text color based on background
+const getContrastColor = (hex) => {
+  return isLightColor(hex) ? '#1F2937' : '#FFFFFF';
 };
+
+// Find color object by name
+const getColorByName = (name) => {
+  return PRODUCT_COLORS.find(c => c.name === name) || PRODUCT_COLORS[0];
+};
+
+// Available cup colors reference
+const availableCupColors = AVAILABLE_CUP_COLORS;
 
 // Bangladeshi phone validation
 const validateBDPhone = (phone) => {
@@ -396,12 +409,12 @@ function App() {
   const [customScoops, setCustomScoops] = useState('');
   const [isCustomScoops, setIsCustomScoops] = useState(false);
 
-  // Color Cup state
-  const [cupColor, setCupColor] = useState('Red');
+  // Color Cup state - default to first available cup color
+  const [cupColor, setCupColor] = useState(AVAILABLE_CUP_COLORS[0]);
   const [cupQuantity, setCupQuantity] = useState(1);
 
-  // Gift Box Modal state
-  const [giftBoxColor, setGiftBoxColor] = useState('Red');
+  // Gift Box Modal state - default to first product color
+  const [giftBoxColor, setGiftBoxColor] = useState(PRODUCT_COLORS[0].name);
   const [giftBoxQuantity, setGiftBoxQuantity] = useState(1);
   const [selectedGalleryImage, setSelectedGalleryImage] = useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0); // Track which image is selected for cart/WhatsApp
@@ -766,7 +779,7 @@ function App() {
     // Recalculate final total
     finalTotal = afterDiscount + deliveryFee;
 
-    let message = `🛍️ *NEW ORDER FROM YUMORA*\n\n`;
+    let message = `🛍️ *I Would Like To Order*\n\n`;
     message += `━━━━━━━━━━━━━━━━━━━━\n`;
     message += `📦 *ORDER DETAILS*\n`;
     message += `━━━━━━━━━━━━━━━━━━━━\n`;
@@ -1350,27 +1363,43 @@ function App() {
 
                   <p className="font-display font-bold text-5xl flex items-baseline" style={{ color: '#c5a880' }}><span>৳</span><span>12</span></p>
 
-                  {/* Color Selector */}
+                  {/* Color Selector - Using Inline Styles for Build Safety */}
                   <div className="space-y-4">
                     <label className="font-sans font-semibold" style={{ color: '#eedfe3' }}>Select Color:</label>
                     <div className="grid grid-cols-3 gap-3">
-                      {colorOptions.map(color => {
-                        const isAvailable = availableCupColors.includes(color);
-                        const { bgClass, textClass } = getColorStyle(color);
+                      {PRODUCT_COLORS.slice(0, 6).map(colorObj => {
+                        const isAvailable = AVAILABLE_CUP_COLORS.includes(colorObj.name);
+                        const textColor = getContrastColor(colorObj.hex);
+                        const isSelected = cupColor === colorObj.name;
+
                         return (
                           <button
-                            key={color}
-                            onClick={() => isAvailable && setCupColor(color)}
+                            key={colorObj.name}
+                            onClick={() => isAvailable && setCupColor(colorObj.name)}
                             disabled={!isAvailable}
                             className={`relative p-4 rounded-sm font-sans font-semibold transition-all ${
-                              isAvailable
-                                ? `${bgClass} ${textClass} hover:opacity-90 ${
-                                    cupColor === color ? 'ring-4 ring-primary' : ''
-                                  }`
-                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                            }`}
+                              isAvailable ? 'hover:opacity-90' : 'cursor-not-allowed'
+                            } ${isSelected ? 'ring-4 ring-[#c5a880]' : ''}`}
+                            style={{
+                              backgroundColor: isAvailable ? colorObj.hex : '#E5E7EB',
+                              color: isAvailable ? textColor : '#9CA3AF',
+                              border: colorObj.hex === '#FFFFFF' ? '1px solid #D1D5DB' : 'none'
+                            }}
                           >
-                            {color}
+                            {colorObj.name}
+                            {/* Selection checkmark */}
+                            {isSelected && isAvailable && (
+                              <div className="absolute top-1 right-1">
+                                <svg
+                                  className="w-5 h-5"
+                                  fill={textColor}
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                                </svg>
+                              </div>
+                            )}
+                            {/* Unavailable overlay */}
                             {!isAvailable && (
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="absolute w-full h-0.5 bg-gray-500 rotate-45" />
@@ -1813,29 +1842,47 @@ function App() {
                     )}
                   </div>
 
-                  {/* Color Selection */}
+                  {/* Color Selection - Using Inline Styles for Build Safety */}
                   <div>
                     <label className="text-surface font-sans font-semibold block mb-3">
                       Select Color:
                     </label>
                     <div className="grid grid-cols-2 gap-3">
-                      {selectedGiftBox.colors.map(color => {
-                        const isAvailable = selectedGiftBox.availableColors.includes(color);
-                        const { bgClass, textClass } = getColorStyle(color);
+                      {selectedGiftBox.colors.map(colorName => {
+                        const isAvailable = selectedGiftBox.availableColors.includes(colorName);
+                        const colorObj = getColorByName(colorName);
+                        const textColor = getContrastColor(colorObj.hex);
+                        const isSelected = giftBoxColor === colorName;
+                        const isDisabled = !isAvailable || !selectedGiftBox.inStock;
+
                         return (
                           <button
-                            key={color}
-                            onClick={() => isAvailable && setGiftBoxColor(color)}
-                            disabled={!isAvailable || !selectedGiftBox.inStock}
+                            key={colorName}
+                            onClick={() => isAvailable && setGiftBoxColor(colorName)}
+                            disabled={isDisabled}
                             className={`relative p-4 rounded-sm font-sans font-semibold transition-all ${
-                              isAvailable && selectedGiftBox.inStock
-                                ? `${bgClass} ${textClass} hover:opacity-90 ${
-                                    giftBoxColor === color ? 'ring-4 ring-primary' : ''
-                                  }`
-                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                            }`}
+                              !isDisabled ? 'hover:opacity-90' : 'cursor-not-allowed'
+                            } ${isSelected && !isDisabled ? 'ring-4 ring-[#c5a880]' : ''}`}
+                            style={{
+                              backgroundColor: !isDisabled ? colorObj.hex : '#E5E7EB',
+                              color: !isDisabled ? textColor : '#9CA3AF',
+                              border: colorObj.hex === '#FFFFFF' && !isDisabled ? '1px solid #D1D5DB' : 'none'
+                            }}
                           >
-                            {color}
+                            {colorName}
+                            {/* Selection checkmark */}
+                            {isSelected && !isDisabled && (
+                              <div className="absolute top-1 right-1">
+                                <svg
+                                  className="w-5 h-5"
+                                  fill={textColor}
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                                </svg>
+                              </div>
+                            )}
+                            {/* Unavailable overlay */}
                             {!isAvailable && (
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="absolute w-full h-0.5 bg-gray-500 rotate-45" />
