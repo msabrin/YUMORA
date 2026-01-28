@@ -335,6 +335,9 @@ function App() {
   const [showBuyNowModal, setShowBuyNowModal] = useState(false); // Buy Now discount popup
   const [buyNowProduct, setBuyNowProduct] = useState(null); // Product for Buy Now popup
 
+  // Back to Top button state
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
   // Hero Slider state
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -399,12 +402,39 @@ function App() {
     return () => clearInterval(interval);
   }, [heroSlides.length]);
 
+  // Back to Top button visibility
+  useEffect(() => {
+    const handleScrollForBackToTop = () => {
+      if (window.scrollY > 300) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScrollForBackToTop);
+    return () => window.removeEventListener('scroll', handleScrollForBackToTop);
+  }, []);
+
   // Smooth scroll function
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setIsMobileMenuOpen(false);
+    }
+  };
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Scroll to specific shop section
+  const scrollToShopSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 
@@ -475,7 +505,6 @@ function App() {
     };
 
     addToCart(item);
-    alert('Added to cart!');
   };
 
   // Add Color Cup to cart
@@ -496,7 +525,6 @@ function App() {
     };
 
     addToCart(item);
-    alert('Added to cart!');
   };
 
   // Add Gift Box from modal to cart
@@ -531,7 +559,6 @@ function App() {
 
     addToCart(item);
     setSelectedGiftBox(null);
-    alert('Added to cart!');
   };
 
   // Buy Now functions - Show discount popup
@@ -783,7 +810,7 @@ function App() {
       {!showGiftBoxCollection && (
         <>
           {/* Hero Section with Auto-Slider */}
-          <section id="home" className="relative py-24 md:py-36 overflow-hidden">
+          <section id="home" className="relative py-10 md:py-14 overflow-hidden">
             {/* Watermark Logo Background - Left Side, Smaller, 15% Opacity */}
             <div className="absolute left-0 top-1/2 -translate-y-1/2 pointer-events-none z-0">
               <img
@@ -798,7 +825,7 @@ function App() {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
               {/* Hero Slider with Split Layout */}
-              <div className="relative min-h-[600px]">
+              <div className="relative min-h-[400px] md:min-h-[500px]">
                 {heroSlides.map((slide, index) => (
                   <div
                     key={index}
@@ -877,11 +904,96 @@ function App() {
             </div>
           </section>
 
+          {/* Quick Category Navigation */}
+          <section className="py-10 md:py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-6 md:mb-8">
+                <h3 className="text-xl md:text-2xl font-display font-bold" style={{ color: '#c5a880' }}>
+                  Shop by Category
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 md:gap-6 lg:gap-8">
+                {/* Charm Mystery Box */}
+                <button
+                  onClick={() => scrollToShopSection('charm-mystery-box')}
+                  className="group flex flex-col items-center space-y-2 md:space-y-3 transition-all duration-300 hover:scale-[1.02] focus:outline-none"
+                >
+                  <div className="relative w-full aspect-square rounded-lg overflow-hidden border-2 md:border-4 border-[#c5a880]/40 shadow-lg group-hover:shadow-2xl group-hover:border-[#c5a880] transition-all duration-300">
+                    <img
+                      src="/assets/earring&locket11.png"
+                      alt="Charm Mystery Box"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const fallback = document.createElement('div');
+                        fallback.className = 'absolute inset-0 bg-gradient-to-br from-[#c5a880]/20 to-[#9a8c98]/20 flex items-center justify-center';
+                        fallback.innerHTML = '<span style="color: #c5a880" class="text-4xl md:text-6xl font-display font-bold">?</span>';
+                        e.target.parentElement.appendChild(fallback);
+                      }}
+                    />
+                  </div>
+                  <span className="font-sans font-semibold text-xs md:text-sm lg:text-base text-center px-1" style={{ color: '#eedfe3' }}>
+                    Charm Mystery Box
+                  </span>
+                </button>
+
+                {/* Custom Gift Box */}
+                <button
+                  onClick={() => scrollToShopSection('custom-gift-box')}
+                  className="group flex flex-col items-center space-y-2 md:space-y-3 transition-all duration-300 hover:scale-[1.02] focus:outline-none"
+                >
+                  <div className="relative w-full aspect-square rounded-lg overflow-hidden border-2 md:border-4 border-[#c5a880]/40 shadow-lg group-hover:shadow-2xl group-hover:border-[#c5a880] transition-all duration-300">
+                    <img
+                      src="/assets/earring&locket01.png"
+                      alt="Custom Gift Box"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const fallback = document.createElement('div');
+                        fallback.className = 'absolute inset-0 bg-gradient-to-br from-[#c5a880]/20 to-[#9a8c98]/20 flex items-center justify-center';
+                        fallback.innerHTML = '<span style="color: #c5a880" class="text-4xl md:text-6xl font-display font-bold">🎁</span>';
+                        e.target.parentElement.appendChild(fallback);
+                      }}
+                    />
+                  </div>
+                  <span className="font-sans font-semibold text-xs md:text-sm lg:text-base text-center px-1" style={{ color: '#eedfe3' }}>
+                    Custom Gift Box
+                  </span>
+                </button>
+
+                {/* Color Cup */}
+                <button
+                  onClick={() => scrollToShopSection('color-cup')}
+                  className="group flex flex-col items-center space-y-2 md:space-y-3 transition-all duration-300 hover:scale-[1.02] focus:outline-none"
+                >
+                  <div className="relative w-full aspect-square rounded-lg overflow-hidden border-2 md:border-4 border-[#c5a880]/40 shadow-lg group-hover:shadow-2xl group-hover:border-[#c5a880] transition-all duration-300">
+                    <img
+                      src="/assets/1earring&locket11.png"
+                      alt="Color Cup"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        const fallback = document.createElement('div');
+                        fallback.className = 'absolute inset-0 bg-gradient-to-br from-[#c5a880]/20 to-[#9a8c98]/20 flex items-center justify-center';
+                        fallback.innerHTML = '<span style="color: #c5a880" class="text-4xl md:text-6xl font-display font-bold">🎨</span>';
+                        e.target.parentElement.appendChild(fallback);
+                      }}
+                    />
+                  </div>
+                  <span className="font-sans font-semibold text-xs md:text-sm lg:text-base text-center px-1" style={{ color: '#eedfe3' }}>
+                    Color Cup
+                  </span>
+                </button>
+              </div>
+            </div>
+          </section>
+
           {/* Products Section */}
-      <section id="shop" className="py-20">
+      <section id="shop" className="py-10 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-10 md:mb-12">
             <p className="text-sm uppercase tracking-[0.3em] font-sans font-semibold mb-4" style={{ color: '#c5a880' }}>
               Our Collection
             </p>
@@ -893,9 +1005,9 @@ function App() {
             </p>
           </div>
 
-          <div className="space-y-16">
+          <div className="space-y-10 md:space-y-12">
             {/* 1. Charm Mystery Box */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-sm p-10 md:p-14 border border-white/20 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+            <div id="charm-mystery-box" className="bg-white/10 backdrop-blur-xl rounded-sm p-6 md:p-10 border border-white/20 shadow-xl hover:shadow-2xl transition-shadow duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
                   <h4 className="text-3xl md:text-4xl font-display font-bold flex items-center gap-3" style={{ color: '#eedfe3' }}>
@@ -1004,7 +1116,7 @@ function App() {
             </div>
 
             {/* 2. Custom Gift Box Gallery */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-sm p-10 md:p-14 border border-white/20 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+            <div id="custom-gift-box" className="bg-white/10 backdrop-blur-xl rounded-sm p-6 md:p-10 border border-white/20 shadow-xl hover:shadow-2xl transition-shadow duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
                   <h4 className="text-3xl md:text-4xl font-display font-bold" style={{ color: '#eedfe3' }}>
@@ -1050,7 +1162,7 @@ function App() {
             </div>
 
             {/* 3. Mystery Color Cup */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-sm p-10 md:p-14 border border-white/20 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+            <div id="color-cup" className="bg-white/10 backdrop-blur-xl rounded-sm p-6 md:p-10 border border-white/20 shadow-xl hover:shadow-2xl transition-shadow duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="relative aspect-square rounded-sm overflow-hidden border border-white/20 shadow-xl order-2 lg:order-1">
                   <img
@@ -1076,7 +1188,7 @@ function App() {
                     Choose your perfect shade from our vibrant collection. Each color tells a different story.
                   </p>
 
-                  <p className="font-display font-bold text-5xl" style={{ color: '#c5a880' }}>$12</p>
+                  <p className="font-display font-bold text-5xl" style={{ color: '#c5a880' }}>Tk.12</p>
 
                   {/* Color Selector */}
                   <div className="space-y-4">
@@ -1290,6 +1402,30 @@ function App() {
                 </div>
               ))}
             </div>
+
+            {/* Back to Top Button */}
+            {showBackToTop && (
+              <button
+                onClick={scrollToTop}
+                className="fixed bottom-8 right-8 z-40 w-14 h-14 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-[0_0_30px_rgba(197,168,128,0.5)] flex items-center justify-center group"
+                style={{ backgroundColor: '#c5a880' }}
+                aria-label="Back to top"
+              >
+                <svg
+                  className="w-6 h-6 text-white transition-transform group-hover:-translate-y-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M5 10l7-7m0 0l7 7m-7-7v18"
+                  />
+                </svg>
+              </button>
+            )}
           </div>
         </section>
       )}
