@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, X, Phone, Mail, MapPin, Instagram, Facebook, MessageCircle, IceCream } from 'lucide-react';
+import { ShoppingBag, Menu, X, Phone, Mail, MapPin, Instagram, Facebook, MessageCircle, IceCream, Copy, Check } from 'lucide-react';
 
 // ============================================
 // DISCOUNT CODES - UPDATE HERE TO CHANGE CODES
@@ -335,6 +335,22 @@ function App() {
   const [showBuyNowModal, setShowBuyNowModal] = useState(false); // Buy Now discount popup
   const [buyNowProduct, setBuyNowProduct] = useState(null); // Product for Buy Now popup
 
+  // Confirm Order Modal state
+  const [showConfirmOrder, setShowConfirmOrder] = useState(false);
+  const [confirmOrderProduct, setConfirmOrderProduct] = useState(null);
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerAddress, setCustomerAddress] = useState('');
+  const [deliveryType, setDeliveryType] = useState('inside'); // 'inside' or 'outside'
+  const [copiedNumber, setCopiedNumber] = useState(null);
+
+  // Payment numbers
+  const paymentNumbers = {
+    bkash: '01335156146',
+    nagad: '01335156146',
+    rocket: '01335156146'
+  };
+
   // Back to Top button state
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -561,7 +577,7 @@ function App() {
     setSelectedGiftBox(null);
   };
 
-  // Buy Now functions - Show discount popup
+  // Buy Now functions - Show confirm order modal
   const buyNowMysteryBox = () => {
     const scoops = isCustomScoops ? parseInt(customScoops) : mysteryBoxScoops;
     if (!scoops || scoops < 1) {
@@ -575,12 +591,15 @@ function App() {
     else if (scoops === 3) price = 40;
     else price = scoops * 15;
 
-    setBuyNowProduct({
+    setConfirmOrderProduct({
       name: 'Charm Mystery Box',
       price: price,
-      type: 'mystery-box'
+      type: 'mystery-box',
+      scoops: scoops,
+      quantity: 1,
+      image: '/assets/earring&locket11.png'
     });
-    setShowBuyNowModal(true);
+    setShowConfirmOrder(true);
   };
 
   const buyNowColorCup = () => {
@@ -589,12 +608,15 @@ function App() {
       return;
     }
 
-    setBuyNowProduct({
+    setConfirmOrderProduct({
       name: 'Mystery Color Cup',
       price: 12,
-      type: 'color-cup'
+      type: 'color-cup',
+      color: cupColor,
+      quantity: cupQuantity,
+      image: '/assets/1earring&locket11.png'
     });
-    setShowBuyNowModal(true);
+    setShowConfirmOrder(true);
   };
 
   const buyNowGiftBox = () => {
@@ -610,12 +632,143 @@ function App() {
       return;
     }
 
-    setBuyNowProduct({
+    const selectedImage = selectedGiftBox.images && selectedGiftBox.images.length > 0
+      ? selectedGiftBox.images[selectedImageIndex]
+      : selectedGiftBox.image;
+
+    setConfirmOrderProduct({
       name: selectedGiftBox.name,
       price: selectedGiftBox.price,
-      type: 'gift-box'
+      type: 'gift-box',
+      color: giftBoxColor,
+      quantity: giftBoxQuantity,
+      image: selectedImage,
+      selectedImageUrl: selectedImage
     });
-    setShowBuyNowModal(true);
+    setSelectedGiftBox(null);
+    setShowConfirmOrder(true);
+  };
+
+  // Copy payment number to clipboard
+  const copyToClipboard = (number, type) => {
+    navigator.clipboard.writeText(number);
+    setCopiedNumber(type);
+    setTimeout(() => setCopiedNumber(null), 2000);
+  };
+
+  // Calculate delivery fee
+  const getDeliveryFee = () => {
+    return deliveryType === 'inside' ? 80 : 200;
+  };
+
+  // Handle confirm order WhatsApp
+  const handleConfirmOrderWhatsApp = () => {
+    if (!customerName.trim() || !customerPhone.trim() || !customerAddress.trim()) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    if (!confirmOrderProduct) return;
+
+    const deliveryFee = getDeliveryFee();
+    let productPrice, discountAmount, afterDiscount, finalTotal, productDetails;
+
+    // Handle cart orders vs single product orders
+    if (confirmOrderProduct.type === 'cart' && confirmOrderProduct.cartItems) {
+      // Cart order - use pre-calculated values from cart
+      productPrice = confirmOrderProduct.originalSubtotal;
+      const cartDiscount = confirmOrderProduct.appliedDiscount || 0;
+      const cartDiscountCode = confirmOrderProduct.appliedDiscountCode || '';
+      discountAmount = productPrice * cartDiscount;
+      afterDiscount = productPrice - discountAmount;
+      finalTotal = afterDiscount + deliveryFee;
+
+      // Build detailed product list
+      productDetails = confirmOrderProduct.cartItems.map(item => {
+        let details = `• *${item.name}*`;
+        if (item.scoops) details += ` (${item.scoops} Scoops)`;
+        if (item.color) details += ` - ${item.color}`;
+        details += ` x${item.quantity} = ৳${item.price * item.quantity}`;
+        if (item.selectedImageUrl) {
+          details += `\n  Image: ${item.selectedImageUrl}`;
+        }
+        return details;
+      }).join('\n');
+
+      // Use cart's discount info
+      if (cartDiscount > 0 && cartDiscountCode) {
+        discountAmount = productPrice * cartDiscount;
+        afterDiscount = productPrice - discountAmount;
+      }
+    } else {
+      // Single product order
+      productPrice = confirmOrderProduct.price * confirmOrderProduct.quantity;
+      discountAmount = productPrice * discount;
+      afterDiscount = productPrice - discountAmount;
+      finalTotal = afterDiscount + deliveryFee;
+
+      productDetails = `*Product:* ${confirmOrderProduct.name}`;
+      if (confirmOrderProduct.scoops) productDetails += `\n*Scoops:* ${confirmOrderProduct.scoops}`;
+      if (confirmOrderProduct.color) productDetails += `\n*Color:* ${confirmOrderProduct.color}`;
+      productDetails += `\n*Quantity:* ${confirmOrderProduct.quantity}`;
+      if (confirmOrderProduct.selectedImageUrl) {
+        productDetails += `\n*Selected Image:* ${confirmOrderProduct.selectedImageUrl}`;
+      }
+    }
+
+    // Recalculate final total
+    finalTotal = afterDiscount + deliveryFee;
+
+    let message = `🛍️ *NEW ORDER FROM YUMORA*\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `📦 *ORDER DETAILS*\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `${productDetails}\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `👤 *CUSTOMER DETAILS*\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `*Name:* ${customerName}\n`;
+    message += `*Phone:* ${customerPhone}\n`;
+    message += `*Address:* ${customerAddress}\n`;
+    message += `*Delivery:* ${deliveryType === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka'}\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `💰 *PRICE BREAKDOWN*\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `*Subtotal:* ৳${productPrice}\n`;
+
+    const appliedDiscountCode = confirmOrderProduct.type === 'cart' ? confirmOrderProduct.appliedDiscountCode : discountCode;
+    const appliedDiscount = confirmOrderProduct.type === 'cart' ? confirmOrderProduct.appliedDiscount : discount;
+
+    if (appliedDiscount > 0 && appliedDiscountCode) {
+      message += `*Discount (${appliedDiscountCode}):* -৳${discountAmount.toFixed(0)}\n`;
+      message += `*After Discount:* ৳${afterDiscount.toFixed(0)}\n`;
+    }
+
+    message += `*Delivery Fee:* ৳${deliveryFee}\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `*FINAL TOTAL:* ৳${finalTotal.toFixed(0)}\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+    message += `💳 *Advance Payment:* ৳${(finalTotal / 2).toFixed(0)} (Half of total)`;
+
+    const whatsappNumber = '8801335156146';
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+    window.open(whatsappURL, '_blank');
+
+    // Reset form and clear cart if it was a cart order
+    if (confirmOrderProduct.type === 'cart') {
+      setCartItems([]);
+    }
+    setShowConfirmOrder(false);
+    setConfirmOrderProduct(null);
+    setCustomerName('');
+    setCustomerPhone('');
+    setCustomerAddress('');
+    setDeliveryType('inside');
+    setDiscount(0);
+    setDiscountCode('');
+    setDiscountInput('');
   };
 
   // Remove from cart
@@ -645,47 +798,6 @@ function App() {
   // Calculate subtotal (before discount)
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  };
-
-  // WhatsApp checkout
-  const handleWhatsAppCheckout = () => {
-    if (cartItems.length === 0) {
-      alert('Your cart is empty');
-      return;
-    }
-
-    const orderDetails = cartItems.map(item => {
-      let details = `${item.name} x${item.quantity}`;
-      if (item.scoops) details += ` (${item.scoops} Scoops)`;
-      if (item.color) details += ` (${item.color})`;
-      details += ` - $${item.price * item.quantity}`;
-      // Add selected image URL if available
-      if (item.selectedImageUrl) {
-        details += `\nImage: ${item.selectedImageUrl}`;
-      }
-      return details;
-    }).join('\n\n');
-
-    const subtotal = calculateSubtotal();
-    const total = calculateTotal();
-
-    // Build message with discount information
-    let message = `Hello! I'd like to place an order:\n\n${orderDetails}\n\n`;
-    message += `━━━━━━━━━━━━━━━━━━━━\n`;
-    message += `Original Price: $${subtotal.toFixed(2)}\n`;
-
-    if (discount > 0 && discountCode) {
-      message += `Discount Code: ${discountCode} (-${(discount * 100).toFixed(0)}%)\n`;
-      message += `Discount Amount: -$${(subtotal * discount).toFixed(2)}\n`;
-    }
-
-    message += `Final Total: $${total.toFixed(2)}`;
-
-    const whatsappNumber = '8801335156146';
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-
-    window.open(whatsappURL, '_blank');
   };
 
   // Open gift box modal
@@ -732,7 +844,7 @@ function App() {
                   key={item}
                   onClick={() => {
                     setShowGiftBoxCollection(false);
-                    scrollToSection(item.toLowerCase());
+                    scrollToSection(item === 'Shop' ? 'shopcategory' : item.toLowerCase());
                   }}
                   className="font-sans font-medium transition-colors hover:text-[#c5a880]"
                   style={{ color: '#22223b' }}
@@ -783,7 +895,7 @@ function App() {
                   key={item}
                   onClick={() => {
                     setShowGiftBoxCollection(false);
-                    scrollToSection(item.toLowerCase());
+                    scrollToSection(item === 'Shop' ? 'shopcategory' : item.toLowerCase());
                   }}
                   className="block w-full text-left px-4 py-2 hover:bg-white/10 rounded-sm transition-colors font-sans font-medium"
                   style={{ color: '#22223b' }}
@@ -1397,37 +1509,37 @@ function App() {
                   </div>
                   <div className="p-4">
                     <h5 className="font-sans font-semibold text-sm truncate mb-1" style={{ color: '#eedfe3' }}>{product.name}</h5>
-                    <p className="font-display font-bold text-lg" style={{ color: '#c5a880' }}>${product.price}</p>
+                    <p className="font-display font-bold text-lg" style={{ color: '#c5a880' }}>৳{product.price}</p>
                   </div>
                 </div>
               ))}
             </div>
-
-            {/* Back to Top Button */}
-            {showBackToTop && (
-              <button
-                onClick={scrollToTop}
-                className="fixed bottom-8 right-8 z-40 w-14 h-14 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-[0_0_30px_rgba(197,168,128,0.5)] flex items-center justify-center group"
-                style={{ backgroundColor: '#c5a880' }}
-                aria-label="Back to top"
-              >
-                <svg
-                  className="w-6 h-6 text-white transition-transform group-hover:-translate-y-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2.5}
-                    d="M5 10l7-7m0 0l7 7m-7-7v18"
-                  />
-                </svg>
-              </button>
-            )}
           </div>
         </section>
+      )}
+
+      {/* Global Back to Top Button */}
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-40 w-14 h-14 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 hover:shadow-[0_0_30px_rgba(197,168,128,0.5)] flex items-center justify-center group"
+          style={{ backgroundColor: '#c5a880' }}
+          aria-label="Back to top"
+        >
+          <svg
+            className="w-6 h-6 text-white transition-transform group-hover:-translate-y-1"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.5}
+              d="M5 10l7-7m0 0l7 7m-7-7v18"
+            />
+          </svg>
+        </button>
       )}
 
       {/* Footer */}
@@ -1563,16 +1675,16 @@ function App() {
 
       {/* Gift Box Detail Modal */}
       {selectedGiftBox && (
-        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4 bg-surface/70 backdrop-blur-lg">
-          <div className="relative bg-white rounded-sm shadow-2xl max-w-4xl w-full border-2 border-primary/20">
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-start md:items-center justify-center p-4 bg-surface/70 backdrop-blur-lg">
+          <div className="relative bg-white rounded-sm shadow-2xl max-w-4xl w-full border-2 border-primary/20 my-4 md:my-0 max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setSelectedGiftBox(null)}
-              className="absolute top-6 right-6 z-10 p-2 hover:bg-primary/10 rounded-sm transition-colors"
+              className="absolute top-4 right-4 md:top-6 md:right-6 z-10 p-2 hover:bg-primary/10 rounded-sm transition-colors bg-white/80"
             >
               <X className="w-6 h-6 text-surface" />
             </button>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 p-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 p-6 md:p-10">
               {/* Left - Image Gallery */}
               <div className="space-y-4">
                 {/* Main Image */}
@@ -1637,7 +1749,7 @@ function App() {
                       {selectedGiftBox.name}
                     </h3>
                     <p className="text-4xl font-display font-bold text-primary">
-                      ${selectedGiftBox.price}
+                      ৳{selectedGiftBox.price}
                     </p>
                     {!selectedGiftBox.inStock && (
                       <p className="text-sm font-sans text-red-600 mt-2 font-semibold">
@@ -1798,7 +1910,7 @@ function App() {
                             <p className="text-xs text-surface/60 font-sans">Color: {item.color}</p>
                           )}
                           <p className="text-primary font-sans font-bold mt-1">
-                            ${item.price} × {item.quantity}
+                            ৳{item.price} × {item.quantity}
                           </p>
 
                           <div className="flex items-center gap-2 mt-2">
@@ -1878,7 +1990,7 @@ function App() {
                     <div className="flex justify-between items-center text-sm">
                       <span className="font-sans text-surface/70">Subtotal:</span>
                       <span className="font-sans text-surface/70">
-                        ${calculateSubtotal().toFixed(2)}
+                        ৳{calculateSubtotal().toFixed(2)}
                       </span>
                     </div>
                   )}
@@ -1886,26 +1998,56 @@ function App() {
                     <div className="flex justify-between items-center text-sm">
                       <span className="font-sans text-surface/70">Discount ({(discount * 100).toFixed(0)}%):</span>
                       <span className="font-sans text-green-600 font-semibold">
-                        -${(calculateSubtotal() * discount).toFixed(2)}
+                        -৳{(calculateSubtotal() * discount).toFixed(2)}
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between items-center text-lg border-t border-primary/20 pt-4">
                     <span className="font-sans font-semibold text-surface">Total:</span>
                     <span className="font-display font-bold text-2xl text-primary">
-                      ${calculateTotal().toFixed(2)}
+                      ৳{calculateTotal().toFixed(2)}
                     </span>
                   </div>
+                  <p className="text-xs text-center text-surface/60 font-sans italic">
+                    * Delivery charge will be added at checkout
+                  </p>
 
                   <button
-                    onClick={handleWhatsAppCheckout}
+                    onClick={() => {
+                      if (cartItems.length === 0) {
+                        alert('Your cart is empty');
+                        return;
+                      }
+                      // Create a combined product for cart checkout
+                      const cartTotal = calculateTotal();
+                      const itemsSummary = cartItems.map(item => {
+                        let name = item.name;
+                        if (item.scoops) name += ` (${item.scoops} Scoops)`;
+                        if (item.color) name += ` - ${item.color}`;
+                        return `${name} x${item.quantity}`;
+                      }).join(', ');
+
+                      setConfirmOrderProduct({
+                        name: itemsSummary,
+                        price: cartTotal,
+                        type: 'cart',
+                        quantity: 1,
+                        image: cartItems[0]?.image || '/assets/YUMORA.png',
+                        cartItems: cartItems,
+                        originalSubtotal: calculateSubtotal(),
+                        appliedDiscount: discount,
+                        appliedDiscountCode: discountCode
+                      });
+                      setIsCartOpen(false);
+                      setShowConfirmOrder(true);
+                    }}
                     className="w-full py-4 bg-primary text-white font-sans font-bold rounded-sm hover:bg-surface transition-colors flex items-center justify-center gap-2"
                   >
-                    <Phone className="w-5 h-5" />
-                    Complete Order via WhatsApp
+                    <ShoppingBag className="w-5 h-5" />
+                    Buy Now
                   </button>
                   <p className="text-xs text-center text-surface/60 font-sans">
-                    You'll be redirected to WhatsApp to complete your purchase
+                    Proceed to checkout with delivery options
                   </p>
                 </div>
               )}
@@ -1944,7 +2086,7 @@ function App() {
                   {buyNowProduct.name}
                 </h4>
                 <p className="text-2xl font-display font-bold text-primary">
-                  ${buyNowProduct.price}
+                  ৳{buyNowProduct.price}
                 </p>
               </div>
 
@@ -2004,6 +2146,329 @@ function App() {
                   Skip & Continue
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Order Modal */}
+      {showConfirmOrder && confirmOrderProduct && (
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-start md:items-center justify-center p-4 bg-surface/70 backdrop-blur-lg">
+          <div className="relative bg-white rounded-sm shadow-2xl max-w-lg w-full border-2 border-primary/20 my-4 md:my-0 max-h-[95vh] overflow-y-auto">
+            <button
+              onClick={() => {
+                setShowConfirmOrder(false);
+                setConfirmOrderProduct(null);
+                setCustomerName('');
+                setCustomerPhone('');
+                setCustomerAddress('');
+                setDeliveryType('inside');
+              }}
+              className="absolute top-4 right-4 z-10 p-2 hover:bg-primary/10 rounded-sm transition-colors bg-white/80"
+            >
+              <X className="w-6 h-6 text-surface" />
+            </button>
+
+            <div className="p-6 md:p-8 space-y-6">
+              {/* Header */}
+              <div className="text-center">
+                <h3 className="text-2xl font-display font-bold text-surface mb-2">
+                  Confirm Your Order
+                </h3>
+                <p className="text-sm font-sans text-surface/70">
+                  Please fill in your details to complete the order
+                </p>
+              </div>
+
+              {/* Product Summary */}
+              <div className="bg-light/30 rounded-sm p-4 border border-primary/10">
+                {confirmOrderProduct.type === 'cart' && confirmOrderProduct.cartItems ? (
+                  // Cart items display
+                  <div className="space-y-3">
+                    <h4 className="font-sans font-semibold text-surface border-b border-primary/10 pb-2">
+                      Cart Items ({confirmOrderProduct.cartItems.length})
+                    </h4>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {confirmOrderProduct.cartItems.map((item, idx) => (
+                        <div key={idx} className="flex gap-3 items-center">
+                          <div className="w-12 h-12 flex-shrink-0 bg-white rounded-sm overflow-hidden border border-primary/10">
+                            <img
+                              src={item.image}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-sans text-surface truncate">{item.name}</p>
+                            <p className="text-xs text-surface/60">
+                              {item.color && `${item.color} • `}
+                              {item.scoops && `${item.scoops} Scoops • `}
+                              Qty: {item.quantity}
+                            </p>
+                          </div>
+                          <p className="text-sm font-semibold text-primary">৳{item.price * item.quantity}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="border-t border-primary/10 pt-2 flex justify-between">
+                      <span className="font-sans font-semibold text-surface">Subtotal:</span>
+                      <span className="font-display font-bold text-primary">৳{confirmOrderProduct.originalSubtotal}</span>
+                    </div>
+                    {confirmOrderProduct.appliedDiscount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-surface/70">Discount ({confirmOrderProduct.appliedDiscountCode}):</span>
+                        <span className="text-green-600 font-semibold">-৳{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedDiscount).toFixed(0)}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  // Single product display
+                  <div className="flex gap-4">
+                    <div className="w-20 h-20 flex-shrink-0 bg-white rounded-sm overflow-hidden border border-primary/10">
+                      <img
+                        src={confirmOrderProduct.image}
+                        alt={confirmOrderProduct.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-sans font-semibold text-surface">
+                        {confirmOrderProduct.name}
+                      </h4>
+                      {confirmOrderProduct.scoops && (
+                        <p className="text-xs text-surface/60 font-sans">{confirmOrderProduct.scoops} Scoops</p>
+                      )}
+                      {confirmOrderProduct.color && (
+                        <p className="text-xs text-surface/60 font-sans">Color: {confirmOrderProduct.color}</p>
+                      )}
+                      <p className="text-xs text-surface/60 font-sans">Qty: {confirmOrderProduct.quantity}</p>
+                      <p className="text-lg font-display font-bold text-primary mt-1">
+                        ৳{confirmOrderProduct.price * confirmOrderProduct.quantity}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Discount Code Input - Only show for non-cart orders */}
+              {confirmOrderProduct.type !== 'cart' && (
+              <div className="space-y-2">
+                <label className="text-surface font-sans font-semibold text-sm">Discount Code (Optional):</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={discountInput}
+                    onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
+                    placeholder="Enter code"
+                    disabled={!!discountCode}
+                    className="flex-1 px-4 py-2 rounded-sm border-2 border-primary/20 text-surface font-sans focus:outline-none focus:border-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  />
+                  {!discountCode ? (
+                    <button
+                      onClick={() => {
+                        if (applyDiscountCode(discountInput)) {
+                          setDiscountInput('');
+                        }
+                      }}
+                      className="px-4 py-2 bg-primary text-white font-sans font-semibold rounded-sm hover:bg-surface transition-colors"
+                    >
+                      Apply
+                    </button>
+                  ) : (
+                    <button
+                      onClick={removeDiscount}
+                      className="px-4 py-2 bg-red-500 text-white font-sans font-semibold rounded-sm hover:bg-red-600 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                {discountCode && (
+                  <p className="text-xs text-green-600 font-sans font-semibold">
+                    Code "{discountCode}" applied - {(discount * 100).toFixed(0)}% off
+                  </p>
+                )}
+              </div>
+              )}
+
+              {/* Customer Details */}
+              <div className="space-y-4">
+                <h4 className="font-sans font-semibold text-surface border-b border-primary/20 pb-2">Customer Details</h4>
+
+                <div className="space-y-2">
+                  <label className="text-surface font-sans font-semibold text-sm">Name *</label>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Enter your full name"
+                    className="w-full px-4 py-3 rounded-sm border-2 border-primary/20 text-surface font-sans focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-surface font-sans font-semibold text-sm">Phone Number *</label>
+                  <input
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    placeholder="01XXXXXXXXX"
+                    className="w-full px-4 py-3 rounded-sm border-2 border-primary/20 text-surface font-sans focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-surface font-sans font-semibold text-sm">Full Address *</label>
+                  <textarea
+                    value={customerAddress}
+                    onChange={(e) => setCustomerAddress(e.target.value)}
+                    placeholder="Enter your complete delivery address"
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-sm border-2 border-primary/20 text-surface font-sans focus:outline-none focus:border-primary resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Delivery Selection */}
+              <div className="space-y-3">
+                <h4 className="font-sans font-semibold text-surface border-b border-primary/20 pb-2">Delivery Location</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setDeliveryType('inside')}
+                    className={`p-4 rounded-sm border-2 transition-all ${
+                      deliveryType === 'inside'
+                        ? 'border-primary bg-primary/10'
+                        : 'border-primary/20 hover:border-primary/50'
+                    }`}
+                  >
+                    <p className="font-sans font-semibold text-surface text-sm">Inside Dhaka</p>
+                    <p className="text-primary font-display font-bold text-lg">৳80</p>
+                  </button>
+                  <button
+                    onClick={() => setDeliveryType('outside')}
+                    className={`p-4 rounded-sm border-2 transition-all ${
+                      deliveryType === 'outside'
+                        ? 'border-primary bg-primary/10'
+                        : 'border-primary/20 hover:border-primary/50'
+                    }`}
+                  >
+                    <p className="font-sans font-semibold text-surface text-sm">Outside Dhaka</p>
+                    <p className="text-primary font-display font-bold text-lg">৳200</p>
+                  </button>
+                </div>
+              </div>
+
+              {/* Price Breakdown */}
+              <div className="bg-light/30 rounded-sm p-4 border border-primary/10 space-y-2">
+                {confirmOrderProduct.type === 'cart' ? (
+                  // Cart order price breakdown
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="font-sans text-surface/70">Subtotal:</span>
+                      <span className="font-sans text-surface">৳{confirmOrderProduct.originalSubtotal}</span>
+                    </div>
+                    {confirmOrderProduct.appliedDiscount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="font-sans text-surface/70">Discount ({(confirmOrderProduct.appliedDiscount * 100).toFixed(0)}%):</span>
+                        <span className="font-sans text-green-600 font-semibold">-৳{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedDiscount).toFixed(0)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-sm">
+                      <span className="font-sans text-surface/70">Delivery Fee:</span>
+                      <span className="font-sans text-surface">৳{getDeliveryFee()}</span>
+                    </div>
+                    <div className="flex justify-between text-lg border-t border-primary/20 pt-2 mt-2">
+                      <span className="font-sans font-semibold text-surface">Total:</span>
+                      <span className="font-display font-bold text-primary">
+                        ৳{((confirmOrderProduct.originalSubtotal * (1 - (confirmOrderProduct.appliedDiscount || 0))) + getDeliveryFee()).toFixed(0)}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  // Single product price breakdown
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="font-sans text-surface/70">Product Price:</span>
+                      <span className="font-sans text-surface">৳{confirmOrderProduct.price * confirmOrderProduct.quantity}</span>
+                    </div>
+                    {discount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="font-sans text-surface/70">Discount ({(discount * 100).toFixed(0)}%):</span>
+                        <span className="font-sans text-green-600 font-semibold">-৳{(confirmOrderProduct.price * confirmOrderProduct.quantity * discount).toFixed(0)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-sm">
+                      <span className="font-sans text-surface/70">Delivery Fee:</span>
+                      <span className="font-sans text-surface">৳{getDeliveryFee()}</span>
+                    </div>
+                    <div className="flex justify-between text-lg border-t border-primary/20 pt-2 mt-2">
+                      <span className="font-sans font-semibold text-surface">Total:</span>
+                      <span className="font-display font-bold text-primary">
+                        ৳{((confirmOrderProduct.price * confirmOrderProduct.quantity * (1 - discount)) + getDeliveryFee()).toFixed(0)}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Payment Information */}
+              <div className="space-y-3">
+                <h4 className="font-sans font-semibold text-surface border-b border-primary/20 pb-2">Payment Information</h4>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-4">
+                  <p className="text-sm font-sans text-yellow-800 font-medium">
+                    Advance payment of half the total cost (৳{confirmOrderProduct.type === 'cart'
+                      ? (((confirmOrderProduct.originalSubtotal * (1 - (confirmOrderProduct.appliedDiscount || 0))) + getDeliveryFee()) / 2).toFixed(0)
+                      : (((confirmOrderProduct.price * confirmOrderProduct.quantity * (1 - discount)) + getDeliveryFee()) / 2).toFixed(0)
+                    }) is required to confirm the order.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  {[
+                    { name: 'Bkash', number: paymentNumbers.bkash, color: 'bg-pink-500' },
+                    { name: 'Nagad', number: paymentNumbers.nagad, color: 'bg-orange-500' },
+                    { name: 'Rocket', number: paymentNumbers.rocket, color: 'bg-purple-500' }
+                  ].map((payment) => (
+                    <div key={payment.name} className="flex items-center justify-between p-3 bg-white border border-primary/10 rounded-sm">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 ${payment.color} rounded-sm flex items-center justify-center`}>
+                          <span className="text-white font-bold text-xs">{payment.name[0]}</span>
+                        </div>
+                        <div>
+                          <p className="font-sans font-semibold text-surface text-sm">{payment.name}</p>
+                          <p className="font-sans text-surface/70 text-sm">{payment.number}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard(payment.number, payment.name)}
+                        className={`p-2 rounded-sm transition-all ${
+                          copiedNumber === payment.name
+                            ? 'bg-green-500 text-white'
+                            : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
+                        }`}
+                      >
+                        {copiedNumber === payment.name ? (
+                          <Check className="w-5 h-5" />
+                        ) : (
+                          <Copy className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Confirm Button */}
+              <button
+                onClick={handleConfirmOrderWhatsApp}
+                className="w-full py-4 bg-green-500 text-white font-sans font-bold rounded-sm hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Buy Now
+              </button>
+              <p className="text-xs text-center text-surface/60 font-sans">
+                You'll be redirected to WhatsApp to finalize your order
+              </p>
             </div>
           </div>
         </div>
