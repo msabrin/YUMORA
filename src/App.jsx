@@ -26,7 +26,7 @@ const giftBoxProducts = [
     description: 'Elegant and stylish finger ring perfect for any occasion. Features a delicate design that adds charm to your everyday look.',
     image: '/assets/ring01.png',
     images: ['/assets/ring01.png', '/assets/1ring01.png', '/assets/2ring01.png'],
-    price: 40,
+    price: 100,
     colors: ['Red', 'Pink', 'Blue', 'Yellow'],
     availableColors: ['Red', 'Blue', 'Yellow'], // Pink unavailable
     inStock: true
@@ -37,7 +37,7 @@ const giftBoxProducts = [
     description: 'Premium quality earrings with intricate details. Lightweight and comfortable for all-day wear, perfect for special events.',
     image: '/assets/earring.png',
     images: ['/assets/earring.png', '/assets/earring1.png', '/assets/Earring2.png'],
-    price: 349,
+    price: 250,
     colors: ['Red', 'Pink', 'Green', 'Blue'],
     availableColors: ['Red', 'Pink', 'Green', 'Blue'],
     inStock: true
@@ -48,7 +48,7 @@ const giftBoxProducts = [
     description: 'Beautiful matching earring and locket set. Coordinated design that creates a sophisticated and cohesive look.',
     image: '/assets/earringlocket.png',
     images: ['/assets/earringlocket.png', '/assets/earringlocket1.png', '/assets/earringlocket2.png', '/assets/earringlocket3.png', '/assets/earringlocket4.png', '/assets/earringlocket5.png', '/assets/earringlocket6.png', '/assets/earringlocket7.png', '/assets/earringlocket8.png'],
-    price: 599,
+    price: 300,
     colors: ['Silver', 'Golden'],
     availableColors: ['Silver', 'Golden'],
     inStock: true
@@ -59,7 +59,7 @@ const giftBoxProducts = [
     description: 'Stunning stone-studded earring and locket set. Features premium quality stones that sparkle and shine beautifully.',
     image: '/assets/stoneearringlocket.png',
     images: ['/assets/stoneearringlocket.png', '/assets/stoneearringlocket1.png', '/assets/stoneearringlocket2.png'],
-    price: 449,
+    price: 400,
     colors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black'],
     availableColors: ['Red', 'Blue', 'Green', 'Pink', 'Purple'], // Yellow unavailable
     inStock: true
@@ -70,7 +70,7 @@ const giftBoxProducts = [
     description: 'Creative and fun erasers in various unique designs. Perfect for students or as collectible items.',
     image: '/assets/eraser.jpg',
     images: ['/assets/eraser.jpg', '/assets/eraser1.png', '/assets/eraser2.png', '/assets/eraser3.png', '/assets/eraser4.png', '/assets/eraser5.png', '/assets/eraser6.png'],
-    price: 389,
+    price: 100,
     colors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black', 'White'],
     availableColors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black', 'White'],
     inStock: true
@@ -81,7 +81,7 @@ const giftBoxProducts = [
     description: 'Stylish and practical bag with multiple compartments. Perfect for daily use with a touch of elegance.',
     image: '/assets/bag.png',
     images: ['/assets/bag.png', '/assets/bag1.jpg'],
-    price: 649,
+    price: 700,
     colors: ['Black', 'Pink', 'White', 'Purple'],
     availableColors: ['Black', 'Pink', 'White', 'Purple'],
     inStock: true
@@ -92,7 +92,7 @@ const giftBoxProducts = [
     description: 'Professional-grade beauty blender for flawless makeup application. Soft, durable, and perfect for blending foundation and concealer.',
     image: '/assets/Beautyblander.png',
     images: ['/assets/Beautyblander.png', '/assets/Beautyblender1.png'],
-    price: 329,
+    price: 100,
     colors: ['Marron', 'Pink', 'Green', 'Cream', 'Light Pink', 'Orange'],
     availableColors: ['Marron', 'Pink', 'Green', 'Cream', 'Light Pink', 'Orange'],
     inStock: true
@@ -103,7 +103,7 @@ const giftBoxProducts = [
     description: 'Trendy and comfortable scrunchies that hold your hair gently without damage. Available in a variety of colors to match any outfit.',
     image: '/assets/Crunchy.png',
     images: ['/assets/Crunchy.png', '/assets/Chunchy1.png'],
-    price: 419,
+    price: 60,
     colors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black', 'White', 'Orange', 'Maroon', 'Silver', 'Cream'],
     availableColors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black', 'White', 'Orange', 'Maroon', 'Silver', 'Cream'],
     inStock: true
@@ -114,7 +114,7 @@ const giftBoxProducts = [
     description: 'Chic bracelet that adds a modern touch to any outfit. Adjustable and comfortable for everyday wear.',
     image: '/assets/braslet.png',
     images: ['/assets/braslet.png', '/assets/braclet1.png', '/assets/braclet2.png', '/assets/braclet3.png'],
-    price: 699,
+    price: 100,
     colors: ['Black', 'Rainbow'],
     availableColors: ['Black', 'Rainbow'],
     inStock: true
@@ -125,7 +125,7 @@ const giftBoxProducts = [
     description: 'Adorable miniature mug charm perfect for keychains or decorative purposes. A cute and unique accessory.',
     image: '/assets/Charm.png',
     images: ['/assets/Charm.png'],
-    price: 379,
+    price: 60,
     colors: ['Green', 'Pink', 'Blue'],
     availableColors: ['Green', 'Pink', 'Blue'],
     inStock: true
@@ -136,7 +136,7 @@ const giftBoxProducts = [
     description: 'Decorative hair clips that securely hold your hair in place. Stylish and functional for various hairstyles.',
     image: '/assets/hairpin.png',
     images: ['/assets/hairpin.png', '/assets/hairpin1.png'],
-    price: 429,
+    price: 100,
     colors: ['Green', 'Blue', 'Yellow', 'Pink', 'Purple', 'White'],
     availableColors: ['Green', 'Blue', 'Yellow', 'Pink', 'Purple', 'White'],
     inStock: true
@@ -147,7 +147,7 @@ const giftBoxProducts = [
     description: 'Long-lasting premium lipstick with rich color and smooth application. Moisturizing formula for beautiful, comfortable lips.',
     image: '/assets/Lipstick.png',
     images: ['/assets/Lipstick.png', '/assets/Lipstick1.png', '/assets/lipstick2.png', '/assets/2ring01.png'],
-    price: 549,
+    price: 500,
     colors: ['Red', 'Pink', 'Maroon', 'Nude', 'Light Pink'],
     availableColors: ['Red', 'Pink', 'Maroon', 'Nude', 'Light Pink'],
     inStock: true
@@ -158,7 +158,7 @@ const giftBoxProducts = [
     description: 'Moisturizing lip gel infused with floral extracts. Provides a glossy finish while keeping your lips hydrated and soft.',
     image: '/assets/Lipgel.jpg',
     images: ['/assets/Lipgel.jpg'],
-    price: 549,
+    price: 300,
     colors: ['Red', 'Pink', 'Orange'],
     availableColors: ['Red', 'Pink', 'Orange'],
     inStock: true
@@ -169,7 +169,7 @@ const giftBoxProducts = [
     description: 'High-shine lip gloss that adds volume and dimension to your lips. Non-sticky formula for comfortable all-day wear.',
     image: '/assets/Lipgloss.png',
     images: ['/assets/Lipgloss.png'],
-    price: 549,
+    price: 200,
     colors: ['Pink'],
     availableColors: ['Pink'],
     inStock: true
@@ -180,7 +180,7 @@ const giftBoxProducts = [
     description: 'Premium press-on nails with modern designs. Easy to apply and remove, perfect for a quick nail makeover.',
     image: '/assets/Fakenails.png',
     images: ['/assets/Fakenails.png'],
-    price: 549,
+    price: 300,
     colors: ['Cream', 'Pink', 'Maroon', 'Blue', 'Light Brown'],
     availableColors: ['Cream', 'Pink', 'Maroon', 'Blue', 'Light Brown'],
     inStock: true
@@ -191,7 +191,7 @@ const giftBoxProducts = [
     description: 'Comfortable and breathable face mask in trendy colors. Washable and reusable for everyday protection.',
     image: '/assets/Facemask.png',
     images: ['/assets/Facemask.png'],
-    price: 549,
+    price: 100,
     colors: ['Red', 'Pink', 'Black', 'Blue', 'White', 'Green', 'Purple'],
     availableColors: ['Red', 'Pink', 'Black', 'Blue', 'White', 'Green', 'Purple'],
     inStock: true
@@ -202,7 +202,7 @@ const giftBoxProducts = [
     description: 'Purifying mud mask that deeply cleanses pores and removes impurities. Leaves skin feeling refreshed and revitalized.',
     image: '/assets/Mudmask.jpg',
     images: ['/assets/Mudmask.jpg'],
-    price: 549,
+    price: 80,
     colors: ['Pink'],
     availableColors: ['Pink'],
     inStock: true
@@ -213,7 +213,7 @@ const giftBoxProducts = [
     description: 'Sweet-scented beauty mask with nourishing ingredients. Treats your skin while providing a delightful aromatherapy experience.',
     image: '/assets/candymask.jpeg',
     images: ['/assets/candymask.jpeg', '/assets/candymask1.jpeg', '/assets/candymask2.jpeg'],
-    price: 549,
+    price: 20,
     colors: ['Pink'],
     availableColors: ['Pink'],
     inStock: true
@@ -224,7 +224,7 @@ const giftBoxProducts = [
     description: 'Compact handheld mirror perfect for on-the-go touch-ups. Clear reflection with an elegant design.',
     image: '/assets/Mirror.png',
     images: ['/assets/Mirror.png'],
-    price: 549,
+    price: 250,
     colors: ['Cream', 'Pink', 'Black', 'Silver'],
     availableColors: ['Cream', 'Pink', 'Black', 'Silver'],
     inStock: true
@@ -235,7 +235,7 @@ const giftBoxProducts = [
     description: 'Charming ceramic mug perfect for your favorite hot beverages. Comfortable handle and generous capacity.',
     image: '/assets/Mug.png',
     images: ['/assets/Mug.png', '/assets/mug1.png'],
-    price: 549,
+    price: 300,
     colors: ['Pink', 'Green', 'Blue'],
     availableColors: ['Green', 'Pink', 'Blue'],
     inStock: true
@@ -246,7 +246,7 @@ const giftBoxProducts = [
     description: 'Beautiful diary with lock and key to keep your thoughts private. Quality paper perfect for daily journaling.',
     image: '/assets/dairy.png',
     images: ['/assets/dairy.png', '/assets/dairy1.png'],
-    price: 549,
+    price: 200,
     colors: ['Blue', 'Pink', 'Purple'],
     availableColors: ['Blue', 'Pink', 'Purple'],
     inStock: true
@@ -257,7 +257,7 @@ const giftBoxProducts = [
     description: 'Decorative washi tape perfect for crafts, journals, and gift wrapping. Easy to tear and reposition.',
     image: '/assets/Washitape.png',
     images: ['/assets/Washitape.png'],
-    price: 549,
+    price: 40,
     colors: ['White', 'Pink', 'Red', 'Blue', 'Green'],
     availableColors: ['White', 'Pink', 'Red', 'Blue', 'Green'],
     inStock: true
@@ -268,7 +268,7 @@ const giftBoxProducts = [
     description: 'Easy-to-apply nail stickers in trendy designs. Long-lasting and perfect for quick nail art.',
     image: '/assets/Nailsticker.png',
     images: ['/assets/Nailsticker.png'],
-    price: 549,
+    price: 100,
     colors: ['Pink', 'Yellow'],
     availableColors: ['Pink'],
     inStock: true
@@ -279,7 +279,7 @@ const giftBoxProducts = [
     description: 'Vibrant highlighter markers perfect for studying and organizing notes. Chisel tip for both thick and thin lines.',
     image: '/assets/Highlighter.png',
     images: ['/assets/Highlighter.png', '/assets/Highlighter1.png'],
-    price: 549,
+    price: 40,
     colors: ['Orange', 'Pink', 'Green', 'Blue', 'Purple', 'Yellow'],
     availableColors: ['Orange', 'Pink', 'Green', 'Blue', 'Purple', 'Yellow'],
     inStock: true
@@ -290,7 +290,7 @@ const giftBoxProducts = [
     description: 'Colorful decorative tip perfect for personalizing your stationery and accessories. Fun and creative design.',
     image: '/assets/Tip.png',
     images: ['/assets/Tip.png'],
-    price: 549,
+    price: 20,
     colors: ['Rainbow'],
     availableColors: ['Rainbow'],
     inStock: true
@@ -303,26 +303,26 @@ const giftBoxProducts = [
 // ============================================
 const PRODUCT_COLORS = [
   { name: 'Sky Blue', hex: '#8bd0e0' },
-  { name: 'Pink', hex: '#F472B6' },
-  { name: 'Green', hex: '#22C55E' },
-  { name: 'Blue', hex: '#3B82F6' },
-  { name: 'Purple', hex: '#A855F7' },
-  { name: 'Yellow', hex: '#FACC15' },
+  { name: 'Pink', hex: '#ef007bff' },
+  { name: 'Green', hex: '#16ad4eff' },
+  { name: 'Blue', hex: '#2669d5ff' },
+  { name: 'Purple', hex: '#a659eeff' },
+  { name: 'Yellow', hex: '#ffcf11ff' },
   { name: 'Silver', hex: '#C0C0C0' },
-  { name: 'Golden', hex: '#D4AF37' },
-  { name: 'Orange', hex: '#F97316' },
-  { name: 'Light Pink', hex: '#FBB6CE' },
-  { name: 'Cream', hex: '#FFFDD0' },
-  { name: 'Black', hex: '#1F2937' },
-  { name: 'Light Brown', hex: '#A78B71' },
+  { name: 'Golden', hex: '#cca72dff' },
+  { name: 'Orange', hex: '#f06400ff' },
+  { name: 'Light Pink', hex: '#f799baff' },
+  { name: 'Cream', hex: '#fcf799ff' },
+  { name: 'Black', hex: '#000000ff' },
+  { name: 'Light Brown', hex: '#8d6c4eff' },
   { name: 'White', hex: '#FFFFFF' },
-  { name: 'Nude', hex: '#E3BC9A' },
+  { name: 'Nude', hex: '#dcb28cff' },
   { name: 'Maroon', hex: '#800020' },
-  { name: 'Red', hex: '#EF4444' },
+  { name: 'Red', hex: '#e50404ff' },
 ];
 
 // Colors available for Color Cup product (by name)
-const AVAILABLE_CUP_COLORS = ['Sky Blue', 'Green', 'Blue', 'Purple'];
+const AVAILABLE_CUP_COLORS = ['Red', 'Green', 'Blue', 'Purple', 'Pink', 'Rainbow'];
 
 // Helper function to calculate brightness from HEX and determine if color is light
 const isLightColor = (hex) => {
@@ -1548,7 +1548,8 @@ function App() {
                 Custom Gift Box
               </h3>
               <p className="font-sans text-lg max-w-2xl mx-auto" style={{ color: '#eedfe3', opacity: 0.8 }}>
-                Explore our exquisite collection and customize your perfect gift
+                Explore our exquisite collection and customize your perfect gift. 
+                Buy up to 10 Gifts to get 10% Discount! And up to 16 Gifts to get 15% discount! 
               </p>
             </div>
 
