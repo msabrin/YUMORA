@@ -1182,7 +1182,7 @@ function App() {
             <div id="charm-mystery-box" className="bg-white/10 backdrop-blur-xl rounded-sm p-6 md:p-10 border border-white/20 shadow-xl hover:shadow-2xl transition-shadow duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
-                  <h4 className="text-3xl md:text-4xl font-display font-bold flex items-center gap-3" style={{ color: '#eedfe3' }}>
+                  <h4 className="text-3xl md:text-4xl font-san font-bold flex items-center gap-3" style={{ color: '#eedfe3' }}>
                     <IceCream className="w-10 h-10" style={{ color: '#c5a880' }} />
                     Charm Mystery Box
                   </h4>
@@ -1192,7 +1192,7 @@ function App() {
                   </p>
 
                   {/* Scoop Selector */}
-                  <div className="space-y-4">
+                  <div className="font-san space-y-4">
                     <label className="font-sans font-semibold" style={{ color: '#eedfe3' }}>Select Scoops:</label>
 
                     <div className="grid grid-cols-3 gap-3">
@@ -1203,7 +1203,7 @@ function App() {
                             setIsCustomScoops(false);
                             setMysteryBoxScoops(option.scoops);
                           }}
-                          className={`p-4 rounded-sm font-sans font-semibold transition-all border-2 ${
+                          className={`p-4 rounded-l font-sans font-semibold text[60px] transition-all border-2 ${
                             !isCustomScoops && mysteryBoxScoops === option.scoops
                               ? 'text-white border-[#c5a880]'
                               : 'border-white/20 hover:border-[#c5a880]'
@@ -1212,11 +1212,11 @@ function App() {
                             ? { backgroundColor: '#c5a880' }
                             : { backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#eedfe3' }}
                         >
-                          <div className="flex items-center justify-center gap-1 text-2xl font-display">
+                          <div className="flex items-center justify-center gap-1 text-3xl font-san">
                             <IceCream className="w-6 h-6" />
                             {option.scoops}
                           </div>
-                          <div className="flex items-baseline justify-center text-sm mt-1 opacity-80"><span>৳</span><span className="font-san">{option.price}</span></div>
+                          <div className="flex items-baseline justify-center text-xl mt-1 opacity-80"><span>৳</span><span className="font-san">{option.price}</span></div>
                         </button>
                       ))}
                     </div>
@@ -1360,7 +1360,7 @@ function App() {
                     Choose your perfect shade from our vibrant collection. Each color tells a different story.
                   </p>
 
-                  <p className="font-display font-bold text-5xl flex items-baseline" style={{ color: '#c5a880' }}><span>৳</span><span>12</span></p>
+                  <p className="font-san font-semibold text-5xl flex items-baseline" style={{ color: '#c5a880' }}><span>৳ 12</span></p>
 
                   {/* Color Selector - Using Inline Styles for Build Safety */}
                   <div className="space-y-4">
@@ -1498,14 +1498,14 @@ function App() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-6 pt-10">
+              <div className="font-san grid grid-cols-3 gap-6 pt-10">
                 {[
                   { value: '38+', label: 'Years' },
                   { value: '50K+', label: 'Customers' },
                   { value: '100%', label: 'Handcrafted' }
                 ].map((stat, i) => (
                   <div key={i} className="text-center p-6 rounded-sm bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <p className="text-4xl font-display font-bold mb-2" style={{ color: '#c5a880' }}>{stat.value}</p>
+                    <p className="text-4xl font-san mb-2" style={{ color: '#c5a880' }}>{stat.value}</p>
                     <p className="text-sm font-sans uppercase tracking-wide" style={{ color: '#eedfe3', opacity: 0.7 }}>{stat.label}</p>
                   </div>
                 ))}
