@@ -12,6 +12,18 @@ const VALID_CODES = {
 };
 // ============================================
 
+// ============================================
+// CUSTOM GIFT BOX CONSTANTS - EASY TO EDIT
+// ============================================
+const MIN_TYPES = 8;               // Minimum unique product types to checkout
+const TIER_1_TYPES = 10;           // Unique types needed for tier 1 discount
+const TIER_2_TYPES = 16;           // Unique types needed for tier 2 discount
+const TIER_1_DISCOUNT = 0.05;      // 5% discount for 10+ types
+const TIER_2_DISCOUNT = 0.10;      // 10% discount for 16+ types
+const DELIVERY_INSIDE_DHAKA = 80;  // Delivery fee inside Dhaka
+const DELIVERY_OUTSIDE_DHAKA = 200; // Delivery fee outside Dhaka
+// ============================================
+
 // Product data with availability
 const mysteryBoxOptions = [
   { scoops: 1, price: 15 },
@@ -302,11 +314,12 @@ const giftBoxProducts = [
 // Easy to add/modify colors - just add to this array
 // ============================================
 const PRODUCT_COLORS = [
-  { name: 'Sky Blue', hex: '#8bd0e0' },
+  { name: 'Red', hex: '#e50404ff' },
   { name: 'Pink', hex: '#ef007bff' },
   { name: 'Green', hex: '#16ad4eff' },
   { name: 'Blue', hex: '#2669d5ff' },
   { name: 'Purple', hex: '#a659eeff' },
+  { name: 'Rainbow', hex: '#cb6579ff' },
   { name: 'Yellow', hex: '#ffcf11ff' },
   { name: 'Silver', hex: '#C0C0C0' },
   { name: 'Golden', hex: '#cca72dff' },
@@ -318,11 +331,11 @@ const PRODUCT_COLORS = [
   { name: 'White', hex: '#FFFFFF' },
   { name: 'Nude', hex: '#dcb28cff' },
   { name: 'Maroon', hex: '#800020' },
-  { name: 'Red', hex: '#e50404ff' },
+  
 ];
 
 // Colors available for Color Cup product (by name)
-const AVAILABLE_CUP_COLORS = ['Red', 'Green', 'Blue', 'Purple', 'Pink', 'Rainbow'];
+const AVAILABLE_CUP_COLORS = ['Red', 'Green', 'Blue', 'Purple', 'Pink', 'Yellow', 'Rainbow'];
 
 // Helper function to calculate brightness from HEX and determine if color is light
 const isLightColor = (hex) => {
@@ -668,37 +681,6 @@ function App() {
     setShowConfirmOrder(true);
   };
 
-  const buyNowGiftBox = () => {
-    if (!selectedGiftBox) return;
-
-    if (!selectedGiftBox.inStock) {
-      alert('This product is currently sold out');
-      return;
-    }
-
-    if (!selectedGiftBox.availableColors.includes(giftBoxColor)) {
-      alert('This color is currently unavailable');
-      return;
-    }
-
-    const selectedImage = selectedGiftBox.images && selectedGiftBox.images.length > 0
-      ? selectedGiftBox.images[selectedImageIndex]
-      : selectedGiftBox.image;
-
-    setConfirmOrderProduct({
-      name: selectedGiftBox.name,
-      description: selectedGiftBox.description,
-      price: selectedGiftBox.price,
-      type: 'gift-box',
-      color: giftBoxColor,
-      quantity: giftBoxQuantity,
-      image: selectedImage,
-      selectedImageUrl: selectedImage
-    });
-    setSelectedGiftBox(null);
-    setShowConfirmOrder(true);
-  };
-
   // Copy payment number to clipboard
   const copyToClipboard = (number, type) => {
     navigator.clipboard.writeText(number);
@@ -708,8 +690,22 @@ function App() {
 
   // Calculate delivery fee
   const getDeliveryFee = () => {
-    return deliveryType === 'inside' ? 80 : 200;
+    return deliveryType === 'inside' ? DELIVERY_INSIDE_DHAKA : DELIVERY_OUTSIDE_DHAKA;
   };
+
+  // Gift box cart calculations - track unique product TYPES (not quantity)
+  const giftBoxCartItems = cartItems.filter(item => item.type === 'gift-box');
+  const giftBoxUniqueTypes = new Set(giftBoxCartItems.map(item => item.id.replace(/-[^-]+$/, ''))).size;
+  const hasGiftBoxItems = giftBoxUniqueTypes > 0;
+  const giftBoxMeetsMinimum = giftBoxUniqueTypes >= MIN_TYPES;
+
+  // Bulk discount based on unique gift box types
+  const getBulkDiscountRate = () => {
+    if (giftBoxUniqueTypes >= TIER_2_TYPES) return TIER_2_DISCOUNT;
+    if (giftBoxUniqueTypes >= TIER_1_TYPES) return TIER_1_DISCOUNT;
+    return 0;
+  };
+  const bulkDiscountRate = getBulkDiscountRate();
 
   // Handle confirm order WhatsApp
   const handleConfirmOrderWhatsApp = () => {
@@ -726,17 +722,17 @@ function App() {
     if (!confirmOrderProduct) return;
 
     const deliveryFee = getDeliveryFee();
-    let productPrice, discountAmount, afterDiscount, finalTotal, productDetails;
+    let productPrice, bulkDiscountAmount, promoDiscountAmount, finalTotal, productDetails;
 
     // Handle cart orders vs single product orders
     if (confirmOrderProduct.type === 'cart' && confirmOrderProduct.cartItems) {
       // Cart order - use pre-calculated values from cart
       productPrice = confirmOrderProduct.originalSubtotal;
-      const cartDiscount = confirmOrderProduct.appliedDiscount || 0;
-      const cartDiscountCode = confirmOrderProduct.appliedDiscountCode || '';
-      discountAmount = productPrice * cartDiscount;
-      afterDiscount = productPrice - discountAmount;
-      finalTotal = afterDiscount + deliveryFee;
+      const cartBulkDiscount = confirmOrderProduct.appliedBulkDiscount || 0;
+      const cartPromoDiscount = confirmOrderProduct.appliedDiscount || 0;
+      bulkDiscountAmount = productPrice * cartBulkDiscount;
+      promoDiscountAmount = productPrice * cartPromoDiscount;
+      finalTotal = productPrice - bulkDiscountAmount - promoDiscountAmount + deliveryFee;
 
       // Build detailed product list
       productDetails = confirmOrderProduct.cartItems.map((item, idx) => {
@@ -750,18 +746,12 @@ function App() {
         }
         return details;
       }).join('\n');
-
-      // Use cart's discount info
-      if (cartDiscount > 0 && cartDiscountCode) {
-        discountAmount = productPrice * cartDiscount;
-        afterDiscount = productPrice - discountAmount;
-      }
     } else {
       // Single product order
       productPrice = confirmOrderProduct.price * confirmOrderProduct.quantity;
-      discountAmount = productPrice * discount;
-      afterDiscount = productPrice - discountAmount;
-      finalTotal = afterDiscount + deliveryFee;
+      bulkDiscountAmount = 0;
+      promoDiscountAmount = productPrice * discount;
+      finalTotal = productPrice - promoDiscountAmount + deliveryFee;
 
       productDetails = `*📌 Product Name:* ${confirmOrderProduct.name}`;
       if (confirmOrderProduct.description) {
@@ -775,9 +765,6 @@ function App() {
         productDetails += `\n*🖼️ Selected Image:* ${confirmOrderProduct.selectedImageUrl}`;
       }
     }
-
-    // Recalculate final total
-    finalTotal = afterDiscount + deliveryFee;
 
     let message = `🛍️ *I Would Like To Order*\n\n`;
     message += `━━━━━━━━━━━━━━━━━━━━\n`;
@@ -796,12 +783,22 @@ function App() {
     message += `━━━━━━━━━━━━━━━━━━━━\n`;
     message += `*Subtotal:* ৳${productPrice}\n`;
 
-    const appliedDiscountCode = confirmOrderProduct.type === 'cart' ? confirmOrderProduct.appliedDiscountCode : discountCode;
-    const appliedDiscount = confirmOrderProduct.type === 'cart' ? confirmOrderProduct.appliedDiscount : discount;
+    // Bulk discount info
+    const cartBulkRate = confirmOrderProduct.type === 'cart' ? (confirmOrderProduct.appliedBulkDiscount || 0) : 0;
+    if (cartBulkRate > 0) {
+      message += `*Bulk Discount (${(cartBulkRate * 100).toFixed(0)}%):* -৳${bulkDiscountAmount.toFixed(0)}\n`;
+    }
 
-    if (appliedDiscount > 0 && appliedDiscountCode) {
-      message += `*Discount (${appliedDiscountCode}):* -৳${discountAmount.toFixed(0)}\n`;
-      message += `*After Discount:* ৳${afterDiscount.toFixed(0)}\n`;
+    // Promo discount info
+    const appliedDiscountCode = confirmOrderProduct.type === 'cart' ? confirmOrderProduct.appliedDiscountCode : discountCode;
+    const appliedPromoRate = confirmOrderProduct.type === 'cart' ? (confirmOrderProduct.appliedDiscount || 0) : discount;
+
+    if (appliedPromoRate > 0 && appliedDiscountCode) {
+      message += `*Promo Discount (${appliedDiscountCode}):* -৳${promoDiscountAmount.toFixed(0)}\n`;
+    }
+
+    if (bulkDiscountAmount > 0 || promoDiscountAmount > 0) {
+      message += `*After Discounts:* ৳${(productPrice - bulkDiscountAmount - promoDiscountAmount).toFixed(0)}\n`;
     }
 
     message += `*Delivery Fee:* ৳${deliveryFee}\n`;
@@ -850,10 +847,12 @@ function App() {
     );
   };
 
-  // Calculate total
+  // Calculate total: Total = Subtotal - Bulk Discount - Promo Discount
   const calculateTotal = () => {
     const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-    return subtotal * (1 - discount); // Apply discount formula: Total = Subtotal × (1 - Discount)
+    const bulkDiscountAmount = subtotal * bulkDiscountRate;
+    const promoDiscountAmount = subtotal * discount;
+    return subtotal - bulkDiscountAmount - promoDiscountAmount;
   };
 
   // Calculate subtotal (before discount)
@@ -931,7 +930,7 @@ function App() {
               >
                 <ShoppingBag className="w-7 h-7" />
                 {cartItems.length > 0 && (
-                  <span className="absolute -top-1 -right-1 text-xm font-bold rounded-full h-6 w-6 flex items-center justify-center" style={{ backgroundColor: '#e63535ff', color: '#fff' }}>
+                  <span className="absolute -top-1 -right-1 text-xm font-bold rounded-full h-6 w-6 flex items-center justify-center font-fraktur" style={{ backgroundColor: '#e63535ff', color: '#fff' }}>
                     {cartItems.reduce((total, item) => total + item.quantity, 0)}
                   </span>
                 )}
@@ -1217,7 +1216,7 @@ function App() {
                             <IceCream className="w-6 h-6" />
                             {option.scoops}
                           </div>
-                          <div className="flex items-baseline justify-center text-sm mt-1 opacity-80"><span>৳</span><span>{option.price}</span></div>
+                          <div className="flex items-baseline justify-center text-sm mt-1 opacity-80"><span>৳</span><span className="font-fraktur">{option.price}</span></div>
                         </button>
                       ))}
                     </div>
@@ -1520,10 +1519,11 @@ function App() {
 
       {/* Gift Box Collection View */}
       {showGiftBoxCollection && (
-        <section className="py-20 min-h-screen">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="min-h-screen pb-20">
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
             {/* Back Button */}
-            <div className="mb-12">
+            <div className="mb-10">
               <button
                 onClick={() => {
                   setShowGiftBoxCollection(false);
@@ -1540,58 +1540,177 @@ function App() {
             </div>
 
             {/* Collection Header */}
-            <div className="text-center mb-16">
+            <div className="text-center mb-12">
               <p className="text-sm uppercase tracking-[0.3em] font-sans font-semibold mb-4" style={{ color: '#c5a880' }}>
-                Our Collection
+                Curated Collection
               </p>
-              <h3 className="text-4xl md:text-5xl font-display font-bold mb-4" style={{ color: '#eedfe3' }}>
+              <h3 className="text-4xl md:text-6xl font-display font-bold mb-4 tracking-tight" style={{ color: '#eedfe3' }}>
                 Custom Gift Box
               </h3>
-              <p className="font-sans text-lg max-w-2xl mx-auto" style={{ color: '#eedfe3', opacity: 0.8 }}>
-                Explore our exquisite collection and customize your perfect gift. 
-                Buy up to 10 Gifts to get 10% Discount! And up to 16 Gifts to get 15% discount! 
+              <p className="font-sans text-lg max-w-2xl mx-auto" style={{ color: '#eedfe3', opacity: 0.7 }}>
+                Select 8 types of Product to build your own from premium Gift Box with our exquisite products.
+                To Unlock Offers fill the product type bar.
               </p>
             </div>
 
-            {/* Product Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {giftBoxProducts.map(product => (
-                <div
-                  key={product.id}
-                  onClick={() => product.inStock && openGiftBoxModal(product)}
-                  className={`group relative bg-white/10 backdrop-blur-xl rounded-sm overflow-hidden border border-white/20 shadow-lg transition-all duration-300 ${
-                    product.inStock
-                      ? 'cursor-pointer hover:shadow-2xl hover:border-[#c5a880] hover:-translate-y-1'
-                      : 'opacity-60 cursor-not-allowed'
-                  }`}
-                >
-                  <div className="aspect-square overflow-hidden relative">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className={`w-full h-full object-cover transition-transform ${
-                        product.inStock ? 'group-hover:scale-105' : 'grayscale'
-                      }`}
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        const fallback = document.createElement('div');
-                        fallback.className = 'w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10';
-                        fallback.innerHTML = `<span style="color: #c5a880" class="font-display text-4xl font-bold">${product.name[0]}</span>`;
-                        e.target.parentElement.appendChild(fallback);
-                      }}
-                    />
-                    {!product.inStock && (
-                      <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-                        <span className="font-sans font-bold text-sm" style={{ color: 'rgba(0, 0, 0, 0.8)' }}>SOLD OUT</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3 md:p-4">
-                    <h5 className="font-sans font-medium text-base md:text-lg truncate mb-1 leading-tight" style={{ color: '#eedfe3' }}>{product.name}</h5>
-                    <p className="font-display font-bold text-xl md:text-2xl flex items-baseline" style={{ color: '#c5a880' }}><span className="text-lg md:text-xl">৳</span><span>{product.price}</span></p>
+            {/* ===== Split Layout Progress Bar ===== */}
+            <div className="mb-10 rounded-lg px-6 sm:px-8 py-5 sm:py-6" style={{ backgroundColor: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 4px 24px rgba(0,0,0,0.10)' }}>
+              <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
+                {/* Left Side - Status Text */}
+                <div className="md:w-[280px] flex-shrink-0">
+                  <p className="font-display font-bold text-xl sm:text-2xl tracking-tight mb-1" style={{ color: '#eedfe3' }}>
+                    {giftBoxUniqueTypes >= TIER_2_TYPES
+                      ? <><span className="font-fraktur">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% Bulk Discount Applied</>
+                      : giftBoxUniqueTypes >= TIER_1_TYPES
+                        ? <>Select <span className="font-fraktur">{TIER_2_TYPES - giftBoxUniqueTypes}</span> more to unlock <span className="font-fraktur">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                        : giftBoxUniqueTypes >= MIN_TYPES
+                          ? <>Select <span className="font-fraktur">{TIER_1_TYPES - giftBoxUniqueTypes}</span> more to unlock <span className="font-fraktur">{(TIER_1_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                          : 'Build Your Custom Gift Box'
+                    }
+                  </p>
+                  <p className="font-sans text-l" style={{ color: 'rgba(255, 255, 255, 0.93)' }}>
+                    {giftBoxUniqueTypes < MIN_TYPES
+                      ? <>Select minimum <span className="font-fraktur">{MIN_TYPES}</span> types to purchase</>
+                      : <><span className="font-fraktur">{giftBoxUniqueTypes}</span> of <span className="font-fraktur">{giftBoxProducts.length}</span> types selected</>
+                    }
+                  </p>
+                  <div className="font-fraktur font-bold text-3xl sm:text-4xl tracking-tight mt-2" style={{ color: '#8bd0e0' }}>
+                    {giftBoxUniqueTypes}<span className="text-lg sm:text-xl font-semibold" style={{ color: 'rgba(238,223,227,0.4)' }}>/{giftBoxProducts.length}</span>
                   </div>
                 </div>
-              ))}
+
+                {/* Right Side - Wide Progress Bar */}
+                <div className="flex-1 min-w-0">
+                  {/* Numbers above bar */}
+                  <div className="relative mb-1.5">
+                    <div className="flex items-end" style={{ height: '28px' }}>
+                      {[
+                        { val: 1, label: '1' },
+                        { val: MIN_TYPES, label: String(MIN_TYPES) },
+                        { val: TIER_1_TYPES, label: String(TIER_1_TYPES) },
+                        { val: TIER_2_TYPES, label: String(TIER_2_TYPES) }
+                      ].map(marker => (
+                        <div
+                          key={marker.val}
+                          className="absolute text-center"
+                          style={{ left: `${(marker.val / giftBoxProducts.length) * 100}%`, transform: 'translateX(-50%)' }}
+                        >
+                          <span
+                            className="font-fraktur font-bold text-base sm:text-xl block leading-none"
+                            style={{
+                              color: giftBoxUniqueTypes >= marker.val ? '#eedfe3' : 'rgba(238,223,227,0.3)'
+                            }}
+                          >
+                            {marker.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* The thick bar */}
+                  <div className="relative w-full rounded-full overflow-hidden" style={{ height: '16px', backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                    {/* Fill */}
+                    <div
+                      className="absolute top-0 left-0 h-full rounded-full"
+                      style={{
+                        width: `${Math.min((giftBoxUniqueTypes / giftBoxProducts.length) * 100, 100)}%`,
+                        backgroundColor: '#8bd0e0',
+                        transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                        boxShadow: giftBoxUniqueTypes > 0 ? '0 2px 8px rgba(139,208,224,0.4)' : 'none'
+                      }}
+                    />
+                    {/* Tick marks */}
+                    {[MIN_TYPES, TIER_1_TYPES, TIER_2_TYPES].map(tick => (
+                      <div
+                        key={tick}
+                        className="absolute top-0 h-full"
+                        style={{
+                          left: `${(tick / giftBoxProducts.length) * 100}%`,
+                          width: '3px',
+                          backgroundColor: giftBoxUniqueTypes >= tick ? 'rgba(255, 255, 255, 0.87)' : 'rgba(255, 255, 255, 0.48)'
+                        }}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Percentages below bar */}
+                  <div className="relative mt-1.5" style={{ height: '22px' }}>
+                    {[
+                      { val: MIN_TYPES, label: '0%' },
+                      { val: TIER_1_TYPES, label: `${(TIER_1_DISCOUNT * 100).toFixed(0)}%` },
+                      { val: TIER_2_TYPES, label: `${(TIER_2_DISCOUNT * 100).toFixed(0)}%` }
+                    ].map(marker => (
+                      <div
+                        key={marker.val}
+                        className="absolute text-center"
+                        style={{ left: `${(marker.val / giftBoxProducts.length) * 100}%`, transform: 'translateX(-50%)' }}
+                      >
+                        <span
+                          className="font-sans font-bold text-xs sm:text-sm"
+                          style={{ color: giftBoxUniqueTypes >= marker.val ? '#8bd0e0' : 'rgba(238, 223, 227, 0.59)' }}
+                        >
+                          {marker.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {giftBoxProducts.map(product => {
+                const isInCart = cartItems.some(item => item.type === 'gift-box' && item.id.replace(/-[^-]+$/, '') === product.id);
+                return (
+                  <div
+                    key={product.id}
+                    onClick={() => product.inStock && openGiftBoxModal(product)}
+                    className={`group relative bg-white/10 backdrop-blur-xl rounded-sm overflow-hidden border shadow-lg transition-all duration-300 ${
+                      product.inStock
+                        ? `cursor-pointer hover:shadow-2xl hover:-translate-y-1 ${isInCart ? 'border-[#8bd0e0]/60 ring-2 ring-[#8bd0e0]/30' : 'border-white/20 hover:border-[#c5a880]'}`
+                        : 'opacity-50 cursor-not-allowed border-white/10'
+                    }`}
+                  >
+                    {isInCart && (
+                      <div className="absolute top-2.5 right-2.5 z-10 rounded-full p-1.5" style={{ backgroundColor: '#8bd0e0' }}>
+                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                        </svg>
+                      </div>
+                    )}
+                    <div className="aspect-square overflow-hidden relative">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className={`w-full h-full object-cover transition-transform duration-500 ${
+                          product.inStock ? 'group-hover:scale-110' : 'grayscale'
+                        }`}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          const fallback = document.createElement('div');
+                          fallback.className = 'w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10';
+                          fallback.innerHTML = `<span style="color: #c5a880" class="font-display text-4xl font-bold">${product.name[0]}</span>`;
+                          e.target.parentElement.appendChild(fallback);
+                        }}
+                      />
+                      {!product.inStock && (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                          <span className="font-sans font-bold text-sm uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.9)' }}>Sold Out</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3 md:p-4">
+                      <h5 className="font-display font-bold text-base md:text-lg truncate mb-1 leading-tight tracking-tight" style={{ color: '#eedfe3' }}>{product.name}</h5>
+                      <p className="font-fraktur font-bold text-xl md:text-2xl flex items-baseline tracking-tight" style={{ color: '#c5a880' }}>
+                        <span className="text-base md:text-lg mr-0.5 font-display" style={{ color: '#c5a880', opacity: 0.8 }}>৳</span>
+                        <span>{product.price}</span>
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -1637,7 +1756,7 @@ function App() {
                 />
               </div>
               <p className="font-sans text-sm leading-relaxed" style={{ color: '#22223b', opacity: 0.8 }}>
-                Crafting timeless elegance since 2025. Premium Gifts for those who appreciate the finer things.
+                Timeless elegance since 2025. Premium Gifts for those who appreciate the finer things.
               </p>
             </div>
 
@@ -1746,7 +1865,7 @@ function App() {
 
           <div className="border-t border-[#22223b]/20 pt-8 text-center">
             <p className="font-sans text-sm" style={{ color: '#040405ff', opacity: 0.6 }}>
-              © 2025 Yumora by <a href="https://github.com/msabrin" target="_blank" rel="noopener noreferrer"> <strong>Mirza Sabrin</strong></a> .All rights reserved. Crafted with excellence.
+              © 2025 Yumora by <a href="https://github.com/msabrin" target="_blank" rel="noopener noreferrer"> <strong>Mirza Sabrin</strong></a> .All rights reserved.
             </p>
           </div>
         </div>
@@ -1754,11 +1873,81 @@ function App() {
 
       {/* Gift Box Detail Modal */}
       {selectedGiftBox && (
-        <div className="fixed inset-0 z-50 overflow-y-auto flex items-start md:items-center justify-center p-4 bg-surface/70 backdrop-blur-lg">
+        <div className="fixed inset-0 z-[110] overflow-y-auto flex items-start md:items-center justify-center p-4 bg-surface/70 backdrop-blur-lg">
           <div className="relative bg-white rounded-sm shadow-2xl max-w-4xl w-full border-2 border-primary/20 my-4 md:my-0 max-h-[90vh] overflow-y-auto">
+            {/* Progress bar inside modal - Split Layout */}
+            <div className="sticky top-0 z-20 border-b" style={{ backgroundColor: '#fafbfc', borderColor: '#e5e7eb' }}>
+              <div className="px-4 sm:px-6 md:px-10 py-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+                  {/* Left Side - Status Text */}
+                  <div className="sm:w-[180px] flex-shrink-0 flex sm:flex-col items-center sm:items-start gap-3 sm:gap-0">
+                    <p className="font-fraktur font-semibold text-xl tracking-tight" style={{ color: '#000000ff' }}>
+                      {giftBoxUniqueTypes < MIN_TYPES
+                        ? <><span className="">{MIN_TYPES - giftBoxUniqueTypes}</span> more type{MIN_TYPES - giftBoxUniqueTypes !== 1 ? 's' : ''} needed</>
+                        : giftBoxUniqueTypes < TIER_1_TYPES
+                          ? <><span className="font-fraktur">{TIER_1_TYPES - giftBoxUniqueTypes}</span> more for <span className="font-fraktur">{(TIER_1_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                          : giftBoxUniqueTypes < TIER_2_TYPES
+                            ? <><span className="font-fraktur">{TIER_2_TYPES - giftBoxUniqueTypes}</span> more for <span className="font-fraktur">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                            : <><span className="font-fraktur">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% Discount Applied</>
+                      }
+                    </p>
+                    <span className="font-fraktur font-bold text-lg tracking-tight" style={{ color: '#22223b' }}>
+                      {giftBoxUniqueTypes}<span className="text-xs font-semibold" style={{ color: '#7d838dff', fontFamily: 'Outfit, sans-serif' }}>/{giftBoxProducts.length}</span>
+                    </span>
+                  </div>
+
+                  {/* Right Side - Progress Bar */}
+                  <div className="flex-1 min-w-0">
+                    <div className="relative w-full rounded-full overflow-hidden" style={{ height: '15px', backgroundColor: '#f1f5f9' }}>
+                      <div
+                        className="absolute top-0 left-0 h-full rounded-full"
+                        style={{
+                          width: `${Math.min((giftBoxUniqueTypes / giftBoxProducts.length) * 100, 100)}%`,
+                          backgroundColor: '#8bd0e0',
+                          transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+                        }}
+                      />
+                      {[MIN_TYPES, TIER_1_TYPES, TIER_2_TYPES].map(tick => (
+                        <div
+                          key={tick}
+                          className="absolute top-0 h-full"
+                          style={{
+                            left: `${(tick / giftBoxProducts.length) * 100}%`,
+                            width: '2px',
+                            backgroundColor: giftBoxUniqueTypes >= tick ? 'rgba(167, 162, 162, 0.82)' : 'rgba(0,0,0,0.08)'
+                          }}
+                        />
+                      ))}
+                    </div>
+                    {/* Compact percentages below */}
+                    <div className="relative mt-1" style={{ height: '20px' }}>
+                      {[
+                        { val: MIN_TYPES, label: '0%' },
+                        { val: TIER_1_TYPES, label: `${(TIER_1_DISCOUNT * 100).toFixed(0)}%` },
+                        { val: TIER_2_TYPES, label: `${(TIER_2_DISCOUNT * 100).toFixed(0)}%` }
+                      ].map(marker => (
+                        <div
+                          key={marker.val}
+                          className="absolute text-center"
+                          style={{ left: `${(marker.val / giftBoxProducts.length) * 100}%`, transform: 'translateX(-50%)' }}
+                        >
+                          <span
+                            className="font-sans font-bold text-[13px]"
+                            style={{ color: giftBoxUniqueTypes >= marker.val ? '#8bd0e0' : '#9ca3af' }}
+                          >
+                            {marker.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <button
               onClick={() => setSelectedGiftBox(null)}
-              className="absolute top-4 right-4 md:top-6 md:right-6 z-10 p-2 hover:bg-primary/10 rounded-sm transition-colors bg-white/80"
+              className="absolute top-16 right-4 md:top-[72px] md:right-6 z-20 p-2 hover:bg-primary/10 rounded-sm transition-colors bg-white/80"
             >
               <X className="w-6 h-6 text-surface" />
             </button>
@@ -1824,11 +2013,11 @@ function App() {
               <div className="flex flex-col justify-between space-y-6">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-3xl font-display font-bold text-surface mb-2">
+                    <h3 className="text-2xl sm:text-3xl font-display font-bold text-surface mb-2 tracking-tight">
                       {selectedGiftBox.name}
                     </h3>
-                    <p className="text-4xl font-display font-bold text-primary flex items-baseline">
-                      <span className="text-3xl">৳</span><span>{selectedGiftBox.price}</span>
+                    <p className="text-3xl sm:text-4xl font-fraktur font-bold text-primary flex items-baseline tracking-tight">
+                      <span className="text-xl sm:text-2xl mr-1 font-display" style={{ opacity: 0.8 }}>৳</span><span>{selectedGiftBox.price}</span>
                     </p>
                     {!selectedGiftBox.inStock && (
                       <p className="text-sm font-sans text-red-600 mt-2 font-semibold">
@@ -1917,25 +2106,33 @@ function App() {
                   <button
                     onClick={addGiftBoxToCart}
                     disabled={!selectedGiftBox.inStock}
-                    className={`w-full px-6 py-4 font-sans font-bold rounded-sm transition-all border-2 ${
+                    className={`w-full px-6 py-4 font-sans font-bold text-lg rounded-sm transition-all border-2 ${
                       selectedGiftBox.inStock
-                        ? 'bg-white text-surface border-primary/20 hover:border-primary'
+                        ? 'bg-primary text-white hover:bg-surface border-primary'
                         : 'bg-gray-200 text-gray-400 border-gray-200 cursor-not-allowed'
                     }`}
                   >
                     {selectedGiftBox.inStock ? 'Add to Cart' : 'Sold Out'}
                   </button>
-                  <button
-                    onClick={buyNowGiftBox}
-                    disabled={!selectedGiftBox.inStock}
-                    className={`w-full px-6 py-4 font-sans font-bold rounded-sm transition-all ${
-                      selectedGiftBox.inStock
-                        ? 'bg-primary text-white hover:bg-surface'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    {selectedGiftBox.inStock ? 'Buy Now' : 'Sold Out'}
-                  </button>
+                  {/* Go To Cart - appears only when 8+ unique types selected */}
+                  {selectedGiftBox.inStock && giftBoxMeetsMinimum && (
+                    <button
+                      onClick={() => {
+                        setSelectedGiftBox(null);
+                        setIsCartOpen(true);
+                      }}
+                      className="w-full px-6 py-4 font-sans font-bold text-lg rounded-sm transition-all flex items-center justify-center gap-3 hover:opacity-90"
+                      style={{ backgroundColor: '#c5a880', color: '#ffffff' }}
+                    >
+                      <ShoppingBag className="w-6 h-6" />
+                      Go To Cart — <span className="font-fraktur">{giftBoxUniqueTypes}</span> Types Selected
+                    </button>
+                  )}
+                  {selectedGiftBox.inStock && !giftBoxMeetsMinimum && (
+                    <p className="text-sm text-center font-sans font-semibold" style={{ color: '#6b7280' }}>
+                      Select <span className="font-fraktur">{MIN_TYPES - giftBoxUniqueTypes}</span> more type{MIN_TYPES - giftBoxUniqueTypes !== 1 ? 's' : ''} to proceed — <span className="font-fraktur">{giftBoxUniqueTypes}/{MIN_TYPES}</span> selected
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -2008,7 +2205,7 @@ function App() {
                             <p className="text-xs text-surface/60 font-sans">Color: {item.color}</p>
                           )}
                           <p className="text-primary font-sans font-bold mt-1">
-                            ৳{item.price} × {item.quantity}
+                            ৳<span className="font-fraktur">{item.price}</span> × <span className="font-fraktur">{item.quantity}</span>
                           </p>
 
                           <div className="flex items-center gap-2 mt-2">
@@ -2018,7 +2215,7 @@ function App() {
                             >
                               -
                             </button>
-                            <span className="w-8 text-center font-sans font-semibold text-surface">
+                            <span className="w-8 text-center font-fraktur font-semibold text-surface">
                               {item.quantity}
                             </span>
                             <button
@@ -2078,37 +2275,54 @@ function App() {
                     </div>
                     {discountCode && (
                       <p className="text-xs text-green-600 font-sans font-semibold">
-                        Code "{discountCode}" applied - {(discount * 100).toFixed(0)}% off
+                        Code "{discountCode}" applied - <span className="font-fraktur">{(discount * 100).toFixed(0)}</span>% off
                       </p>
                     )}
                   </div>
 
                   {/* Subtotal and Total */}
-                  {discount > 0 && (
+                  {(discount > 0 || bulkDiscountRate > 0) && (
                     <div className="flex justify-between items-center text-sm">
                       <span className="font-sans text-surface/70">Subtotal:</span>
                       <span className="font-sans text-surface/70">
-                        ৳{calculateSubtotal().toFixed(2)}
+                        ৳<span className="font-fraktur">{calculateSubtotal().toFixed(2)}</span>
+                      </span>
+                    </div>
+                  )}
+                  {bulkDiscountRate > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-sans text-surface/70">Bulk Discount (<span className="font-fraktur">{(bulkDiscountRate * 100).toFixed(0)}</span>%):</span>
+                      <span className="font-sans text-green-600 font-semibold">
+                        -৳<span className="font-fraktur">{(calculateSubtotal() * bulkDiscountRate).toFixed(2)}</span>
                       </span>
                     </div>
                   )}
                   {discount > 0 && (
                     <div className="flex justify-between items-center text-sm">
-                      <span className="font-sans text-surface/70">Discount ({(discount * 100).toFixed(0)}%):</span>
+                      <span className="font-sans text-surface/70">Promo Discount (<span className="font-fraktur">{(discount * 100).toFixed(0)}</span>%):</span>
                       <span className="font-sans text-green-600 font-semibold">
-                        -৳{(calculateSubtotal() * discount).toFixed(2)}
+                        -৳<span className="font-fraktur">{(calculateSubtotal() * discount).toFixed(2)}</span>
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between items-center text-lg border-t border-primary/20 pt-4">
                     <span className="font-sans font-semibold text-surface">Total:</span>
-                    <span className="font-display font-bold text-2xl text-primary">
+                    <span className="font-fraktur font-bold text-2xl text-primary">
                       ৳{calculateTotal().toFixed(2)}
                     </span>
                   </div>
                   <p className="text-xs text-center text-surface/60 font-sans italic">
                     * Delivery charge will be added at checkout
                   </p>
+
+                  {/* Gift Box minimum types warning */}
+                  {hasGiftBoxItems && !giftBoxMeetsMinimum && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-3">
+                      <p className="text-xs font-sans text-yellow-800 font-medium text-center">
+                        Add at least <span className="font-fraktur">{MIN_TYPES}</span> different product types to complete your Custom Gift Box. (<span className="font-fraktur">{giftBoxUniqueTypes}/{MIN_TYPES}</span> types added)
+                      </p>
+                    </div>
+                  )}
 
                   <button
                     onClick={() => {
@@ -2131,15 +2345,22 @@ function App() {
                         type: 'cart',
                         quantity: 1,
                         image: cartItems[0]?.image || '/assets/YUMORA.png',
-                        cartItems: cartItems,
+                        cartItems: [...cartItems],
                         originalSubtotal: calculateSubtotal(),
                         appliedDiscount: discount,
-                        appliedDiscountCode: discountCode
+                        appliedDiscountCode: discountCode,
+                        appliedBulkDiscount: bulkDiscountRate,
+                        uniqueGiftTypes: giftBoxUniqueTypes
                       });
                       setIsCartOpen(false);
                       setShowConfirmOrder(true);
                     }}
-                    className="w-full py-4 bg-primary text-white font-sans font-bold rounded-sm hover:bg-surface transition-colors flex items-center justify-center gap-2"
+                    disabled={hasGiftBoxItems && !giftBoxMeetsMinimum}
+                    className={`w-full py-4 font-sans font-bold rounded-sm transition-colors flex items-center justify-center gap-2 ${
+                      hasGiftBoxItems && !giftBoxMeetsMinimum
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-primary text-white hover:bg-surface'
+                    }`}
                   >
                     <ShoppingBag className="w-5 h-5" />
                     Buy Now
@@ -2183,7 +2404,7 @@ function App() {
                 <h4 className="font-sans font-semibold text-surface mb-2">
                   {buyNowProduct.name}
                 </h4>
-                <p className="text-2xl font-display font-bold text-primary">
+                <p className="text-2xl font-fraktur font-bold text-primary">
                   ৳{buyNowProduct.price}
                 </p>
               </div>
@@ -2302,21 +2523,27 @@ function App() {
                             <p className="text-xs text-surface/60">
                               {item.color && `${item.color} • `}
                               {item.scoops && `${item.scoops} Scoops • `}
-                              Qty: {item.quantity}
+                              Qty: <span className="font-fraktur">{item.quantity}</span>
                             </p>
                           </div>
-                          <p className="text-sm font-semibold text-primary">৳{item.price * item.quantity}</p>
+                          <p className="text-sm font-semibold text-primary">৳<span className="font-fraktur">{item.price * item.quantity}</span></p>
                         </div>
                       ))}
                     </div>
                     <div className="border-t border-primary/10 pt-2 flex justify-between">
                       <span className="font-sans font-semibold text-surface">Subtotal:</span>
-                      <span className="font-display font-bold text-primary">৳{confirmOrderProduct.originalSubtotal}</span>
+                      <span className="font-fraktur font-bold text-primary">৳{confirmOrderProduct.originalSubtotal}</span>
                     </div>
+                    {confirmOrderProduct.appliedBulkDiscount > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-surface/70">Bulk Discount (<span className="font-fraktur">{(confirmOrderProduct.appliedBulkDiscount * 100).toFixed(0)}</span>%):</span>
+                        <span className="text-green-600 font-semibold">-৳<span className="font-fraktur">{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedBulkDiscount).toFixed(0)}</span></span>
+                      </div>
+                    )}
                     {confirmOrderProduct.appliedDiscount > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-surface/70">Discount ({confirmOrderProduct.appliedDiscountCode}):</span>
-                        <span className="text-green-600 font-semibold">-৳{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedDiscount).toFixed(0)}</span>
+                        <span className="text-surface/70">Promo Discount ({confirmOrderProduct.appliedDiscountCode}):</span>
+                        <span className="text-green-600 font-semibold">-৳<span className="font-fraktur">{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedDiscount).toFixed(0)}</span></span>
                       </div>
                     )}
                   </div>
@@ -2340,8 +2567,8 @@ function App() {
                       {confirmOrderProduct.color && (
                         <p className="text-xs text-surface/60 font-sans">Color: {confirmOrderProduct.color}</p>
                       )}
-                      <p className="text-xs text-surface/60 font-sans">Qty: {confirmOrderProduct.quantity}</p>
-                      <p className="text-lg font-display font-bold text-primary mt-1">
+                      <p className="text-xs text-surface/60 font-sans">Qty: <span className="font-fraktur">{confirmOrderProduct.quantity}</span></p>
+                      <p className="text-lg font-fraktur font-bold text-primary mt-1">
                         ৳{confirmOrderProduct.price * confirmOrderProduct.quantity}
                       </p>
                     </div>
@@ -2384,7 +2611,7 @@ function App() {
                 </div>
                 {discountCode && (
                   <p className="text-xs text-green-600 font-sans font-semibold">
-                    Code "{discountCode}" applied - {(discount * 100).toFixed(0)}% off
+                    Code "{discountCode}" applied - <span className="font-fraktur">{(discount * 100).toFixed(0)}</span>% off
                   </p>
                 )}
               </div>
@@ -2458,7 +2685,7 @@ function App() {
                     }`}
                   >
                     <p className="font-sans font-semibold text-surface text-xs sm:text-sm">Inside Dhaka</p>
-                    <p className="text-primary font-display font-bold text-base sm:text-lg">৳80</p>
+                    <p className="text-primary font-fraktur font-bold text-base sm:text-lg">৳{DELIVERY_INSIDE_DHAKA}</p>
                   </button>
                   <button
                     onClick={() => setDeliveryType('outside')}
@@ -2469,7 +2696,7 @@ function App() {
                     }`}
                   >
                     <p className="font-sans font-semibold text-surface text-xs sm:text-sm">Outside Dhaka</p>
-                    <p className="text-primary font-display font-bold text-base sm:text-lg">৳200</p>
+                    <p className="text-primary font-fraktur font-bold text-base sm:text-lg">৳{DELIVERY_OUTSIDE_DHAKA}</p>
                   </button>
                 </div>
               </div>
@@ -2478,48 +2705,64 @@ function App() {
               <div className="bg-light/30 rounded-sm p-4 border border-primary/10 space-y-2">
                 {confirmOrderProduct.type === 'cart' ? (
                   // Cart order price breakdown
-                  <>
-                    <div className="flex justify-between text-sm">
-                      <span className="font-sans text-surface/70">Subtotal:</span>
-                      <span className="font-sans text-surface">৳{confirmOrderProduct.originalSubtotal}</span>
-                    </div>
-                    {confirmOrderProduct.appliedDiscount > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="font-sans text-surface/70">Discount ({(confirmOrderProduct.appliedDiscount * 100).toFixed(0)}%):</span>
-                        <span className="font-sans text-green-600 font-semibold">-৳{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedDiscount).toFixed(0)}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between text-sm">
-                      <span className="font-sans text-surface/70">Delivery Fee:</span>
-                      <span className="font-sans text-surface">৳{getDeliveryFee()}</span>
-                    </div>
-                    <div className="flex justify-between text-lg border-t border-primary/20 pt-2 mt-2">
-                      <span className="font-sans font-semibold text-surface">Total:</span>
-                      <span className="font-display font-bold text-primary">
-                        ৳{((confirmOrderProduct.originalSubtotal * (1 - (confirmOrderProduct.appliedDiscount || 0))) + getDeliveryFee()).toFixed(0)}
-                      </span>
-                    </div>
-                  </>
+                  (() => {
+                    const sub = confirmOrderProduct.originalSubtotal;
+                    const bulkRate = confirmOrderProduct.appliedBulkDiscount || 0;
+                    const promoRate = confirmOrderProduct.appliedDiscount || 0;
+                    const bulkAmt = sub * bulkRate;
+                    const promoAmt = sub * promoRate;
+                    const total = sub - bulkAmt - promoAmt + getDeliveryFee();
+                    return (
+                      <>
+                        <div className="flex justify-between text-sm">
+                          <span className="font-sans text-surface/70">Subtotal:</span>
+                          <span className="font-sans text-surface">৳<span className="font-fraktur">{sub}</span></span>
+                        </div>
+                        {bulkRate > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="font-sans text-surface/70">Bulk Discount (<span className="font-fraktur">{(bulkRate * 100).toFixed(0)}</span>%):</span>
+                            <span className="font-sans text-green-600 font-semibold">-৳<span className="font-fraktur">{bulkAmt.toFixed(0)}</span></span>
+                          </div>
+                        )}
+                        {promoRate > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="font-sans text-surface/70">Promo Discount ({confirmOrderProduct.appliedDiscountCode}):</span>
+                            <span className="font-sans text-green-600 font-semibold">-৳<span className="font-fraktur">{promoAmt.toFixed(0)}</span></span>
+                          </div>
+                        )}
+                        <div className="flex justify-between text-sm">
+                          <span className="font-sans text-surface/70">Delivery Fee:</span>
+                          <span className="font-sans text-surface">৳<span className="font-fraktur">{getDeliveryFee()}</span></span>
+                        </div>
+                        <div className="flex justify-between text-lg border-t border-primary/20 pt-2 mt-2">
+                          <span className="font-sans font-semibold text-surface">Total:</span>
+                          <span className="font-fraktur font-bold text-primary">
+                            ৳{total.toFixed(0)}
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })()
                 ) : (
                   // Single product price breakdown
                   <>
                     <div className="flex justify-between text-sm">
                       <span className="font-sans text-surface/70">Product Price:</span>
-                      <span className="font-sans text-surface">৳{confirmOrderProduct.price * confirmOrderProduct.quantity}</span>
+                      <span className="font-sans text-surface">৳<span className="font-fraktur">{confirmOrderProduct.price * confirmOrderProduct.quantity}</span></span>
                     </div>
                     {discount > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="font-sans text-surface/70">Discount ({(discount * 100).toFixed(0)}%):</span>
-                        <span className="font-sans text-green-600 font-semibold">-৳{(confirmOrderProduct.price * confirmOrderProduct.quantity * discount).toFixed(0)}</span>
+                        <span className="font-sans text-surface/70">Discount (<span className="font-fraktur">{(discount * 100).toFixed(0)}</span>%):</span>
+                        <span className="font-sans text-green-600 font-semibold">-৳<span className="font-fraktur">{(confirmOrderProduct.price * confirmOrderProduct.quantity * discount).toFixed(0)}</span></span>
                       </div>
                     )}
                     <div className="flex justify-between text-sm">
                       <span className="font-sans text-surface/70">Delivery Fee:</span>
-                      <span className="font-sans text-surface">৳{getDeliveryFee()}</span>
+                      <span className="font-sans text-surface">৳<span className="font-fraktur">{getDeliveryFee()}</span></span>
                     </div>
                     <div className="flex justify-between text-lg border-t border-primary/20 pt-2 mt-2">
                       <span className="font-sans font-semibold text-surface">Total:</span>
-                      <span className="font-display font-bold text-primary">
+                      <span className="font-fraktur font-bold text-primary">
                         ৳{((confirmOrderProduct.price * confirmOrderProduct.quantity * (1 - discount)) + getDeliveryFee()).toFixed(0)}
                       </span>
                     </div>
@@ -2532,10 +2775,10 @@ function App() {
                 <h4 className="font-sans font-semibold text-surface border-b border-primary/20 pb-2">Payment Information</h4>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-4">
                   <p className="text-sm font-sans text-yellow-800 font-medium">
-                    Advance payment of half the total cost (৳{confirmOrderProduct.type === 'cart'
-                      ? (((confirmOrderProduct.originalSubtotal * (1 - (confirmOrderProduct.appliedDiscount || 0))) + getDeliveryFee()) / 2).toFixed(0)
+                    Advance payment of half the total cost and send us the Screenshort(৳<span className="font-fraktur">{confirmOrderProduct.type === 'cart'
+                      ? (((confirmOrderProduct.originalSubtotal - (confirmOrderProduct.originalSubtotal * (confirmOrderProduct.appliedBulkDiscount || 0)) - (confirmOrderProduct.originalSubtotal * (confirmOrderProduct.appliedDiscount || 0))) + getDeliveryFee()) / 2).toFixed(0)
                       : (((confirmOrderProduct.price * confirmOrderProduct.quantity * (1 - discount)) + getDeliveryFee()) / 2).toFixed(0)
-                    }) is required to confirm the order.
+                    }</span>) is required to confirm the order.
                   </p>
                 </div>
 
@@ -2574,14 +2817,40 @@ function App() {
                 </div>
               </div>
 
-              {/* Confirm Button */}
-              <button
-                onClick={handleConfirmOrderWhatsApp}
-                className="w-full py-4 bg-green-500 text-white font-sans font-bold rounded-sm hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
-              >
-                <MessageCircle className="w-5 h-5" />
-                Buy Now
-              </button>
+              {/* Confirm Button with safety catch */}
+              {(() => {
+                // Safety catch: re-check unique gift box types from live cart
+                const confirmGiftItems = confirmOrderProduct.type === 'cart' && confirmOrderProduct.cartItems
+                  ? confirmOrderProduct.cartItems.filter(i => i.type === 'gift-box')
+                  : [];
+                const confirmGiftTypes = new Set(confirmGiftItems.map(i => i.id.replace(/-[^-]+$/, ''))).size;
+                const confirmHasGift = confirmGiftTypes > 0;
+                const confirmMeetsMin = confirmGiftTypes >= MIN_TYPES;
+                const isDisabled = confirmHasGift && !confirmMeetsMin;
+                return (
+                  <>
+                    {isDisabled && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-3">
+                        <p className="text-xs font-sans text-yellow-800 font-medium text-center">
+                          You need at least <span className="font-fraktur">{MIN_TYPES}</span> different product types in your Custom Gift Box. (<span className="font-fraktur">{confirmGiftTypes}/{MIN_TYPES}</span> types)
+                        </p>
+                      </div>
+                    )}
+                    <button
+                      onClick={handleConfirmOrderWhatsApp}
+                      disabled={isDisabled}
+                      className={`w-full py-4 font-sans font-bold rounded-sm transition-colors flex items-center justify-center gap-2 ${
+                        isDisabled
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'bg-green-500 text-white hover:bg-green-600'
+                      }`}
+                    >
+                      <MessageCircle className="w-5 h-5" />
+                      Buy Now
+                    </button>
+                  </>
+                );
+              })()}
               <p className="text-xs text-center text-surface/60 font-sans">
                 You'll be redirected to WhatsApp to finalize your order
               </p>
@@ -2610,7 +2879,7 @@ function App() {
               {[
                 {
                   title: '1. Information We Collect',
-                  content: 'At Yumora, we collect information that you provide directly to us when you make a purchase, create an account, or communicate with us. This may include your name, email address, shipping address, and payment information.'
+                  content: 'At Yumora, we collect information that you provide directly to us when you make a purchase or communicate with us. This may include your name, phone number, shipping address, and payment information.'
                 },
                 {
                   title: '2. How We Use Your Information',
@@ -2626,7 +2895,7 @@ function App() {
                 },
                 {
                   title: '5. Your Rights',
-                  content: 'You have the right to access, correct, or delete your personal information. You may also opt out of marketing communications at any time. To exercise these rights, please contact us at privacy@yumora.com.'
+                  content: 'You have the right to access, correct, or delete your personal information. You may also opt out of marketing communications at any time. To exercise these rights, please contact us at yumorabd@gmail.com.'
                 },
                 {
                   title: '6. Cookies',
@@ -2638,7 +2907,7 @@ function App() {
                 },
                 {
                   title: '8. Contact Us',
-                  content: 'If you have any questions about this privacy policy or our data practices, please contact us at privacy@yumora.com or call us at +880 1335 156146.'
+                  content: 'If you have any questions about this privacy policy or our data practices, please contact us at yumorabd@gmail.com or call us at +880 1335 156146.'
                 }
               ].map((section, i) => (
                 <div key={i} className="space-y-3">

@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         display: ['Cormorant Garamond', 'serif'],
         sans: ['Outfit', 'sans-serif'],
+        fraktur: ['UnifrakturMaguntia', 'cursive'],
       },
       backdropBlur: {
         xs: '2px',
