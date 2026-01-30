@@ -930,7 +930,7 @@ function App() {
               >
                 <ShoppingBag className="w-7 h-7" />
                 {cartItems.length > 0 && (
-                  <span className="absolute -top-1 -right-1 text-xm font-bold rounded-full h-6 w-6 flex items-center justify-center font-fraktur" style={{ backgroundColor: '#e63535ff', color: '#fff' }}>
+                  <span className="absolute -top-1 -right-1 text-xm font-bold rounded-full h-6 w-6 flex items-center justify-center font-san" style={{ backgroundColor: '#e63535ff', color: '#fff' }}>
                     {cartItems.reduce((total, item) => total + item.quantity, 0)}
                   </span>
                 )}
@@ -1216,7 +1216,7 @@ function App() {
                             <IceCream className="w-6 h-6" />
                             {option.scoops}
                           </div>
-                          <div className="flex items-baseline justify-center text-sm mt-1 opacity-80"><span>৳</span><span className="font-fraktur">{option.price}</span></div>
+                          <div className="flex items-baseline justify-center text-sm mt-1 opacity-80"><span>৳</span><span className="font-san">{option.price}</span></div>
                         </button>
                       ))}
                     </div>
@@ -1560,21 +1560,21 @@ function App() {
                 <div className="md:w-[280px] flex-shrink-0">
                   <p className="font-display font-bold text-xl sm:text-2xl tracking-tight mb-1" style={{ color: '#eedfe3' }}>
                     {giftBoxUniqueTypes >= TIER_2_TYPES
-                      ? <><span className="font-fraktur">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% Bulk Discount Applied</>
+                      ? <><span className="font-san">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% Bulk Discount Applied</>
                       : giftBoxUniqueTypes >= TIER_1_TYPES
-                        ? <>Select <span className="font-fraktur">{TIER_2_TYPES - giftBoxUniqueTypes}</span> more to unlock <span className="font-fraktur">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                        ? <>Select <span className="font-san">{TIER_2_TYPES - giftBoxUniqueTypes}</span> more to unlock <span className="font-san">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% off</>
                         : giftBoxUniqueTypes >= MIN_TYPES
-                          ? <>Select <span className="font-fraktur">{TIER_1_TYPES - giftBoxUniqueTypes}</span> more to unlock <span className="font-fraktur">{(TIER_1_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                          ? <>Select <span className="font-san">{TIER_1_TYPES - giftBoxUniqueTypes}</span> more to unlock <span className="font-san">{(TIER_1_DISCOUNT * 100).toFixed(0)}</span>% off</>
                           : 'Build Your Custom Gift Box'
                     }
                   </p>
                   <p className="font-sans text-l" style={{ color: 'rgba(255, 255, 255, 0.93)' }}>
                     {giftBoxUniqueTypes < MIN_TYPES
-                      ? <>Select minimum <span className="font-fraktur">{MIN_TYPES}</span> types to purchase</>
-                      : <><span className="font-fraktur">{giftBoxUniqueTypes}</span> of <span className="font-fraktur">{giftBoxProducts.length}</span> types selected</>
+                      ? <>Select minimum <span className="font-san">{MIN_TYPES}</span> types to purchase</>
+                      : <><span className="font-san">{giftBoxUniqueTypes}</span> of <span className="font-san">{giftBoxProducts.length}</span> types selected</>
                     }
                   </p>
-                  <div className="font-fraktur font-bold text-3xl sm:text-4xl tracking-tight mt-2" style={{ color: '#8bd0e0' }}>
+                  <div className="font-san font-bold text-3xl sm:text-4xl tracking-tight mt-2" style={{ color: '#8bd0e0' }}>
                     {giftBoxUniqueTypes}<span className="text-lg sm:text-xl font-semibold" style={{ color: 'rgba(238,223,227,0.4)' }}>/{giftBoxProducts.length}</span>
                   </div>
                 </div>
@@ -1596,7 +1596,7 @@ function App() {
                           style={{ left: `${(marker.val / giftBoxProducts.length) * 100}%`, transform: 'translateX(-50%)' }}
                         >
                           <span
-                            className="font-fraktur font-bold text-base sm:text-xl block leading-none"
+                            className="font-san font-bold text-base sm:text-xl block leading-none"
                             style={{
                               color: giftBoxUniqueTypes >= marker.val ? '#eedfe3' : 'rgba(238,223,227,0.3)'
                             }}
@@ -1702,8 +1702,8 @@ function App() {
                       )}
                     </div>
                     <div className="p-3 md:p-4">
-                      <h5 className="font-display font-bold text-base md:text-lg truncate mb-1 leading-tight tracking-tight" style={{ color: '#eedfe3' }}>{product.name}</h5>
-                      <p className="font-fraktur font-bold text-xl md:text-2xl flex items-baseline tracking-tight" style={{ color: '#c5a880' }}>
+                      <h5 className="font-san font-bold text-base md:text-[23px] truncate mb-1 leading-tight tracking-tight" style={{ color: '#eedfe3' }}>{product.name}</h5>
+                      <p className="font-san font-bold text-xl md:text-2xl flex items-baseline tracking-tight" style={{ color: '#c5a880' }}>
                         <span className="text-base md:text-lg mr-0.5 font-display" style={{ color: '#c5a880', opacity: 0.8 }}>৳</span>
                         <span>{product.price}</span>
                       </p>
@@ -1881,17 +1881,17 @@ function App() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
                   {/* Left Side - Status Text */}
                   <div className="sm:w-[180px] flex-shrink-0 flex sm:flex-col items-center sm:items-start gap-3 sm:gap-0">
-                    <p className="font-fraktur font-semibold text-xl tracking-tight" style={{ color: '#000000ff' }}>
+                    <p className="font-san font-semibold text-xl tracking-tight" style={{ color: '#000000ff' }}>
                       {giftBoxUniqueTypes < MIN_TYPES
                         ? <><span className="">{MIN_TYPES - giftBoxUniqueTypes}</span> more type{MIN_TYPES - giftBoxUniqueTypes !== 1 ? 's' : ''} needed</>
                         : giftBoxUniqueTypes < TIER_1_TYPES
-                          ? <><span className="font-fraktur">{TIER_1_TYPES - giftBoxUniqueTypes}</span> more for <span className="font-fraktur">{(TIER_1_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                          ? <><span className="font-san">{TIER_1_TYPES - giftBoxUniqueTypes}</span> more for <span className="font-san">{(TIER_1_DISCOUNT * 100).toFixed(0)}</span>% off</>
                           : giftBoxUniqueTypes < TIER_2_TYPES
-                            ? <><span className="font-fraktur">{TIER_2_TYPES - giftBoxUniqueTypes}</span> more for <span className="font-fraktur">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% off</>
-                            : <><span className="font-fraktur">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% Discount Applied</>
+                            ? <><span className="font-san">{TIER_2_TYPES - giftBoxUniqueTypes}</span> more for <span className="font-san">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                            : <><span className="font-san">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% Discount Applied</>
                       }
                     </p>
-                    <span className="font-fraktur font-bold text-lg tracking-tight" style={{ color: '#22223b' }}>
+                    <span className="font-san font-bold text-lg tracking-tight" style={{ color: '#22223b' }}>
                       {giftBoxUniqueTypes}<span className="text-xs font-semibold" style={{ color: '#7d838dff', fontFamily: 'Outfit, sans-serif' }}>/{giftBoxProducts.length}</span>
                     </span>
                   </div>
@@ -2016,7 +2016,7 @@ function App() {
                     <h3 className="text-2xl sm:text-3xl font-display font-bold text-surface mb-2 tracking-tight">
                       {selectedGiftBox.name}
                     </h3>
-                    <p className="text-3xl sm:text-4xl font-fraktur font-bold text-primary flex items-baseline tracking-tight">
+                    <p className="text-3xl sm:text-4xl font-san font-bold text-primary flex items-baseline tracking-tight">
                       <span className="text-xl sm:text-2xl mr-1 font-display" style={{ opacity: 0.8 }}>৳</span><span>{selectedGiftBox.price}</span>
                     </p>
                     {!selectedGiftBox.inStock && (
@@ -2125,12 +2125,12 @@ function App() {
                       style={{ backgroundColor: '#c5a880', color: '#ffffff' }}
                     >
                       <ShoppingBag className="w-6 h-6" />
-                      Go To Cart — <span className="font-fraktur">{giftBoxUniqueTypes}</span> Types Selected
+                      Go To Cart — <span className="font-san">{giftBoxUniqueTypes}</span> Types Selected
                     </button>
                   )}
                   {selectedGiftBox.inStock && !giftBoxMeetsMinimum && (
                     <p className="text-sm text-center font-sans font-semibold" style={{ color: '#6b7280' }}>
-                      Select <span className="font-fraktur">{MIN_TYPES - giftBoxUniqueTypes}</span> more type{MIN_TYPES - giftBoxUniqueTypes !== 1 ? 's' : ''} to proceed — <span className="font-fraktur">{giftBoxUniqueTypes}/{MIN_TYPES}</span> selected
+                      Select <span className="font-san">{MIN_TYPES - giftBoxUniqueTypes}</span> more type{MIN_TYPES - giftBoxUniqueTypes !== 1 ? 's' : ''} to proceed — <span className="font-san">{giftBoxUniqueTypes}/{MIN_TYPES}</span> selected
                     </p>
                   )}
                 </div>
@@ -2205,7 +2205,7 @@ function App() {
                             <p className="text-xs text-surface/60 font-sans">Color: {item.color}</p>
                           )}
                           <p className="text-primary font-sans font-bold mt-1">
-                            ৳<span className="font-fraktur">{item.price}</span> × <span className="font-fraktur">{item.quantity}</span>
+                            ৳<span className="font-san">{item.price}</span> × <span className="font-san">{item.quantity}</span>
                           </p>
 
                           <div className="flex items-center gap-2 mt-2">
@@ -2215,7 +2215,7 @@ function App() {
                             >
                               -
                             </button>
-                            <span className="w-8 text-center font-fraktur font-semibold text-surface">
+                            <span className="w-8 text-center font-san font-semibold text-surface">
                               {item.quantity}
                             </span>
                             <button
@@ -2275,7 +2275,7 @@ function App() {
                     </div>
                     {discountCode && (
                       <p className="text-xs text-green-600 font-sans font-semibold">
-                        Code "{discountCode}" applied - <span className="font-fraktur">{(discount * 100).toFixed(0)}</span>% off
+                        Code "{discountCode}" applied - <span className="font-san">{(discount * 100).toFixed(0)}</span>% off
                       </p>
                     )}
                   </div>
@@ -2285,29 +2285,29 @@ function App() {
                     <div className="flex justify-between items-center text-sm">
                       <span className="font-sans text-surface/70">Subtotal:</span>
                       <span className="font-sans text-surface/70">
-                        ৳<span className="font-fraktur">{calculateSubtotal().toFixed(2)}</span>
+                        ৳<span className="font-san">{calculateSubtotal().toFixed(2)}</span>
                       </span>
                     </div>
                   )}
                   {bulkDiscountRate > 0 && (
                     <div className="flex justify-between items-center text-sm">
-                      <span className="font-sans text-surface/70">Bulk Discount (<span className="font-fraktur">{(bulkDiscountRate * 100).toFixed(0)}</span>%):</span>
+                      <span className="font-sans text-surface/70">Bulk Discount (<span className="font-san">{(bulkDiscountRate * 100).toFixed(0)}</span>%):</span>
                       <span className="font-sans text-green-600 font-semibold">
-                        -৳<span className="font-fraktur">{(calculateSubtotal() * bulkDiscountRate).toFixed(2)}</span>
+                        -৳<span className="font-san">{(calculateSubtotal() * bulkDiscountRate).toFixed(2)}</span>
                       </span>
                     </div>
                   )}
                   {discount > 0 && (
                     <div className="flex justify-between items-center text-sm">
-                      <span className="font-sans text-surface/70">Promo Discount (<span className="font-fraktur">{(discount * 100).toFixed(0)}</span>%):</span>
+                      <span className="font-sans text-surface/70">Promo Discount (<span className="font-san">{(discount * 100).toFixed(0)}</span>%):</span>
                       <span className="font-sans text-green-600 font-semibold">
-                        -৳<span className="font-fraktur">{(calculateSubtotal() * discount).toFixed(2)}</span>
+                        -৳<span className="font-san">{(calculateSubtotal() * discount).toFixed(2)}</span>
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between items-center text-lg border-t border-primary/20 pt-4">
                     <span className="font-sans font-semibold text-surface">Total:</span>
-                    <span className="font-fraktur font-bold text-2xl text-primary">
+                    <span className="font-san font-bold text-2xl text-primary">
                       ৳{calculateTotal().toFixed(2)}
                     </span>
                   </div>
@@ -2319,7 +2319,7 @@ function App() {
                   {hasGiftBoxItems && !giftBoxMeetsMinimum && (
                     <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-3">
                       <p className="text-xs font-sans text-yellow-800 font-medium text-center">
-                        Add at least <span className="font-fraktur">{MIN_TYPES}</span> different product types to complete your Custom Gift Box. (<span className="font-fraktur">{giftBoxUniqueTypes}/{MIN_TYPES}</span> types added)
+                        Add at least <span className="font-san">{MIN_TYPES}</span> different product types to complete your Custom Gift Box. (<span className="font-san">{giftBoxUniqueTypes}/{MIN_TYPES}</span> types added)
                       </p>
                     </div>
                   )}
@@ -2404,7 +2404,7 @@ function App() {
                 <h4 className="font-sans font-semibold text-surface mb-2">
                   {buyNowProduct.name}
                 </h4>
-                <p className="text-2xl font-fraktur font-bold text-primary">
+                <p className="text-2xl font-san font-bold text-primary">
                   ৳{buyNowProduct.price}
                 </p>
               </div>
@@ -2523,27 +2523,27 @@ function App() {
                             <p className="text-xs text-surface/60">
                               {item.color && `${item.color} • `}
                               {item.scoops && `${item.scoops} Scoops • `}
-                              Qty: <span className="font-fraktur">{item.quantity}</span>
+                              Qty: <span className="font-san">{item.quantity}</span>
                             </p>
                           </div>
-                          <p className="text-sm font-semibold text-primary">৳<span className="font-fraktur">{item.price * item.quantity}</span></p>
+                          <p className="text-sm font-semibold text-primary">৳<span className="font-san">{item.price * item.quantity}</span></p>
                         </div>
                       ))}
                     </div>
                     <div className="border-t border-primary/10 pt-2 flex justify-between">
                       <span className="font-sans font-semibold text-surface">Subtotal:</span>
-                      <span className="font-fraktur font-bold text-primary">৳{confirmOrderProduct.originalSubtotal}</span>
+                      <span className="font-san font-bold text-primary">৳{confirmOrderProduct.originalSubtotal}</span>
                     </div>
                     {confirmOrderProduct.appliedBulkDiscount > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-surface/70">Bulk Discount (<span className="font-fraktur">{(confirmOrderProduct.appliedBulkDiscount * 100).toFixed(0)}</span>%):</span>
-                        <span className="text-green-600 font-semibold">-৳<span className="font-fraktur">{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedBulkDiscount).toFixed(0)}</span></span>
+                        <span className="text-surface/70">Bulk Discount (<span className="font-san">{(confirmOrderProduct.appliedBulkDiscount * 100).toFixed(0)}</span>%):</span>
+                        <span className="text-green-600 font-semibold">-৳<span className="font-san">{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedBulkDiscount).toFixed(0)}</span></span>
                       </div>
                     )}
                     {confirmOrderProduct.appliedDiscount > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-surface/70">Promo Discount ({confirmOrderProduct.appliedDiscountCode}):</span>
-                        <span className="text-green-600 font-semibold">-৳<span className="font-fraktur">{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedDiscount).toFixed(0)}</span></span>
+                        <span className="text-green-600 font-semibold">-৳<span className="font-san">{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedDiscount).toFixed(0)}</span></span>
                       </div>
                     )}
                   </div>
@@ -2567,8 +2567,8 @@ function App() {
                       {confirmOrderProduct.color && (
                         <p className="text-xs text-surface/60 font-sans">Color: {confirmOrderProduct.color}</p>
                       )}
-                      <p className="text-xs text-surface/60 font-sans">Qty: <span className="font-fraktur">{confirmOrderProduct.quantity}</span></p>
-                      <p className="text-lg font-fraktur font-bold text-primary mt-1">
+                      <p className="text-xs text-surface/60 font-sans">Qty: <span className="font-san">{confirmOrderProduct.quantity}</span></p>
+                      <p className="text-lg font-san font-bold text-primary mt-1">
                         ৳{confirmOrderProduct.price * confirmOrderProduct.quantity}
                       </p>
                     </div>
@@ -2611,7 +2611,7 @@ function App() {
                 </div>
                 {discountCode && (
                   <p className="text-xs text-green-600 font-sans font-semibold">
-                    Code "{discountCode}" applied - <span className="font-fraktur">{(discount * 100).toFixed(0)}</span>% off
+                    Code "{discountCode}" applied - <span className="font-san">{(discount * 100).toFixed(0)}</span>% off
                   </p>
                 )}
               </div>
@@ -2685,7 +2685,7 @@ function App() {
                     }`}
                   >
                     <p className="font-sans font-semibold text-surface text-xs sm:text-sm">Inside Dhaka</p>
-                    <p className="text-primary font-fraktur font-bold text-base sm:text-lg">৳{DELIVERY_INSIDE_DHAKA}</p>
+                    <p className="text-primary font-san font-bold text-base sm:text-lg">৳{DELIVERY_INSIDE_DHAKA}</p>
                   </button>
                   <button
                     onClick={() => setDeliveryType('outside')}
@@ -2696,7 +2696,7 @@ function App() {
                     }`}
                   >
                     <p className="font-sans font-semibold text-surface text-xs sm:text-sm">Outside Dhaka</p>
-                    <p className="text-primary font-fraktur font-bold text-base sm:text-lg">৳{DELIVERY_OUTSIDE_DHAKA}</p>
+                    <p className="text-primary font-san font-bold text-base sm:text-lg">৳{DELIVERY_OUTSIDE_DHAKA}</p>
                   </button>
                 </div>
               </div>
@@ -2716,27 +2716,27 @@ function App() {
                       <>
                         <div className="flex justify-between text-sm">
                           <span className="font-sans text-surface/70">Subtotal:</span>
-                          <span className="font-sans text-surface">৳<span className="font-fraktur">{sub}</span></span>
+                          <span className="font-sans text-surface">৳<span className="font-san">{sub}</span></span>
                         </div>
                         {bulkRate > 0 && (
                           <div className="flex justify-between text-sm">
-                            <span className="font-sans text-surface/70">Bulk Discount (<span className="font-fraktur">{(bulkRate * 100).toFixed(0)}</span>%):</span>
-                            <span className="font-sans text-green-600 font-semibold">-৳<span className="font-fraktur">{bulkAmt.toFixed(0)}</span></span>
+                            <span className="font-sans text-surface/70">Bulk Discount (<span className="font-san">{(bulkRate * 100).toFixed(0)}</span>%):</span>
+                            <span className="font-sans text-green-600 font-semibold">-৳<span className="font-san">{bulkAmt.toFixed(0)}</span></span>
                           </div>
                         )}
                         {promoRate > 0 && (
                           <div className="flex justify-between text-sm">
                             <span className="font-sans text-surface/70">Promo Discount ({confirmOrderProduct.appliedDiscountCode}):</span>
-                            <span className="font-sans text-green-600 font-semibold">-৳<span className="font-fraktur">{promoAmt.toFixed(0)}</span></span>
+                            <span className="font-sans text-green-600 font-semibold">-৳<span className="font-san">{promoAmt.toFixed(0)}</span></span>
                           </div>
                         )}
                         <div className="flex justify-between text-sm">
                           <span className="font-sans text-surface/70">Delivery Fee:</span>
-                          <span className="font-sans text-surface">৳<span className="font-fraktur">{getDeliveryFee()}</span></span>
+                          <span className="font-sans text-surface">৳<span className="font-san">{getDeliveryFee()}</span></span>
                         </div>
                         <div className="flex justify-between text-lg border-t border-primary/20 pt-2 mt-2">
                           <span className="font-sans font-semibold text-surface">Total:</span>
-                          <span className="font-fraktur font-bold text-primary">
+                          <span className="font-san font-bold text-primary">
                             ৳{total.toFixed(0)}
                           </span>
                         </div>
@@ -2748,21 +2748,21 @@ function App() {
                   <>
                     <div className="flex justify-between text-sm">
                       <span className="font-sans text-surface/70">Product Price:</span>
-                      <span className="font-sans text-surface">৳<span className="font-fraktur">{confirmOrderProduct.price * confirmOrderProduct.quantity}</span></span>
+                      <span className="font-sans text-surface">৳<span className="font-san">{confirmOrderProduct.price * confirmOrderProduct.quantity}</span></span>
                     </div>
                     {discount > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="font-sans text-surface/70">Discount (<span className="font-fraktur">{(discount * 100).toFixed(0)}</span>%):</span>
-                        <span className="font-sans text-green-600 font-semibold">-৳<span className="font-fraktur">{(confirmOrderProduct.price * confirmOrderProduct.quantity * discount).toFixed(0)}</span></span>
+                        <span className="font-sans text-surface/70">Discount (<span className="font-san">{(discount * 100).toFixed(0)}</span>%):</span>
+                        <span className="font-sans text-green-600 font-semibold">-৳<span className="font-san">{(confirmOrderProduct.price * confirmOrderProduct.quantity * discount).toFixed(0)}</span></span>
                       </div>
                     )}
                     <div className="flex justify-between text-sm">
                       <span className="font-sans text-surface/70">Delivery Fee:</span>
-                      <span className="font-sans text-surface">৳<span className="font-fraktur">{getDeliveryFee()}</span></span>
+                      <span className="font-sans text-surface">৳<span className="font-san">{getDeliveryFee()}</span></span>
                     </div>
                     <div className="flex justify-between text-lg border-t border-primary/20 pt-2 mt-2">
                       <span className="font-sans font-semibold text-surface">Total:</span>
-                      <span className="font-fraktur font-bold text-primary">
+                      <span className="font-san font-bold text-primary">
                         ৳{((confirmOrderProduct.price * confirmOrderProduct.quantity * (1 - discount)) + getDeliveryFee()).toFixed(0)}
                       </span>
                     </div>
@@ -2775,7 +2775,7 @@ function App() {
                 <h4 className="font-sans font-semibold text-surface border-b border-primary/20 pb-2">Payment Information</h4>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-4">
                   <p className="text-sm font-sans text-yellow-800 font-medium">
-                    Advance payment of half the total cost and send us the Screenshort(৳<span className="font-fraktur">{confirmOrderProduct.type === 'cart'
+                    Advance payment of half the total cost and send us the Screenshort(৳<span className="font-san">{confirmOrderProduct.type === 'cart'
                       ? (((confirmOrderProduct.originalSubtotal - (confirmOrderProduct.originalSubtotal * (confirmOrderProduct.appliedBulkDiscount || 0)) - (confirmOrderProduct.originalSubtotal * (confirmOrderProduct.appliedDiscount || 0))) + getDeliveryFee()) / 2).toFixed(0)
                       : (((confirmOrderProduct.price * confirmOrderProduct.quantity * (1 - discount)) + getDeliveryFee()) / 2).toFixed(0)
                     }</span>) is required to confirm the order.
@@ -2832,7 +2832,7 @@ function App() {
                     {isDisabled && (
                       <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-3">
                         <p className="text-xs font-sans text-yellow-800 font-medium text-center">
-                          You need at least <span className="font-fraktur">{MIN_TYPES}</span> different product types in your Custom Gift Box. (<span className="font-fraktur">{confirmGiftTypes}/{MIN_TYPES}</span> types)
+                          You need at least <span className="font-san">{MIN_TYPES}</span> different product types in your Custom Gift Box. (<span className="font-san">{confirmGiftTypes}/{MIN_TYPES}</span> types)
                         </p>
                       </div>
                     )}
