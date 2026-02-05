@@ -22,6 +22,8 @@ const TIER_1_DISCOUNT = 0.05;      // 5% discount for 10+ types
 const TIER_2_DISCOUNT = 0.10;      // 10% discount for 16+ types
 const DELIVERY_INSIDE_DHAKA = 80;  // Delivery fee inside Dhaka
 const DELIVERY_OUTSIDE_DHAKA = 200; // Delivery fee outside Dhaka
+const COD_EXTRA_FEE = 100;          // Extra fee for Cash on Delivery
+const URGENT_FEE_BASE = 150;        // Base fee for urgent 24-hour delivery (variable by location)
 // ============================================
 
 // Product data with availability
@@ -319,7 +321,7 @@ const PRODUCT_COLORS = [
   { name: 'Green', hex: '#16ad4eff' },
   { name: 'Blue', hex: '#2669d5ff' },
   { name: 'Purple', hex: '#a659eeff' },
-  { name: 'Rainbow', hex: '#cb6579ff' },
+  { name: 'Rainbow', hex: '#cb6579ff', gradient: 'linear-gradient(to right, #cb6565ff, #cb9665ff, #cbba65ff, #65cb67ff, #6e65cbff, #6584cbff, #9b65cbff)' },
   { name: 'Yellow', hex: '#ffcf11ff' },
   { name: 'Silver', hex: '#C0C0C0' },
   { name: 'Golden', hex: '#cca72dff' },
@@ -382,6 +384,7 @@ function App() {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedGiftBox, setSelectedGiftBox] = useState(null);
   const [scrolled, setScrolled] = useState(false);
@@ -402,13 +405,14 @@ function App() {
   const [phoneError, setPhoneError] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
   const [deliveryType, setDeliveryType] = useState('inside'); // 'inside' or 'outside'
+  const [paymentMethod, setPaymentMethod] = useState('half'); // 'full', 'half', 'cod'
   const [copiedNumber, setCopiedNumber] = useState(null);
 
   // Payment numbers
   const paymentNumbers = {
-    bkash: '01335156146',
-    nagad: '01335156146',
-    rocket: '01335156146'
+    bkash: '01341630469',
+    nagad: '01341630469',
+    rocket: '013416304694'
   };
 
   // Back to Top button state
@@ -722,7 +726,7 @@ function App() {
     if (!confirmOrderProduct) return;
 
     const deliveryFee = getDeliveryFee();
-    let productPrice, bulkDiscountAmount, promoDiscountAmount, finalTotal, productDetails;
+    let productPrice, bulkDiscountAmount, promoDiscountAmount, baseTotal, finalTotal, productDetails;
 
     // Handle cart orders vs single product orders
     if (confirmOrderProduct.type === 'cart' && confirmOrderProduct.cartItems) {
@@ -732,7 +736,7 @@ function App() {
       const cartPromoDiscount = confirmOrderProduct.appliedDiscount || 0;
       bulkDiscountAmount = productPrice * cartBulkDiscount;
       promoDiscountAmount = productPrice * cartPromoDiscount;
-      finalTotal = productPrice - bulkDiscountAmount - promoDiscountAmount + deliveryFee;
+      baseTotal = productPrice - bulkDiscountAmount - promoDiscountAmount + deliveryFee;
 
       // Build detailed product list
       productDetails = confirmOrderProduct.cartItems.map((item, idx) => {
@@ -751,7 +755,7 @@ function App() {
       productPrice = confirmOrderProduct.price * confirmOrderProduct.quantity;
       bulkDiscountAmount = 0;
       promoDiscountAmount = productPrice * discount;
-      finalTotal = productPrice - promoDiscountAmount + deliveryFee;
+      baseTotal = productPrice - promoDiscountAmount + deliveryFee;
 
       productDetails = `*📌 Product Name:* ${confirmOrderProduct.name}`;
       if (confirmOrderProduct.description) {
@@ -764,6 +768,26 @@ function App() {
       if (confirmOrderProduct.selectedImageUrl) {
         productDetails += `\n*🖼️ Selected Image:* ${confirmOrderProduct.selectedImageUrl}`;
       }
+    }
+
+    // Calculate final total based on payment method
+    const codFee = paymentMethod === 'cod' ? COD_EXTRA_FEE : 0;
+    finalTotal = baseTotal + codFee;
+
+    // Calculate payment amounts
+    let paidNow, dueOnDelivery, paymentLabel;
+    if (paymentMethod === 'full') {
+      paidNow = finalTotal;
+      dueOnDelivery = 0;
+      paymentLabel = 'Full Advance';
+    } else if (paymentMethod === 'half') {
+      paidNow = Math.ceil(finalTotal / 2);
+      dueOnDelivery = finalTotal - paidNow;
+      paymentLabel = 'Half Advance';
+    } else {
+      paidNow = 0;
+      dueOnDelivery = finalTotal;
+      paymentLabel = 'Cash on Delivery';
     }
 
     let message = `🛍️ *I Would Like To Order*\n\n`;
@@ -802,10 +826,23 @@ function App() {
     }
 
     message += `*Delivery Fee:* ৳${deliveryFee}\n`;
+
+    if (codFee > 0) {
+      message += `*COD Extra Fee:* ৳${codFee}\n`;
+    }
+
     message += `━━━━━━━━━━━━━━━━━━━━\n`;
     message += `*FINAL TOTAL:* ৳${finalTotal.toFixed(0)}\n`;
     message += `━━━━━━━━━━━━━━━━━━━━\n\n`;
-    message += `💳 *Advance Payment:* ৳${(finalTotal / 2).toFixed(0)} (Half of total)`;
+    message += `💳 *PAYMENT METHOD*\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `*Payment:* ${paymentLabel}\n`;
+    if (paymentMethod !== 'cod') {
+      message += `*Paid Now:* ৳${paidNow.toFixed(0)}\n`;
+    }
+    if (dueOnDelivery > 0) {
+      message += `*Due on Delivery:* ৳${dueOnDelivery.toFixed(0)}\n`;
+    }
 
     const whatsappNumber = '8801335156146';
     const encodedMessage = encodeURIComponent(message);
@@ -824,6 +861,7 @@ function App() {
     setPhoneError('');
     setCustomerAddress('');
     setDeliveryType('inside');
+    setPaymentMethod('half');
     setDiscount(0);
     setDiscountCode('');
     setDiscountInput('');
@@ -919,6 +957,13 @@ function App() {
               >
                 Privacy
               </button>
+              <button
+                onClick={() => setIsTermsOpen(true)}
+                className="font-sans font-medium transition-colors hover:text-[#c5a880]"
+                style={{ color: '#22223b' }}
+              >
+                Terms
+              </button>
             </div>
 
             {/* Cart Icon */}
@@ -930,7 +975,7 @@ function App() {
               >
                 <ShoppingBag className="w-7 h-7" />
                 {cartItems.length > 0 && (
-                  <span className="absolute -top-1 -right-1 text-xm font-bold rounded-full h-6 w-6 flex items-center justify-center font-san" style={{ backgroundColor: '#e63535ff', color: '#fff' }}>
+                  <span className="absolute -top-1 -right-1 text-xm font-bold rounded-full h-6 w-6 flex items-center justify-center font-sans" style={{ backgroundColor: '#e63535ff', color: '#fff' }}>
                     {cartItems.reduce((total, item) => total + item.quantity, 0)}
                   </span>
                 )}
@@ -972,6 +1017,16 @@ function App() {
                 style={{ color: '#22223b' }}
               >
                 Privacy Policy
+              </button>
+              <button
+                onClick={() => {
+                  setIsTermsOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="block w-full text-left px-4 py-2 hover:bg-white/10 rounded-sm transition-colors font-sans font-medium"
+                style={{ color: '#22223b' }}
+              >
+                Terms & Conditions
               </button>
             </div>
           )}
@@ -1182,7 +1237,7 @@ function App() {
             <div id="charm-mystery-box" className="bg-white/10 backdrop-blur-xl rounded-sm p-6 md:p-10 border border-white/20 shadow-xl hover:shadow-2xl transition-shadow duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
-                  <h4 className="text-3xl md:text-4xl font-san font-bold flex items-center gap-3" style={{ color: '#eedfe3' }}>
+                  <h4 className="text-3xl md:text-4xl font-sans font-bold flex items-center gap-3" style={{ color: '#eedfe3' }}>
                     <IceCream className="w-10 h-10" style={{ color: '#c5a880' }} />
                     Charm Mystery Box
                   </h4>
@@ -1192,7 +1247,7 @@ function App() {
                   </p>
 
                   {/* Scoop Selector */}
-                  <div className="font-san space-y-4">
+                  <div className="font-sans space-y-4">
                     <label className="font-sans font-semibold" style={{ color: '#eedfe3' }}>Select Scoops:</label>
 
                     <div className="grid grid-cols-3 gap-3">
@@ -1212,11 +1267,11 @@ function App() {
                             ? { backgroundColor: '#c5a880' }
                             : { backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#eedfe3' }}
                         >
-                          <div className="flex items-center justify-center gap-1 text-3xl font-san">
+                          <div className="flex items-center justify-center gap-1 text-3xl font-sans">
                             <IceCream className="w-6 h-6" />
                             {option.scoops}
                           </div>
-                          <div className="flex items-baseline justify-center text-xl mt-1 opacity-80"><span>৳</span><span className="font-san">{option.price}</span></div>
+                          <div className="flex items-baseline justify-center text-xl mt-1 opacity-80"><span>৳</span><span className="font-sans">{option.price}</span></div>
                         </button>
                       ))}
                     </div>
@@ -1360,7 +1415,7 @@ function App() {
                     Choose your perfect shade from our vibrant collection. Each color tells a different story.
                   </p>
 
-                  <p className="font-san font-semibold text-5xl flex items-baseline" style={{ color: '#c5a880' }}><span>৳ 12</span></p>
+                  <p className="font-sans font-semibold text-5xl flex items-baseline" style={{ color: '#c5a880' }}><span>৳ 12</span></p>
 
                   {/* Color Selector - Using Inline Styles for Build Safety */}
                   <div className="space-y-4">
@@ -1380,9 +1435,10 @@ function App() {
                               isAvailable ? 'hover:opacity-90' : 'cursor-not-allowed'
                             } ${isSelected ? 'ring-4 ring-[#c5a880]' : ''}`}
                             style={{
-                              backgroundColor: isAvailable ? colorObj.hex : '#E5E7EB',
-                              color: isAvailable ? textColor : '#9CA3AF',
-                              border: colorObj.hex === '#FFFFFF' ? '1px solid #D1D5DB' : 'none'
+                              background: isAvailable ? (colorObj.gradient || colorObj.hex) : '#E5E7EB',
+                              color: isAvailable ? (colorObj.gradient ? '#ffffff' : textColor) : '#9CA3AF',
+                              border: colorObj.hex === '#FFFFFF' ? '1px solid #D1D5DB' : 'none',
+                              textShadow: colorObj.gradient && isAvailable ? '0 1px 2px rgba(0,0,0,0.5)' : 'none'
                             }}
                           >
                             {colorObj.name}
@@ -1498,14 +1554,14 @@ function App() {
                 </p>
               </div>
 
-              <div className="font-san grid grid-cols-3 gap-6 pt-10">
+              <div className="font-sans grid grid-cols-3 gap-6 pt-10">
                 {[
                   { value: '38+', label: 'Years' },
                   { value: '50K+', label: 'Customers' },
                   { value: '100%', label: 'Handcrafted' }
                 ].map((stat, i) => (
                   <div key={i} className="text-center p-6 rounded-sm bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <p className="text-4xl font-san mb-2" style={{ color: '#c5a880' }}>{stat.value}</p>
+                    <p className="text-4xl font-sans mb-2" style={{ color: '#c5a880' }}>{stat.value}</p>
                     <p className="text-sm font-sans uppercase tracking-wide" style={{ color: '#eedfe3', opacity: 0.7 }}>{stat.label}</p>
                   </div>
                 ))}
@@ -1560,21 +1616,21 @@ function App() {
                 <div className="md:w-[280px] flex-shrink-0">
                   <p className="font-display font-bold text-xl sm:text-2xl tracking-tight mb-1" style={{ color: '#eedfe3' }}>
                     {giftBoxUniqueTypes >= TIER_2_TYPES
-                      ? <><span className="font-san">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% Bulk Discount Applied</>
+                      ? <><span className="font-sans" style={{ color: '#8bd0e0' }}>{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% Bulk Discount Applied</>
                       : giftBoxUniqueTypes >= TIER_1_TYPES
-                        ? <>Select <span className="font-san">{TIER_2_TYPES - giftBoxUniqueTypes}</span> more to unlock <span className="font-san">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                        ? <>Select <span className="font-sans">{TIER_2_TYPES - giftBoxUniqueTypes}</span> more to unlock <span className="font-sans" style={{ color: '#8bd0e0' }}>{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% off</>
                         : giftBoxUniqueTypes >= MIN_TYPES
-                          ? <>Select <span className="font-san">{TIER_1_TYPES - giftBoxUniqueTypes}</span> more to unlock <span className="font-san">{(TIER_1_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                          ? <>Select <span className="font-sans">{TIER_1_TYPES - giftBoxUniqueTypes}</span> more to unlock <span className="font-sans" style={{ color: '#8bd0e0' }}>{(TIER_1_DISCOUNT * 100).toFixed(0)}</span>% off</>
                           : 'Build Your Custom Gift Box'
                     }
                   </p>
                   <p className="font-sans text-l" style={{ color: 'rgba(255, 255, 255, 0.93)' }}>
                     {giftBoxUniqueTypes < MIN_TYPES
-                      ? <>Select minimum <span className="font-san">{MIN_TYPES}</span> types to purchase</>
-                      : <><span className="font-san">{giftBoxUniqueTypes}</span> of <span className="font-san">{giftBoxProducts.length}</span> types selected</>
+                      ? <>Select minimum <span className="font-sans">{MIN_TYPES}</span> types to purchase</>
+                      : <><span className="font-sans">{giftBoxUniqueTypes}</span> of <span className="font-sans">{giftBoxProducts.length}</span> types selected</>
                     }
                   </p>
-                  <div className="font-san font-bold text-3xl sm:text-4xl tracking-tight mt-2" style={{ color: '#8bd0e0' }}>
+                  <div className="font-sans font-bold text-3xl sm:text-4xl tracking-tight mt-2" style={{ color: '#8bd0e0' }}>
                     {giftBoxUniqueTypes}<span className="text-lg sm:text-xl font-semibold" style={{ color: 'rgba(238,223,227,0.4)' }}>/{giftBoxProducts.length}</span>
                   </div>
                 </div>
@@ -1596,7 +1652,7 @@ function App() {
                           style={{ left: `${(marker.val / giftBoxProducts.length) * 100}%`, transform: 'translateX(-50%)' }}
                         >
                           <span
-                            className="font-san font-bold text-base sm:text-xl block leading-none"
+                            className="font-sans font-bold text-base sm:text-xl block leading-none"
                             style={{
                               color: giftBoxUniqueTypes >= marker.val ? '#eedfe3' : 'rgba(238,223,227,0.3)'
                             }}
@@ -1702,8 +1758,8 @@ function App() {
                       )}
                     </div>
                     <div className="p-3 md:p-4">
-                      <h5 className="font-san font-bold text-base md:text-[23px] truncate mb-1 leading-tight tracking-tight" style={{ color: '#eedfe3' }}>{product.name}</h5>
-                      <p className="font-san font-bold text-xl md:text-2xl flex items-baseline tracking-tight" style={{ color: '#c5a880' }}>
+                      <h5 className="font-sans font-bold text-base md:text-[23px] truncate mb-1 leading-tight tracking-tight" style={{ color: '#eedfe3' }}>{product.name}</h5>
+                      <p className="font-sans font-bold text-xl md:text-2xl flex items-baseline tracking-tight" style={{ color: '#c5a880' }}>
                         <span className="text-base md:text-lg mr-0.5 font-display" style={{ color: '#c5a880', opacity: 0.8 }}>৳</span>
                         <span>{product.price}</span>
                       </p>
@@ -1784,6 +1840,15 @@ function App() {
                     style={{ color: '#22223b', opacity: 0.8 }}
                   >
                     Privacy Policy
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => setIsTermsOpen(true)}
+                    className="transition-colors hover:text-[#4a4e69]"
+                    style={{ color: '#22223b', opacity: 0.8 }}
+                  >
+                    Terms & Conditions
                   </button>
                 </li>
               </ul>
@@ -1881,17 +1946,17 @@ function App() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
                   {/* Left Side - Status Text */}
                   <div className="sm:w-[180px] flex-shrink-0 flex sm:flex-col items-center sm:items-start gap-3 sm:gap-0">
-                    <p className="font-san font-semibold text-xl tracking-tight" style={{ color: '#000000ff' }}>
+                    <p className="font-sans font-semibold text-xl tracking-tight" style={{ color: '#000000ff' }}>
                       {giftBoxUniqueTypes < MIN_TYPES
                         ? <><span className="">{MIN_TYPES - giftBoxUniqueTypes}</span> more type{MIN_TYPES - giftBoxUniqueTypes !== 1 ? 's' : ''} needed</>
                         : giftBoxUniqueTypes < TIER_1_TYPES
-                          ? <><span className="font-san">{TIER_1_TYPES - giftBoxUniqueTypes}</span> more for <span className="font-san">{(TIER_1_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                          ? <><span className="font-sans">{TIER_1_TYPES - giftBoxUniqueTypes}</span> more for <span className="font-sans" style={{ color: '#8bd0e0' }}>{(TIER_1_DISCOUNT * 100).toFixed(0)}</span>% off</>
                           : giftBoxUniqueTypes < TIER_2_TYPES
-                            ? <><span className="font-san">{TIER_2_TYPES - giftBoxUniqueTypes}</span> more for <span className="font-san">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% off</>
-                            : <><span className="font-san">{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% Discount Applied</>
+                            ? <><span className="font-sans">{TIER_2_TYPES - giftBoxUniqueTypes}</span> more for <span className="font-sans" style={{ color: '#8bd0e0' }}>{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% off</>
+                            : <><span className="font-sans" style={{ color: '#8bd0e0' }}>{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% Discount Applied</>
                       }
                     </p>
-                    <span className="font-san font-bold text-lg tracking-tight" style={{ color: '#22223b' }}>
+                    <span className="font-sans font-bold text-lg tracking-tight" style={{ color: '#22223b' }}>
                       {giftBoxUniqueTypes}<span className="text-xs font-semibold" style={{ color: '#7d838dff', fontFamily: 'Outfit, sans-serif' }}>/{giftBoxProducts.length}</span>
                     </span>
                   </div>
@@ -2016,7 +2081,7 @@ function App() {
                     <h3 className="text-2xl sm:text-3xl font-display font-bold text-surface mb-2 tracking-tight">
                       {selectedGiftBox.name}
                     </h3>
-                    <p className="text-3xl sm:text-4xl font-san font-bold text-primary flex items-baseline tracking-tight">
+                    <p className="text-3xl sm:text-4xl font-sans font-bold text-primary flex items-baseline tracking-tight">
                       <span className="text-xl sm:text-2xl mr-1 font-display" style={{ opacity: 0.8 }}>৳</span><span>{selectedGiftBox.price}</span>
                     </p>
                     {!selectedGiftBox.inStock && (
@@ -2125,12 +2190,12 @@ function App() {
                       style={{ backgroundColor: '#c5a880', color: '#ffffff' }}
                     >
                       <ShoppingBag className="w-6 h-6" />
-                      Go To Cart — <span className="font-san">{giftBoxUniqueTypes}</span> Types Selected
+                      Go To Cart — <span className="font-sans">{giftBoxUniqueTypes}</span> Types Selected
                     </button>
                   )}
                   {selectedGiftBox.inStock && !giftBoxMeetsMinimum && (
                     <p className="text-sm text-center font-sans font-semibold" style={{ color: '#6b7280' }}>
-                      Select <span className="font-san">{MIN_TYPES - giftBoxUniqueTypes}</span> more type{MIN_TYPES - giftBoxUniqueTypes !== 1 ? 's' : ''} to proceed — <span className="font-san">{giftBoxUniqueTypes}/{MIN_TYPES}</span> selected
+                      Select <span className="font-sans">{MIN_TYPES - giftBoxUniqueTypes}</span> more type{MIN_TYPES - giftBoxUniqueTypes !== 1 ? 's' : ''} to proceed — <span className="font-sans">{giftBoxUniqueTypes}/{MIN_TYPES}</span> selected
                     </p>
                   )}
                 </div>
@@ -2205,7 +2270,7 @@ function App() {
                             <p className="text-xs text-surface/60 font-sans">Color: {item.color}</p>
                           )}
                           <p className="text-primary font-sans font-bold mt-1">
-                            ৳<span className="font-san">{item.price}</span> × <span className="font-san">{item.quantity}</span>
+                            ৳<span className="font-sans">{item.price}</span> × <span className="font-sans">{item.quantity}</span>
                           </p>
 
                           <div className="flex items-center gap-2 mt-2">
@@ -2215,7 +2280,7 @@ function App() {
                             >
                               -
                             </button>
-                            <span className="w-8 text-center font-san font-semibold text-surface">
+                            <span className="w-8 text-center font-sans font-semibold text-surface">
                               {item.quantity}
                             </span>
                             <button
@@ -2275,7 +2340,7 @@ function App() {
                     </div>
                     {discountCode && (
                       <p className="text-xs text-green-600 font-sans font-semibold">
-                        Code "{discountCode}" applied - <span className="font-san">{(discount * 100).toFixed(0)}</span>% off
+                        Code "{discountCode}" applied - <span className="font-sans" style={{ color: '#cd261dff' }}>{(discount * 100).toFixed(0)}</span>% off
                       </p>
                     )}
                   </div>
@@ -2284,30 +2349,30 @@ function App() {
                   {(discount > 0 || bulkDiscountRate > 0) && (
                     <div className="flex justify-between items-center text-sm">
                       <span className="font-sans text-surface/70">Subtotal:</span>
-                      <span className="font-sans text-surface/70">
-                        ৳<span className="font-san">{calculateSubtotal().toFixed(2)}</span>
+                      <span className="font-sans font-semibold" style={{ color: '#c5a880' }}>
+                        ৳<span className="font-sans">{calculateSubtotal().toFixed(2)}</span>
                       </span>
                     </div>
                   )}
                   {bulkDiscountRate > 0 && (
                     <div className="flex justify-between items-center text-sm">
-                      <span className="font-sans text-surface/70">Bulk Discount (<span className="font-san">{(bulkDiscountRate * 100).toFixed(0)}</span>%):</span>
-                      <span className="font-sans text-green-600 font-semibold">
-                        -৳<span className="font-san">{(calculateSubtotal() * bulkDiscountRate).toFixed(2)}</span>
+                      <span className="font-sans text-surface/70">Bulk Discount (<span className="font-sans" style={{ color: '#ef4444' }}>{(bulkDiscountRate * 100).toFixed(0)}</span>%):</span>
+                      <span className="font-sans font-semibold" style={{ color: '#ef4444' }}>
+                        -৳<span className="font-sans">{(calculateSubtotal() * bulkDiscountRate).toFixed(2)}</span>
                       </span>
                     </div>
                   )}
                   {discount > 0 && (
                     <div className="flex justify-between items-center text-sm">
-                      <span className="font-sans text-surface/70">Promo Discount (<span className="font-san">{(discount * 100).toFixed(0)}</span>%):</span>
-                      <span className="font-sans text-green-600 font-semibold">
-                        -৳<span className="font-san">{(calculateSubtotal() * discount).toFixed(2)}</span>
+                      <span className="font-sans text-surface/70">Promo Discount (<span className="font-sans" style={{ color: '#ef4444' }}>{(discount * 100).toFixed(0)}</span>%):</span>
+                      <span className="font-sans font-semibold" style={{ color: '#ef4444' }}>
+                        -৳<span className="font-sans">{(calculateSubtotal() * discount).toFixed(2)}</span>
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between items-center text-lg border-t border-primary/20 pt-4">
                     <span className="font-sans font-semibold text-surface">Total:</span>
-                    <span className="font-san font-bold text-2xl text-primary">
+                    <span className="font-sans font-bold text-2xl" style={{ color: '#22c55e' }}>
                       ৳{calculateTotal().toFixed(2)}
                     </span>
                   </div>
@@ -2319,7 +2384,7 @@ function App() {
                   {hasGiftBoxItems && !giftBoxMeetsMinimum && (
                     <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-3">
                       <p className="text-xs font-sans text-yellow-800 font-medium text-center">
-                        Add at least <span className="font-san">{MIN_TYPES}</span> different product types to complete your Custom Gift Box. (<span className="font-san">{giftBoxUniqueTypes}/{MIN_TYPES}</span> types added)
+                        Add at least <span className="font-sans">{MIN_TYPES}</span> different product types to complete your Custom Gift Box. (<span className="font-sans">{giftBoxUniqueTypes}/{MIN_TYPES}</span> types added)
                       </p>
                     </div>
                   )}
@@ -2404,7 +2469,7 @@ function App() {
                 <h4 className="font-sans font-semibold text-surface mb-2">
                   {buyNowProduct.name}
                 </h4>
-                <p className="text-2xl font-san font-bold text-primary">
+                <p className="text-2xl font-sans font-bold text-primary">
                   ৳{buyNowProduct.price}
                 </p>
               </div>
@@ -2483,6 +2548,7 @@ function App() {
                 setPhoneError('');
                 setCustomerAddress('');
                 setDeliveryType('inside');
+                setPaymentMethod('half');
               }}
               className="absolute top-3 right-3 md:top-4 md:right-4 z-10 p-2 hover:bg-primary/10 rounded-sm transition-colors bg-white/80"
             >
@@ -2523,27 +2589,27 @@ function App() {
                             <p className="text-xs text-surface/60">
                               {item.color && `${item.color} • `}
                               {item.scoops && `${item.scoops} Scoops • `}
-                              Qty: <span className="font-san">{item.quantity}</span>
+                              Qty: <span className="font-sans">{item.quantity}</span>
                             </p>
                           </div>
-                          <p className="text-sm font-semibold text-primary">৳<span className="font-san">{item.price * item.quantity}</span></p>
+                          <p className="text-sm font-semibold text-primary">৳<span className="font-sans">{item.price * item.quantity}</span></p>
                         </div>
                       ))}
                     </div>
                     <div className="border-t border-primary/10 pt-2 flex justify-between">
                       <span className="font-sans font-semibold text-surface">Subtotal:</span>
-                      <span className="font-san font-bold text-primary">৳{confirmOrderProduct.originalSubtotal}</span>
+                      <span className="font-sans font-bold" style={{ color: '#c5a880' }}>৳{confirmOrderProduct.originalSubtotal}</span>
                     </div>
                     {confirmOrderProduct.appliedBulkDiscount > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-surface/70">Bulk Discount (<span className="font-san">{(confirmOrderProduct.appliedBulkDiscount * 100).toFixed(0)}</span>%):</span>
-                        <span className="text-green-600 font-semibold">-৳<span className="font-san">{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedBulkDiscount).toFixed(0)}</span></span>
+                        <span className="text-surface/70">Bulk Discount (<span className="font-sans" style={{ color: '#ef4444' }}>{(confirmOrderProduct.appliedBulkDiscount * 100).toFixed(0)}</span>%):</span>
+                        <span className="font-semibold" style={{ color: '#ef4444' }}>-৳<span className="font-sans">{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedBulkDiscount).toFixed(0)}</span></span>
                       </div>
                     )}
                     {confirmOrderProduct.appliedDiscount > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-surface/70">Promo Discount ({confirmOrderProduct.appliedDiscountCode}):</span>
-                        <span className="text-green-600 font-semibold">-৳<span className="font-san">{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedDiscount).toFixed(0)}</span></span>
+                        <span className="font-semibold" style={{ color: '#ef4444' }}>-৳<span className="font-sans">{(confirmOrderProduct.originalSubtotal * confirmOrderProduct.appliedDiscount).toFixed(0)}</span></span>
                       </div>
                     )}
                   </div>
@@ -2567,8 +2633,8 @@ function App() {
                       {confirmOrderProduct.color && (
                         <p className="text-xs text-surface/60 font-sans">Color: {confirmOrderProduct.color}</p>
                       )}
-                      <p className="text-xs text-surface/60 font-sans">Qty: <span className="font-san">{confirmOrderProduct.quantity}</span></p>
-                      <p className="text-lg font-san font-bold text-primary mt-1">
+                      <p className="text-xs text-surface/60 font-sans">Qty: <span className="font-sans">{confirmOrderProduct.quantity}</span></p>
+                      <p className="text-lg font-sans font-bold mt-1" style={{ color: '#c5a880' }}>
                         ৳{confirmOrderProduct.price * confirmOrderProduct.quantity}
                       </p>
                     </div>
@@ -2611,7 +2677,7 @@ function App() {
                 </div>
                 {discountCode && (
                   <p className="text-xs text-green-600 font-sans font-semibold">
-                    Code "{discountCode}" applied - <span className="font-san">{(discount * 100).toFixed(0)}</span>% off
+                    Code "{discountCode}" applied - <span className="font-sans" style={{ color: '#d83f3fff' }}>{(discount * 100).toFixed(0)}</span>% off
                   </p>
                 )}
               </div>
@@ -2685,7 +2751,7 @@ function App() {
                     }`}
                   >
                     <p className="font-sans font-semibold text-surface text-xs sm:text-sm">Inside Dhaka</p>
-                    <p className="text-primary font-san font-bold text-base sm:text-lg">৳{DELIVERY_INSIDE_DHAKA}</p>
+                    <p className="text-primary font-sans font-bold text-base sm:text-lg">৳{DELIVERY_INSIDE_DHAKA}</p>
                   </button>
                   <button
                     onClick={() => setDeliveryType('outside')}
@@ -2696,125 +2762,280 @@ function App() {
                     }`}
                   >
                     <p className="font-sans font-semibold text-surface text-xs sm:text-sm">Outside Dhaka</p>
-                    <p className="text-primary font-san font-bold text-base sm:text-lg">৳{DELIVERY_OUTSIDE_DHAKA}</p>
+                    <p className="text-primary font-sans font-bold text-base sm:text-lg">৳{DELIVERY_OUTSIDE_DHAKA}</p>
                   </button>
                 </div>
               </div>
 
-              {/* Price Breakdown */}
-              <div className="bg-light/30 rounded-sm p-4 border border-primary/10 space-y-2">
-                {confirmOrderProduct.type === 'cart' ? (
-                  // Cart order price breakdown
-                  (() => {
-                    const sub = confirmOrderProduct.originalSubtotal;
-                    const bulkRate = confirmOrderProduct.appliedBulkDiscount || 0;
-                    const promoRate = confirmOrderProduct.appliedDiscount || 0;
-                    const bulkAmt = sub * bulkRate;
-                    const promoAmt = sub * promoRate;
-                    const total = sub - bulkAmt - promoAmt + getDeliveryFee();
-                    return (
-                      <>
-                        <div className="flex justify-between text-sm">
-                          <span className="font-sans text-surface/70">Subtotal:</span>
-                          <span className="font-sans text-surface">৳<span className="font-san">{sub}</span></span>
-                        </div>
-                        {bulkRate > 0 && (
-                          <div className="flex justify-between text-sm">
-                            <span className="font-sans text-surface/70">Bulk Discount (<span className="font-san">{(bulkRate * 100).toFixed(0)}</span>%):</span>
-                            <span className="font-sans text-green-600 font-semibold">-৳<span className="font-san">{bulkAmt.toFixed(0)}</span></span>
-                          </div>
-                        )}
-                        {promoRate > 0 && (
-                          <div className="flex justify-between text-sm">
-                            <span className="font-sans text-surface/70">Promo Discount ({confirmOrderProduct.appliedDiscountCode}):</span>
-                            <span className="font-sans text-green-600 font-semibold">-৳<span className="font-san">{promoAmt.toFixed(0)}</span></span>
-                          </div>
-                        )}
-                        <div className="flex justify-between text-sm">
-                          <span className="font-sans text-surface/70">Delivery Fee:</span>
-                          <span className="font-sans text-surface">৳<span className="font-san">{getDeliveryFee()}</span></span>
-                        </div>
-                        <div className="flex justify-between text-lg border-t border-primary/20 pt-2 mt-2">
-                          <span className="font-sans font-semibold text-surface">Total:</span>
-                          <span className="font-san font-bold text-primary">
-                            ৳{total.toFixed(0)}
-                          </span>
-                        </div>
-                      </>
-                    );
-                  })()
-                ) : (
-                  // Single product price breakdown
-                  <>
-                    <div className="flex justify-between text-sm">
-                      <span className="font-sans text-surface/70">Product Price:</span>
-                      <span className="font-sans text-surface">৳<span className="font-san">{confirmOrderProduct.price * confirmOrderProduct.quantity}</span></span>
-                    </div>
-                    {discount > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="font-sans text-surface/70">Discount (<span className="font-san">{(discount * 100).toFixed(0)}</span>%):</span>
-                        <span className="font-sans text-green-600 font-semibold">-৳<span className="font-san">{(confirmOrderProduct.price * confirmOrderProduct.quantity * discount).toFixed(0)}</span></span>
-                      </div>
-                    )}
-                    <div className="flex justify-between text-sm">
-                      <span className="font-sans text-surface/70">Delivery Fee:</span>
-                      <span className="font-sans text-surface">৳<span className="font-san">{getDeliveryFee()}</span></span>
-                    </div>
-                    <div className="flex justify-between text-lg border-t border-primary/20 pt-2 mt-2">
-                      <span className="font-sans font-semibold text-surface">Total:</span>
-                      <span className="font-san font-bold text-primary">
-                        ৳{((confirmOrderProduct.price * confirmOrderProduct.quantity * (1 - discount)) + getDeliveryFee()).toFixed(0)}
-                      </span>
-                    </div>
-                  </>
-                )}
-              </div>
+              {/* Payment Method Selection */}
+              {(() => {
+                // Check if cart contains Custom Gift Box items - COD not allowed for custom boxes
+                const hasCustomGiftBox = confirmOrderProduct.type === 'cart' && confirmOrderProduct.cartItems
+                  ? confirmOrderProduct.cartItems.some(item => item.type === 'gift-box')
+                  : false;
 
-              {/* Payment Information */}
-              <div className="space-y-3">
-                <h4 className="font-sans font-semibold text-surface border-b border-primary/20 pb-2">Payment Information</h4>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-4">
-                  <p className="text-sm font-sans text-yellow-800 font-medium">
-                    Advance payment of half the total cost and send us the Screenshort(৳<span className="font-san">{confirmOrderProduct.type === 'cart'
-                      ? (((confirmOrderProduct.originalSubtotal - (confirmOrderProduct.originalSubtotal * (confirmOrderProduct.appliedBulkDiscount || 0)) - (confirmOrderProduct.originalSubtotal * (confirmOrderProduct.appliedDiscount || 0))) + getDeliveryFee()) / 2).toFixed(0)
-                      : (((confirmOrderProduct.price * confirmOrderProduct.quantity * (1 - discount)) + getDeliveryFee()) / 2).toFixed(0)
-                    }</span>) is required to confirm the order.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  {[
-                    { name: 'Bkash', number: paymentNumbers.bkash, color: 'bg-pink-500' },
-                    { name: 'Nagad', number: paymentNumbers.nagad, color: 'bg-orange-500' },
-                    { name: 'Rocket', number: paymentNumbers.rocket, color: 'bg-purple-500' }
-                  ].map((payment) => (
-                    <div key={payment.name} className="flex items-center justify-between p-3 bg-white border border-primary/10 rounded-sm">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 ${payment.color} rounded-sm flex items-center justify-center`}>
-                          <span className="text-white font-bold text-xs">{payment.name[0]}</span>
-                        </div>
-                        <div>
-                          <p className="font-sans font-semibold text-surface text-sm">{payment.name}</p>
-                          <p className="font-sans text-surface/70 text-sm">{payment.number}</p>
-                        </div>
-                      </div>
+                return (
+                  <div className="space-y-2 sm:space-y-3">
+                    <h4 className="font-sans font-semibold text-surface text-sm sm:text-base border-b border-primary/20 pb-2">Payment Method</h4>
+                    <div className="grid grid-cols-1 gap-2 sm:gap-3">
+                      {/* Full Advance */}
                       <button
-                        onClick={() => copyToClipboard(payment.number, payment.name)}
-                        className={`p-2 rounded-sm transition-all ${
-                          copiedNumber === payment.name
-                            ? 'bg-green-500 text-white'
-                            : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
+                        onClick={() => setPaymentMethod('full')}
+                        className={`p-3 sm:p-4 rounded-sm border-2 transition-all text-left ${
+                          paymentMethod === 'full'
+                            ? 'border-primary bg-primary/10'
+                            : 'border-primary/20 hover:border-primary/50'
                         }`}
                       >
-                        {copiedNumber === payment.name ? (
-                          <Check className="w-5 h-5" />
-                        ) : (
-                          <Copy className="w-5 h-5" />
-                        )}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-sans font-semibold text-surface text-sm sm:text-base">Full Advance</p>
+                            <p className="text-xs text-surface/60 font-sans">Pay full amount now</p>
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'full' ? 'border-primary bg-primary' : 'border-primary/30'}`}>
+                            {paymentMethod === 'full' && <Check className="w-3 h-3 text-white" />}
+                          </div>
+                        </div>
+                      </button>
+
+                      {/* Half Advance */}
+                      <button
+                        onClick={() => setPaymentMethod('half')}
+                        className={`p-3 sm:p-4 rounded-sm border-2 transition-all text-left ${
+                          paymentMethod === 'half'
+                            ? 'border-primary bg-primary/10'
+                            : 'border-primary/20 hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-sans font-semibold text-surface text-sm sm:text-base">Half Advance</p>
+                            <p className="text-xs text-surface/60 font-sans">Pay <span className="font-sans" style={{ color: '#7b7b79ff' }}>50%</span> now, rest on delivery</p>
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'half' ? 'border-primary bg-primary' : 'border-primary/30'}`}>
+                            {paymentMethod === 'half' && <Check className="w-3 h-3 text-white" />}
+                          </div>
+                        </div>
+                      </button>
+
+                      {/* Cash on Delivery - Disabled for Custom Gift Box */}
+                      <button
+                        onClick={() => !hasCustomGiftBox && setPaymentMethod('cod')}
+                        disabled={hasCustomGiftBox}
+                        className={`p-3 sm:p-4 rounded-sm border-2 transition-all text-left ${
+                          hasCustomGiftBox
+                            ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
+                            : paymentMethod === 'cod'
+                              ? 'border-primary bg-primary/10'
+                              : 'border-primary/20 hover:border-primary/50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className={`font-sans font-semibold text-sm sm:text-base ${hasCustomGiftBox ? 'text-gray-400' : 'text-surface'}`}>
+                              Cash on Delivery
+                            </p>
+                            <p className={`text-xs font-sans ${hasCustomGiftBox ? 'text-gray-400' : 'text-surface/60'}`}>
+                              {hasCustomGiftBox
+                                ? 'Not available for Custom Gift Box'
+                                : <>Pay on delivery (+<span className="font-sans" style={{ color: '#686868ff' }}>৳{COD_EXTRA_FEE}</span> COD fee)</>
+                              }
+                            </p>
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            hasCustomGiftBox
+                              ? 'border-gray-300'
+                              : paymentMethod === 'cod'
+                                ? 'border-primary bg-primary'
+                                : 'border-primary/30'
+                          }`}>
+                            {paymentMethod === 'cod' && !hasCustomGiftBox && <Check className="w-3 h-3 text-white" />}
+                          </div>
+                        </div>
                       </button>
                     </div>
-                  ))}
+                    {hasCustomGiftBox && (
+                      <p className="text-xs text-amber-600 font-sans bg-amber-50 p-2 rounded-sm">
+                        Custom Gift Box orders require advance payment (Full or Half) as each box is personalized.
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Price Breakdown with Fraktur Numbers */}
+              <div className="bg-light/30 rounded-sm p-4 border border-primary/10 space-y-2">
+                {(() => {
+                  // Calculate values
+                  let productPrice, bulkAmt, promoAmt, afterDiscounts;
+                  if (confirmOrderProduct.type === 'cart' && confirmOrderProduct.cartItems) {
+                    productPrice = confirmOrderProduct.originalSubtotal;
+                    const bulkRate = confirmOrderProduct.appliedBulkDiscount || 0;
+                    const promoRate = confirmOrderProduct.appliedDiscount || 0;
+                    bulkAmt = productPrice * bulkRate;
+                    promoAmt = productPrice * promoRate;
+                    afterDiscounts = productPrice - bulkAmt - promoAmt;
+                  } else {
+                    productPrice = confirmOrderProduct.price * confirmOrderProduct.quantity;
+                    bulkAmt = 0;
+                    promoAmt = productPrice * discount;
+                    afterDiscounts = productPrice - promoAmt;
+                  }
+                  const deliveryFee = getDeliveryFee();
+                  const codFee = paymentMethod === 'cod' ? COD_EXTRA_FEE : 0;
+                  const finalTotal = afterDiscounts + deliveryFee + codFee;
+
+                  // Payment amounts
+                  let paidNow, dueOnDelivery;
+                  if (paymentMethod === 'full') {
+                    paidNow = finalTotal;
+                    dueOnDelivery = 0;
+                  } else if (paymentMethod === 'half') {
+                    paidNow = Math.ceil(finalTotal / 2);
+                    dueOnDelivery = finalTotal - paidNow;
+                  } else {
+                    paidNow = 0;
+                    dueOnDelivery = finalTotal;
+                  }
+
+                  const bulkRate = confirmOrderProduct.type === 'cart' ? (confirmOrderProduct.appliedBulkDiscount || 0) : 0;
+                  const promoRate = confirmOrderProduct.type === 'cart' ? (confirmOrderProduct.appliedDiscount || 0) : discount;
+
+                  return (
+                    <>
+                      <h4 className="font-sans font-semibold text-surface text-sm border-b border-primary/10 pb-2 mb-2">Price Breakdown</h4>
+
+                      {/* Product Price */}
+                      <div className="flex justify-between text-sm">
+                        <span className="font-sans text-surface/70">Product Total:</span>
+                        <span className="font-sans font-semibold" style={{ color: '#c5a880' }}>৳<span className="font-sans text-base">{productPrice}</span></span>
+                      </div>
+
+                      {/* Bulk Discount */}
+                      {bulkRate > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="font-sans text-surface/70">Bulk Discount (<span className="font-sans" style={{ color: '#ef4444' }}>{(bulkRate * 100).toFixed(0)}</span>%):</span>
+                          <span className="font-sans font-semibold" style={{ color: '#ef4444' }}>-৳<span className="font-sans text-base">{bulkAmt.toFixed(0)}</span></span>
+                        </div>
+                      )}
+
+                      {/* Promo Discount */}
+                      {promoRate > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="font-sans text-surface/70">Promo Discount ({confirmOrderProduct.type === 'cart' ? confirmOrderProduct.appliedDiscountCode : discountCode}):</span>
+                          <span className="font-sans font-semibold" style={{ color: '#ef4444' }}>-৳<span className="font-sans text-base">{promoAmt.toFixed(0)}</span></span>
+                        </div>
+                      )}
+
+                      {/* Delivery Fee */}
+                      <div className="flex justify-between text-sm">
+                        <span className="font-sans text-surface/70">Delivery Fee:</span>
+                        <span className="font-sans font-semibold" style={{ color: '#c5a880' }}>+৳<span className="font-sans text-base">{deliveryFee}</span></span>
+                      </div>
+
+                      {/* COD Fee */}
+                      {paymentMethod === 'cod' && (
+                        <div className="flex justify-between text-sm">
+                          <span className="font-sans text-surface/70">COD Extra Fee:</span>
+                          <span className="font-sans font-semibold" style={{ color: '#c5a880' }}>+৳<span className="font-sans text-base">{COD_EXTRA_FEE}</span></span>
+                        </div>
+                      )}
+
+                      {/* Final Total */}
+                      <div className="flex justify-between text-lg border-t border-primary/20 pt-2 mt-2">
+                        <span className="font-sans font-semibold text-surface">Final Total:</span>
+                        <span className="font-bold">
+                          ৳<span className="font-sans text-xl" style={{ color: '#22c55e' }}>{finalTotal.toFixed(0)}</span>
+                        </span>
+                      </div>
+
+                      {/* Payment Summary */}
+                      <div className="bg-white/50 rounded-sm p-3 mt-3 space-y-1">
+                        {paymentMethod === 'full' && (
+                          <div className="flex justify-between text-sm">
+                            <span className="font-sans text-surface font-medium">Pay Now (Full):</span>
+                            <span className="font-bold" style={{ color: '#c5a880' }}>৳<span className="font-sans text-base">{paidNow.toFixed(0)}</span></span>
+                          </div>
+                        )}
+                        {paymentMethod === 'half' && (
+                          <>
+                            <div className="flex justify-between text-sm">
+                              <span className="font-sans text-surface font-medium">Pay Now (<span className="font-sans" style={{ color: '#525050ff' }}>50%</span>):</span>
+                              <span className="font-bold" style={{ color: '#c5a880' }}>৳<span className="font-sans text-base">{paidNow.toFixed(0)}</span></span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="font-sans text-surface/70">Due on Delivery:</span>
+                              <span className="font-sans font-semibold" style={{ color: '#c5a880' }}>৳<span className="font-sans text-base">{dueOnDelivery.toFixed(0)}</span></span>
+                            </div>
+                          </>
+                        )}
+                        {paymentMethod === 'cod' && (
+                          <div className="flex justify-between text-sm">
+                            <span className="font-sans text-surface font-medium">Pay on Delivery:</span>
+                            <span className="font-bold" style={{ color: '#c5a880' }}>৳<span className="font-sans text-base">{dueOnDelivery.toFixed(0)}</span></span>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+
+              {/* Payment Information - Only show for advance payments */}
+              {paymentMethod !== 'cod' && (
+                <div className="space-y-3">
+                  <h4 className="font-sans font-semibold text-surface border-b border-primary/20 pb-2">Payment Information</h4>
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-4">
+                    <p className="text-sm font-sans text-yellow-800 font-medium">
+                      {paymentMethod === 'full'
+                        ? 'Please pay the full amount and send us the screenshot to confirm your order.'
+                        : <>Pay <span className="font-sans" style={{ color: '#14a029ff' }}>50%</span> advance and send us the screenshot. Remaining amount is due on delivery.</>
+                      }
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    {[
+                      { name: 'Bkash', number: paymentNumbers.bkash, color: 'bg-pink-500' },
+                      { name: 'Nagad', number: paymentNumbers.nagad, color: 'bg-orange-500' },
+                      { name: 'Rocket', number: paymentNumbers.rocket, color: 'bg-purple-500' }
+                    ].map((payment) => (
+                      <div key={payment.name} className="flex items-center justify-between p-3 bg-white border border-primary/10 rounded-sm">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 ${payment.color} rounded-sm flex items-center justify-center`}>
+                            <span className="text-white font-bold text-xs">{payment.name[0]}</span>
+                          </div>
+                          <div>
+                            <p className="font-sans font-semibold text-surface text-sm">{payment.name}</p>
+                            <p className="font-sans text-surface/70 text-sm">{payment.number}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => copyToClipboard(payment.number, payment.name)}
+                          className={`p-2 rounded-sm transition-all ${
+                            copiedNumber === payment.name
+                              ? 'bg-green-500 text-white'
+                              : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
+                          }`}
+                        >
+                          {copiedNumber === payment.name ? (
+                            <Check className="w-5 h-5" />
+                          ) : (
+                            <Copy className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              )}
+
+              {/* Terms Agreement Notice */}
+              <div className="bg-surface/5 border border-surface/10 rounded-sm p-3">
+                <p className="text-xs font-sans text-surface/70 text-center">
+                  By placing this order, you agree to our <button onClick={() => setIsTermsOpen(true)} className="underline underline-offset-4 decoration-1 font-medium hover:opacity-80 transition-opacity" style={{ color: '#b047a0ff' }}>Terms & Conditions</button>.
+                  Orders can only be cancelled within <span className="font-sans" style={{ color: '#505050ff' }}>2</span> hours of confirmation.
+                </p>
               </div>
 
               {/* Confirm Button with safety catch */}
@@ -2832,7 +3053,7 @@ function App() {
                     {isDisabled && (
                       <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-3">
                         <p className="text-xs font-sans text-yellow-800 font-medium text-center">
-                          You need at least <span className="font-san">{MIN_TYPES}</span> different product types in your Custom Gift Box. (<span className="font-san">{confirmGiftTypes}/{MIN_TYPES}</span> types)
+                          You need at least <span className="font-sans">{MIN_TYPES}</span> different product types in your Custom Gift Box. (<span className="font-sans">{confirmGiftTypes}/{MIN_TYPES}</span> types)
                         </p>
                       </div>
                     )}
@@ -2915,6 +3136,129 @@ function App() {
                   <p className="leading-relaxed">{section.content}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Terms & Conditions Modal */}
+      {isTermsOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4 bg-surface/70 backdrop-blur-lg">
+          <div className="relative bg-white rounded-sm shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden border-2" style={{ borderColor: '#c5a880' }}>
+            <div className="px-8 py-6 border-b flex items-center justify-between sticky top-0 bg-white z-10" style={{ borderColor: '#c5a880' }}>
+              <h3 className="text-3xl font-display font-bold text-surface">Terms & Conditions</h3>
+              <button
+                onClick={() => setIsTermsOpen(false)}
+                className="p-2 hover:bg-primary/10 rounded-sm transition-colors"
+              >
+                <X className="w-6 h-6 text-surface" />
+              </button>
+            </div>
+
+            <div className="px-8 py-6 overflow-y-auto max-h-[calc(90vh-100px)] font-sans text-surface/80 space-y-8">
+              <p className="text-sm text-surface/60">Last updated: February 2026</p>
+
+              <div className="space-y-4">
+                <p className="leading-relaxed text-surface/70">
+                  Welcome to Yumora. By placing an order with us, you agree to the following terms and conditions. Please read them carefully before making a purchase.
+                </p>
+              </div>
+
+              {/* Section 1: Order Finality & Cancellation */}
+              <div className="space-y-3">
+                <h4 className="text-xl font-display font-bold" style={{ color: '#c5a880' }}>1. Order Finality & Cancellation</h4>
+                <p className="leading-relaxed">
+                  Once you click the <span className="font-semibold text-surface">'Confirm Order'</span> button and complete your advance payment, your order is considered final. Orders can <span className="font-semibold text-surface">only be cancelled within <span className="font-sans text-lg" style={{ color: '#c5a880' }}>2</span> hours</span> of confirmation by contacting us immediately. After this window, orders <span className="font-semibold text-surface">cannot be canceled or modified</span>. Please ensure all details are correct before confirming your order.
+                </p>
+              </div>
+
+              {/* Section 2: Delivery Inspection Policy */}
+              <div className="space-y-3">
+                <h4 className="text-xl font-display font-bold" style={{ color: '#c5a880' }}>2. Delivery Inspection Policy</h4>
+                <p className="leading-relaxed">
+                  Customers are <span className="font-semibold text-surface">required to open and inspect</span> their parcel in the presence of the delivery person. We <span className="font-semibold text-surface">do not accept returns or complaints</span> once the delivery person has left your premises. This policy ensures that any issues can be addressed immediately at the time of delivery.
+                </p>
+              </div>
+
+              {/* Section 3: Delivery Timeline */}
+              <div className="space-y-3">
+                <h4 className="text-xl font-display font-bold" style={{ color: '#c5a880' }}>3. Delivery Timeline</h4>
+                <p className="leading-relaxed">
+                  At Yumora, we prioritize <span className="font-semibold text-surface">quality over speed</span>. Each gift box is carefully curated and prepared with attention to detail. Please note our standard delivery times:
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li className="leading-relaxed">
+                    <span className="font-semibold text-surface">Inside Dhaka:</span> <span className="font-sans text-lg" style={{ color: '#c5a880' }}>4</span> working days
+                  </li>
+                  <li className="leading-relaxed">
+                    <span className="font-semibold text-surface">Outside Dhaka:</span> <span className="font-sans text-lg" style={{ color: '#c5a880' }}>8</span> working days
+                  </li>
+                </ul>
+                <div className="bg-amber-50 border border-amber-200 rounded-sm p-3 mt-3">
+                  <p className="leading-relaxed text-sm text-amber-800">
+                    <span className="font-semibold">Urgent Delivery:</span> <span className="font-sans" style={{ color: '#c5a880' }}>24</span>-hour delivery is available for an extra fee (starting from ৳<span className="font-sans" style={{ color: '#c5a880' }}>150</span>, variable based on location). Contact us via WhatsApp to request urgent delivery.
+                  </p>
+                </div>
+              </div>
+
+              {/* Section 4: Damage Policy */}
+              <div className="space-y-3">
+                <h4 className="text-xl font-display font-bold" style={{ color: '#c5a880' }}>4. Damage Policy</h4>
+                <p className="leading-relaxed">
+                  If your product arrives damaged, it <span className="font-semibold text-surface">must be returned immediately</span> to the delivery person at the time of delivery. This is the only way to ensure your replacement or refund claim is valid. We cannot process claims for damaged items once the delivery person has left.
+                </p>
+              </div>
+
+              {/* Section 5: Payment Policy */}
+              <div className="space-y-3">
+                <h4 className="text-xl font-display font-bold" style={{ color: '#c5a880' }}>5. Payment Policy</h4>
+                <p className="leading-relaxed">
+                  We offer three payment options:
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li className="leading-relaxed">
+                    <span className="font-semibold text-surface">Full Advance:</span> Pay the complete amount upfront. No additional fees apply.
+                  </li>
+                  <li className="leading-relaxed">
+                    <span className="font-semibold text-surface">Half Advance:</span> Pay <span className="font-sans text-lg" style={{ color: '#c5a880' }}>50%</span> upfront, remaining <span className="font-sans text-lg" style={{ color: '#c5a880' }}>50%</span> on delivery. The advance is <span className="font-semibold text-surface">non-refundable</span> as it covers customization costs.
+                  </li>
+                  <li className="leading-relaxed">
+                    <span className="font-semibold text-surface">Cash on Delivery (COD):</span> Pay the full amount upon delivery with an extra <span className="font-sans text-lg" style={{ color: '#c5a880' }}>৳100</span> COD fee. <span className="text-amber-600 font-medium">Not available for Custom Gift Box orders.</span>
+                  </li>
+                </ul>
+                <div className="bg-green-50 border border-green-200 rounded-sm p-3 mt-3">
+                  <p className="leading-relaxed text-sm text-green-800">
+                    <span className="font-semibold">Save money:</span> Choose Full Advance payment to waive the COD fee and enjoy the fastest order processing!
+                  </p>
+                </div>
+              </div>
+
+              {/* Section 6: Quality Assurance */}
+              <div className="space-y-3">
+                <h4 className="text-xl font-display font-bold" style={{ color: '#c5a880' }}>6. Quality Assurance</h4>
+                <p className="leading-relaxed">
+                  Every Yumora gift box is handcrafted with premium materials and care. We take pride in delivering products that meet our high standards of quality and elegance. If you have any concerns, please contact us within the delivery inspection window.
+                </p>
+              </div>
+
+              {/* Section 7: Contact */}
+              <div className="space-y-3">
+                <h4 className="text-xl font-display font-bold" style={{ color: '#c5a880' }}>7. Contact Us</h4>
+                <p className="leading-relaxed">
+                  If you have any questions about these terms and conditions, please contact us at:
+                </p>
+                <div className="pl-4 space-y-1">
+                  <p><span className="font-semibold">Email:</span> yumorabd@gmail.com</p>
+                  <p><span className="font-semibold">Phone:</span> +880 1335 156146</p>
+                </div>
+              </div>
+
+              {/* Agreement Notice */}
+              <div className="mt-8 p-4 rounded-sm" style={{ backgroundColor: 'rgba(197, 168, 128, 0.15)' }}>
+                <p className="text-sm text-surface font-medium text-center">
+                  By placing an order with Yumora, you acknowledge that you have read, understood, and agree to these Terms & Conditions.
+                </p>
+              </div>
             </div>
           </div>
         </div>
