@@ -1866,7 +1866,7 @@ function App() {
                 </li>
                 <li className="flex items-center space-x-3" style={{ color: '#22223b', opacity: 0.8 }}>
                   <Phone className="w-5 h-5 flex-shrink-0" style={{ color: '#4a4e69' }} />
-                  <span>+880 1335 156146</span>
+                  <span>+880 1410 569777</span>
                 </li>
                 <li className="flex items-center space-x-3" style={{ color: '#22223b', opacity: 0.8 }}>
                   <Mail className="w-5 h-5 flex-shrink-0" style={{ color: '#4a4e69' }} />
@@ -3257,7 +3257,7 @@ function App() {
               <div className="space-y-3">
                 <h4 className="text-xl font-display font-bold" style={{ color: '#c5a880' }}>6. Quality Assurance</h4>
                 <p className="leading-relaxed">
-                  Every Yumora gift box is handcrafted with premium materials and care. We take pride in delivering products that meet our high standards of quality and elegance. If you have any concerns, please contact us within the delivery inspection window.
+                  Every Yumora gift box is premium and elegant packed with care. We take pride in delivering products that meet our high standards of quality and elegance. If you have any concerns, please contact us within the delivery inspection window.
                 </p>
               </div>
 
