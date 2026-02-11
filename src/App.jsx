@@ -22,7 +22,7 @@ const TIER_1_DISCOUNT = 0.05;      // 5% discount for 10+ types
 const TIER_2_DISCOUNT = 0.10;      // 10% discount for 16+ types
 const DELIVERY_INSIDE_DHAKA = 80;  // Delivery fee inside Dhaka
 const DELIVERY_OUTSIDE_DHAKA = 200; // Delivery fee outside Dhaka
-const COD_EXTRA_FEE = 100;          // Extra fee for Cash on Delivery
+const COD_EXTRA_FEE = 200;          // Extra fee for Cash on Delivery
 const URGENT_FEE_BASE = 150;        // Base fee for urgent 24-hour delivery (variable by location)
 // ============================================
 
@@ -41,8 +41,8 @@ const giftBoxProducts = [
     image: '/assets/ring01.png',
     images: ['/assets/ring01.png', '/assets/1ring01.png', '/assets/2ring01.png'],
     price: 100,
-    colors: ['Red', 'Pink', 'Blue', 'Yellow'],
-    availableColors: ['Red', 'Blue', 'Yellow'], // Pink unavailable
+    colors: ['Red', 'Pink', 'Blue', 'Yellow', 'Green', 'Purple'],
+    availableColors: ['Red', 'Pink', 'Blue', 'Yellow', 'Green', 'Purple'],
     inStock: true
   },
   {
@@ -160,7 +160,7 @@ const giftBoxProducts = [
     name: 'Premium Lip Stick',
     description: 'Long-lasting premium lipstick with rich color and smooth application. Moisturizing formula for beautiful, comfortable lips.',
     image: '/assets/Lipstick.png',
-    images: ['/assets/Lipstick.png', '/assets/Lipstick1.png', '/assets/lipstick2.png', '/assets/2ring01.png'],
+    images: ['/assets/Lipstick.png', '/assets/Lipstick1.png', '/assets/lipstick2.png'],
     price: 500,
     colors: ['Red', 'Pink', 'Maroon', 'Nude', 'Light Pink'],
     availableColors: ['Red', 'Pink', 'Maroon', 'Nude', 'Light Pink'],
@@ -394,6 +394,7 @@ function App() {
   const [discount, setDiscount] = useState(0); // Decimal value (e.g., 0.10 for 10%)
   const [discountCode, setDiscountCode] = useState(''); // Applied discount code
   const [discountInput, setDiscountInput] = useState(''); // Input field value in cart
+  const [discountMessage, setDiscountMessage] = useState(''); // Inline discount message
   const [showBuyNowModal, setShowBuyNowModal] = useState(false); // Buy Now discount popup
   const [buyNowProduct, setBuyNowProduct] = useState(null); // Product for Buy Now popup
 
@@ -525,10 +526,11 @@ function App() {
     if (VALID_CODES[upperCode]) {
       setDiscount(VALID_CODES[upperCode]);
       setDiscountCode(upperCode);
-      alert(`Discount code "${upperCode}" applied! You save ${(VALID_CODES[upperCode] * 100).toFixed(0)}%`);
+      setDiscountMessage(`Code Applied! You save ${(VALID_CODES[upperCode] * 100).toFixed(0)}%`);
       return true;
     } else {
-      alert('Invalid discount code');
+      setDiscountMessage('Invalid discount code');
+      setTimeout(() => setDiscountMessage(''), 3000);
       return false;
     }
   };
@@ -538,6 +540,7 @@ function App() {
     setDiscount(0);
     setDiscountCode('');
     setDiscountInput('');
+    setDiscountMessage('');
   };
 
   // Add to cart function
@@ -785,8 +788,9 @@ function App() {
       dueOnDelivery = finalTotal - paidNow;
       paymentLabel = 'Half Advance';
     } else {
-      paidNow = 0;
-      dueOnDelivery = finalTotal;
+      // COD: Advance = Delivery Fee × 2, Due = (Subtotal - Discounts) + COD Fee
+      paidNow = deliveryFee * 2;
+      dueOnDelivery = (productPrice - bulkDiscountAmount - promoDiscountAmount) + COD_EXTRA_FEE;
       paymentLabel = 'Cash on Delivery';
     }
 
@@ -837,14 +841,12 @@ function App() {
     message += `💳 *PAYMENT METHOD*\n`;
     message += `━━━━━━━━━━━━━━━━━━━━\n`;
     message += `*Payment:* ${paymentLabel}\n`;
-    if (paymentMethod !== 'cod') {
-      message += `*Paid Now:* ৳${paidNow.toFixed(0)}\n`;
-    }
+    message += `*Advance Paid:* ৳${paidNow.toFixed(0)}\n`;
     if (dueOnDelivery > 0) {
-      message += `*Due on Delivery:* ৳${dueOnDelivery.toFixed(0)}\n`;
+      message += `*Remaining Due:* ৳${dueOnDelivery.toFixed(0)}\n`;
     }
 
-    const whatsappNumber = '8801335156146';
+    const whatsappNumber = '8801410569777';
     const encodedMessage = encodeURIComponent(message);
     const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
@@ -865,6 +867,7 @@ function App() {
     setDiscount(0);
     setDiscountCode('');
     setDiscountInput('');
+    setDiscountMessage('');
   };
 
   // Remove from cart
@@ -1812,7 +1815,7 @@ function App() {
                 />
               </div>
               <p className="font-sans text-sm leading-relaxed" style={{ color: '#22223b', opacity: 0.8 }}>
-                Timeless elegance since 2025. Premium Gifts for those who appreciate the finer things.
+                Timeless elegance since 2026. Premium Gifts for those who appreciate the finer things.
               </p>
             </div>
 
@@ -1903,7 +1906,7 @@ function App() {
 
                 {/* WhatsApp - Connected to your WhatsApp number */}
                 <a
-                  href="https://wa.me/8801335156146"
+                  href="https://wa.me/8801410569777"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-sm bg-[#22223b]/20 flex items-center justify-center transition-colors"
@@ -1930,7 +1933,7 @@ function App() {
 
           <div className="border-t border-[#22223b]/20 pt-8 text-center">
             <p className="font-sans text-sm" style={{ color: '#040405ff', opacity: 0.6 }}>
-              © 2025 Yumora by <a href="https://github.com/msabrin" target="_blank" rel="noopener noreferrer"> <strong>Mirza Sabrin</strong></a> .All rights reserved.
+              © 2026 Yumora by <a href="https://github.com/msabrin" target="_blank" rel="noopener noreferrer"> <strong>Mirza Sabrin</strong></a> .All rights reserved.
             </p>
           </div>
         </div>
@@ -2338,9 +2341,14 @@ function App() {
                         </button>
                       )}
                     </div>
+                    {discountMessage && !discountCode && (
+                      <p className="text-xs font-sans font-semibold" style={{ color: discountMessage.includes('Invalid') ? '#ef4444' : '#c5a880' }}>
+                        {discountMessage}
+                      </p>
+                    )}
                     {discountCode && (
-                      <p className="text-xs text-green-600 font-sans font-semibold">
-                        Code "{discountCode}" applied - <span className="font-sans" style={{ color: '#cd261dff' }}>{(discount * 100).toFixed(0)}</span>% off
+                      <p className="text-xs font-sans font-semibold" style={{ color: '#c5a880' }}>
+                        Code Applied! {discountCode} - <span className="font-sans" style={{ color: '#cd261dff' }}>{(discount * 100).toFixed(0)}</span>% off
                       </p>
                     )}
                   </div>
@@ -2675,9 +2683,14 @@ function App() {
                     </button>
                   )}
                 </div>
+                {discountMessage && !discountCode && (
+                  <p className="text-xs font-sans font-semibold" style={{ color: discountMessage.includes('Invalid') ? '#ef4444' : '#c5a880' }}>
+                    {discountMessage}
+                  </p>
+                )}
                 {discountCode && (
-                  <p className="text-xs text-green-600 font-sans font-semibold">
-                    Code "{discountCode}" applied - <span className="font-sans" style={{ color: '#d83f3fff' }}>{(discount * 100).toFixed(0)}</span>% off
+                  <p className="text-xs font-sans font-semibold" style={{ color: '#c5a880' }}>
+                    Code Applied! {discountCode} - <span className="font-sans" style={{ color: '#d83f3fff' }}>{(discount * 100).toFixed(0)}</span>% off
                   </p>
                 )}
               </div>
@@ -2863,8 +2876,8 @@ function App() {
                 );
               })()}
 
-              {/* Price Breakdown with Fraktur Numbers */}
-              <div className="bg-light/30 rounded-sm p-4 border border-primary/10 space-y-2">
+              {/* Price Breakdown */}
+              <div className="bg-light/30 rounded-sm p-3 sm:p-4 border border-primary/10 space-y-1.5 sm:space-y-2 overflow-x-auto">
                 {(() => {
                   // Calculate values
                   let productPrice, bulkAmt, promoAmt, afterDiscounts;
@@ -2894,8 +2907,9 @@ function App() {
                     paidNow = Math.ceil(finalTotal / 2);
                     dueOnDelivery = finalTotal - paidNow;
                   } else {
-                    paidNow = 0;
-                    dueOnDelivery = finalTotal;
+                    // COD: Advance = Delivery Fee × 2, Due = (Subtotal - Discounts) + COD Fee
+                    paidNow = deliveryFee * 2;
+                    dueOnDelivery = afterDiscounts + COD_EXTRA_FEE;
                   }
 
                   const bulkRate = confirmOrderProduct.type === 'cart' ? (confirmOrderProduct.appliedBulkDiscount || 0) : 0;
@@ -2903,77 +2917,83 @@ function App() {
 
                   return (
                     <>
-                      <h4 className="font-sans font-semibold text-surface text-sm border-b border-primary/10 pb-2 mb-2">Price Breakdown</h4>
+                      <h4 className="font-sans font-semibold text-surface text-xs sm:text-sm border-b border-primary/10 pb-1.5 sm:pb-2 mb-1.5 sm:mb-2">Price Breakdown</h4>
 
                       {/* Product Price */}
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-xs sm:text-sm">
                         <span className="font-sans text-surface/70">Product Total:</span>
-                        <span className="font-sans font-semibold" style={{ color: '#c5a880' }}>৳<span className="font-sans text-base">{productPrice}</span></span>
+                        <span className="font-sans font-semibold text-sm sm:text-base" style={{ color: '#c5a880' }}>৳{productPrice}</span>
                       </div>
 
                       {/* Bulk Discount */}
                       {bulkRate > 0 && (
-                        <div className="flex justify-between text-sm">
+                        <div className="flex justify-between text-xs sm:text-sm">
                           <span className="font-sans text-surface/70">Bulk Discount (<span className="font-sans" style={{ color: '#ef4444' }}>{(bulkRate * 100).toFixed(0)}</span>%):</span>
-                          <span className="font-sans font-semibold" style={{ color: '#ef4444' }}>-৳<span className="font-sans text-base">{bulkAmt.toFixed(0)}</span></span>
+                          <span className="font-sans font-semibold text-sm sm:text-base" style={{ color: '#ef4444' }}>-৳{bulkAmt.toFixed(0)}</span>
                         </div>
                       )}
 
                       {/* Promo Discount */}
                       {promoRate > 0 && (
-                        <div className="flex justify-between text-sm">
-                          <span className="font-sans text-surface/70">Promo Discount ({confirmOrderProduct.type === 'cart' ? confirmOrderProduct.appliedDiscountCode : discountCode}):</span>
-                          <span className="font-sans font-semibold" style={{ color: '#ef4444' }}>-৳<span className="font-sans text-base">{promoAmt.toFixed(0)}</span></span>
+                        <div className="flex justify-between text-xs sm:text-sm">
+                          <span className="font-sans text-surface/70 truncate mr-2">Promo ({confirmOrderProduct.type === 'cart' ? confirmOrderProduct.appliedDiscountCode : discountCode}):</span>
+                          <span className="font-sans font-semibold text-sm sm:text-base flex-shrink-0" style={{ color: '#ef4444' }}>-৳{promoAmt.toFixed(0)}</span>
                         </div>
                       )}
 
                       {/* Delivery Fee */}
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-xs sm:text-sm">
                         <span className="font-sans text-surface/70">Delivery Fee:</span>
-                        <span className="font-sans font-semibold" style={{ color: '#c5a880' }}>+৳<span className="font-sans text-base">{deliveryFee}</span></span>
+                        <span className="font-sans font-semibold text-sm sm:text-base" style={{ color: '#c5a880' }}>+৳{deliveryFee}</span>
                       </div>
 
                       {/* COD Fee */}
                       {paymentMethod === 'cod' && (
-                        <div className="flex justify-between text-sm">
-                          <span className="font-sans text-surface/70">COD Extra Fee:</span>
-                          <span className="font-sans font-semibold" style={{ color: '#c5a880' }}>+৳<span className="font-sans text-base">{COD_EXTRA_FEE}</span></span>
+                        <div className="flex justify-between text-xs sm:text-sm">
+                          <span className="font-sans text-surface/70">COD Fee:</span>
+                          <span className="font-sans font-semibold text-sm sm:text-base" style={{ color: '#c5a880' }}>+৳{COD_EXTRA_FEE}</span>
                         </div>
                       )}
 
                       {/* Final Total */}
-                      <div className="flex justify-between text-lg border-t border-primary/20 pt-2 mt-2">
-                        <span className="font-sans font-semibold text-surface">Final Total:</span>
-                        <span className="font-bold">
-                          ৳<span className="font-sans text-xl" style={{ color: '#22c55e' }}>{finalTotal.toFixed(0)}</span>
-                        </span>
+                      <div className="flex justify-between text-base sm:text-lg border-t border-primary/20 pt-1.5 sm:pt-2 mt-1.5 sm:mt-2">
+                        <span className="font-sans font-semibold text-surface text-sm sm:text-base">Final Total:</span>
+                        <span className="font-bold text-lg sm:text-xl" style={{ color: '#22c55e' }}>৳{finalTotal.toFixed(0)}</span>
                       </div>
 
                       {/* Payment Summary */}
-                      <div className="bg-white/50 rounded-sm p-3 mt-3 space-y-1">
+                      <div className="bg-white/50 rounded-sm p-2.5 sm:p-3 mt-2 sm:mt-3 space-y-1">
                         {paymentMethod === 'full' && (
-                          <div className="flex justify-between text-sm">
+                          <div className="flex justify-between text-xs sm:text-sm">
                             <span className="font-sans text-surface font-medium">Pay Now (Full):</span>
-                            <span className="font-bold" style={{ color: '#c5a880' }}>৳<span className="font-sans text-base">{paidNow.toFixed(0)}</span></span>
+                            <span className="font-bold text-sm sm:text-base" style={{ color: '#c5a880' }}>৳{paidNow.toFixed(0)}</span>
                           </div>
                         )}
                         {paymentMethod === 'half' && (
                           <>
-                            <div className="flex justify-between text-sm">
+                            <div className="flex justify-between text-xs sm:text-sm">
                               <span className="font-sans text-surface font-medium">Pay Now (<span className="font-sans" style={{ color: '#525050ff' }}>50%</span>):</span>
-                              <span className="font-bold" style={{ color: '#c5a880' }}>৳<span className="font-sans text-base">{paidNow.toFixed(0)}</span></span>
+                              <span className="font-bold text-sm sm:text-base" style={{ color: '#c5a880' }}>৳{paidNow.toFixed(0)}</span>
                             </div>
-                            <div className="flex justify-between text-sm">
+                            <div className="flex justify-between text-xs sm:text-sm">
                               <span className="font-sans text-surface/70">Due on Delivery:</span>
-                              <span className="font-sans font-semibold" style={{ color: '#c5a880' }}>৳<span className="font-sans text-base">{dueOnDelivery.toFixed(0)}</span></span>
+                              <span className="font-sans font-semibold text-sm sm:text-base" style={{ color: '#c5a880' }}>৳{dueOnDelivery.toFixed(0)}</span>
                             </div>
                           </>
                         )}
                         {paymentMethod === 'cod' && (
-                          <div className="flex justify-between text-sm">
-                            <span className="font-sans text-surface font-medium">Pay on Delivery:</span>
-                            <span className="font-bold" style={{ color: '#c5a880' }}>৳<span className="font-sans text-base">{dueOnDelivery.toFixed(0)}</span></span>
-                          </div>
+                          <>
+                            <div className="flex justify-between text-xs sm:text-sm">
+                              <span className="font-sans text-surface font-medium">Advance to Pay:</span>
+                              <span className="font-bold text-sm sm:text-base" style={{ color: '#c5a880' }}>৳{paidNow.toFixed(0)}</span>
+                            </div>
+                            <p className="text-[10px] font-sans text-surface/50 -mt-0.5">Delivery Fee (৳{deliveryFee}) × 2</p>
+                            <div className="flex justify-between text-xs sm:text-sm">
+                              <span className="font-sans text-surface/70">Due on Delivery:</span>
+                              <span className="font-sans font-semibold text-sm sm:text-base" style={{ color: '#c5a880' }}>৳{dueOnDelivery.toFixed(0)}</span>
+                            </div>
+                            <p className="text-[10px] font-sans text-surface/50 -mt-0.5">Product + ৳{COD_EXTRA_FEE} COD Fee</p>
+                          </>
                         )}
                       </div>
                     </>
@@ -2981,15 +3001,16 @@ function App() {
                 })()}
               </div>
 
-              {/* Payment Information - Only show for advance payments */}
-              {paymentMethod !== 'cod' && (
-                <div className="space-y-3">
+              {/* Payment Information */}
+              <div className="space-y-3">
                   <h4 className="font-sans font-semibold text-surface border-b border-primary/20 pb-2">Payment Information</h4>
                   <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-4">
                     <p className="text-sm font-sans text-yellow-800 font-medium">
                       {paymentMethod === 'full'
                         ? 'Please pay the full amount and send us the screenshot to confirm your order.'
-                        : <>Pay <span className="font-sans" style={{ color: '#14a029ff' }}>50%</span> advance and send us the screenshot. Remaining amount is due on delivery.</>
+                        : paymentMethod === 'half'
+                          ? <>Pay <span className="font-sans" style={{ color: '#14a029ff' }}>50%</span> advance and send us the screenshot. Remaining amount is due on delivery.</>
+                          : <>For COD, pay <span className="font-semibold">double the delivery charge</span> (৳{getDeliveryFee() * 2}) as advance to confirm your order. Remaining product price + ৳{COD_EXTRA_FEE} COD fee will be paid on delivery.</>
                       }
                     </p>
                   </div>
@@ -3028,7 +3049,6 @@ function App() {
                     ))}
                   </div>
                 </div>
-              )}
 
               {/* Terms Agreement Notice */}
               <div className="bg-surface/5 border border-surface/10 rounded-sm p-3">
@@ -3095,7 +3115,7 @@ function App() {
             </div>
 
             <div className="px-8 py-6 overflow-y-auto max-h-[calc(90vh-100px)] font-sans text-surface/70 space-y-6">
-              <p className="text-sm text-surface/60">Last updated: December 2025</p>
+              <p className="text-sm text-surface/60">Last updated: December 2026</p>
 
               {[
                 {
@@ -3128,7 +3148,7 @@ function App() {
                 },
                 {
                   title: '8. Contact Us',
-                  content: 'If you have any questions about this privacy policy or our data practices, please contact us at yumorabd@gmail.com or call us at +880 1335 156146.'
+                  content: 'If you have any questions about this privacy policy or our data practices, please contact us at yumorabd@gmail.com or call us at +8801410569777.'
                 }
               ].map((section, i) => (
                 <div key={i} className="space-y-3">
@@ -3188,15 +3208,15 @@ function App() {
                 </p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li className="leading-relaxed">
-                    <span className="font-semibold text-surface">Inside Dhaka:</span> <span className="font-sans text-lg" style={{ color: '#c5a880' }}>4</span> working days
+                    <span className="font-semibold text-surface">Inside Dhaka:</span> <span className="font-sans font-semibold text-lg" style={{ color: '#c5a880' }}>4</span> working days
                   </li>
                   <li className="leading-relaxed">
-                    <span className="font-semibold text-surface">Outside Dhaka:</span> <span className="font-sans text-lg" style={{ color: '#c5a880' }}>8</span> working days
+                    <span className="font-semibold text-surface">Outside Dhaka:</span> <span className="font-sans font-semibold text-lg" style={{ color: '#c5a880' }}>8</span> working days
                   </li>
                 </ul>
                 <div className="bg-amber-50 border border-amber-200 rounded-sm p-3 mt-3">
                   <p className="leading-relaxed text-sm text-amber-800">
-                    <span className="font-semibold">Urgent Delivery:</span> <span className="font-sans" style={{ color: '#c5a880' }}>24</span>-hour delivery is available for an extra fee (starting from ৳<span className="font-sans" style={{ color: '#c5a880' }}>150</span>, variable based on location). Contact us via WhatsApp to request urgent delivery.
+                    <span className="font-semibold">Urgent Delivery:</span> <span className="font-sans font-semibold" style={{ color: '#a88e6aff' }}>24</span>-hour delivery is available for an extra fee (starting from ৳<span className="font-sans font-semibold" style={{ color: '#a88f6bff' }}>150</span>, variable based on location). Contact us via WhatsApp to request urgent delivery.
                   </p>
                 </div>
               </div>
@@ -3220,15 +3240,15 @@ function App() {
                     <span className="font-semibold text-surface">Full Advance:</span> Pay the complete amount upfront. No additional fees apply.
                   </li>
                   <li className="leading-relaxed">
-                    <span className="font-semibold text-surface">Half Advance:</span> Pay <span className="font-sans text-lg" style={{ color: '#c5a880' }}>50%</span> upfront, remaining <span className="font-sans text-lg" style={{ color: '#c5a880' }}>50%</span> on delivery. The advance is <span className="font-semibold text-surface">non-refundable</span> as it covers customization costs.
+                    <span className="font-semibold text-surface">Half Advance:</span> Pay <span className="font-sans font-semibold text-lg" style={{ color: '#c5a880' }}>50%</span> upfront, remaining <span className="font-sans font-semibold text-lg" style={{ color: '#c5a880' }}>50%</span> on delivery. The advance is <span className="font-semibold text-surface">non-refundable</span> as it covers customization costs.
                   </li>
                   <li className="leading-relaxed">
-                    <span className="font-semibold text-surface">Cash on Delivery (COD):</span> Pay the full amount upon delivery with an extra <span className="font-sans text-lg" style={{ color: '#c5a880' }}>৳100</span> COD fee. <span className="text-amber-600 font-medium">Not available for Custom Gift Box orders.</span>
+                    <span className="font-semibold text-surface">Cash on Delivery (COD):</span> For Cash on Delivery, <span className="font-semibold text-surface">double the delivery charge</span> must be paid in advance to confirm the order. The remaining product price + <span className="font-sans font-semibold text-lg" style={{ color: '#c5a880' }}>৳200</span> COD fee will be paid at the time of delivery. <span className="text-amber-600 font-medium">Not available for Custom Gift Box orders.</span>
                   </li>
                 </ul>
                 <div className="bg-green-50 border border-green-200 rounded-sm p-3 mt-3">
                   <p className="leading-relaxed text-sm text-green-800">
-                    <span className="font-semibold">Save money:</span> Choose Full Advance payment to waive the COD fee and enjoy the fastest order processing!
+                    <span className="font-semibold">Save money:</span> Choose Full or Half Advance payment to waive the COD fee and enjoy the fastest order processing!
                   </p>
                 </div>
               </div>
@@ -3249,7 +3269,7 @@ function App() {
                 </p>
                 <div className="pl-4 space-y-1">
                   <p><span className="font-semibold">Email:</span> yumorabd@gmail.com</p>
-                  <p><span className="font-semibold">Phone:</span> +880 1335 156146</p>
+                  <p><span className="font-semibold">Phone:</span> +8801410569777</p>
                 </div>
               </div>
 
