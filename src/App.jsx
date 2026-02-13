@@ -308,8 +308,44 @@ const giftBoxProducts = [
     colors: ['Rainbow'],
     availableColors: ['Rainbow'],
     inStock: true
+  },
+  {
+    id: 'gift-26',
+    name: 'Plushy',
+    description: 'Colorful decorative tip perfect for personalizing your stationery and accessories. Fun and creative design.',
+    image: '/assets/plushy.jpeg',
+    images: ['/assets/plushy.jpeg', '/assets/plushy1.jpeg', '/assets/plushy2.jpeg'],
+    price: 20,
+    colors: ['Rainbow'],
+    availableColors: ['Rainbow'],
+    inStock: true
+  },
+  {
+    id: 'gift-27',
+    name: 'Big Teddy',
+    description: 'Colorful decorative tip perfect for personalizing your stationery and accessories. Fun and creative design.',
+    image: '/assets/Teddy.png',
+    images: ['/assets/Teddy.png'],
+    price: 20,
+    colors: ['Rainbow'],
+    availableColors: ['Rainbow'],
+    inStock: true
+  },
+  {
+    id: 'gift-28',
+    name: 'Flowers',
+    description: 'Colorful decorative tip perfect for personalizing your stationery and accessories. Fun and creative design.',
+    image: '/assets/flower.png',
+    images: ['/assets/flower.png', '/assets/flower1.png', '/assets/flower2.png', '/assets/flower3.png', '/assets/flower4.png', '/assets/flower5.png', '/assets/flower6.png', '/assets/flower7.png', '/assets/flower8.png'],
+    price: 20,
+    colors: ['Rainbow'],
+    availableColors: ['Rainbow'],
+    inStock: true
   }
 ];
+
+// Auto-calculated total — progress bar & counters use this
+const TOTAL_AVAILABLE_TYPES = giftBoxProducts.length;
 
 // ============================================
 // PRODUCT COLORS CONFIGURATION
@@ -1607,7 +1643,7 @@ function App() {
                 Custom Gift Box
               </h3>
               <p className="font-sans text-lg max-w-2xl mx-auto" style={{ color: '#eedfe3', opacity: 0.7 }}>
-                Select 8 types of Product to build your own from premium Gift Box with our exquisite products.
+                Select <span className="font-sans">{MIN_TYPES}</span> types of Product to build your own from premium Gift Box with our <span className="font-sans">{TOTAL_AVAILABLE_TYPES}</span> exquisite products.
                 To Unlock Offers fill the product type bar.
               </p>
             </div>
@@ -1627,14 +1663,14 @@ function App() {
                           : 'Build Your Custom Gift Box'
                     }
                   </p>
-                  <p className="font-sans text-l" style={{ color: 'rgba(255, 255, 255, 0.93)' }}>
+                  <p className="font-sans text-l whitespace-nowrap" style={{ color: 'rgba(255, 255, 255, 0.93)' }}>
                     {giftBoxUniqueTypes < MIN_TYPES
                       ? <>Select minimum <span className="font-sans">{MIN_TYPES}</span> types to purchase</>
-                      : <><span className="font-sans">{giftBoxUniqueTypes}</span> of <span className="font-sans">{giftBoxProducts.length}</span> types selected</>
+                      : <><span className="font-sans tabular-nums">{giftBoxUniqueTypes}</span> of <span className="font-sans tabular-nums">{TOTAL_AVAILABLE_TYPES}</span> types selected</>
                     }
                   </p>
-                  <div className="font-sans font-bold text-3xl sm:text-4xl tracking-tight mt-2" style={{ color: '#8bd0e0' }}>
-                    {giftBoxUniqueTypes}<span className="text-lg sm:text-xl font-semibold" style={{ color: 'rgba(238,223,227,0.4)' }}>/{giftBoxProducts.length}</span>
+                  <div className="font-sans font-bold text-3xl sm:text-4xl tracking-tight mt-2 whitespace-nowrap tabular-nums" style={{ color: '#8bd0e0' }}>
+                    {giftBoxUniqueTypes}<span className="text-lg sm:text-xl font-semibold" style={{ color: 'rgba(238,223,227,0.4)' }}>/{TOTAL_AVAILABLE_TYPES}</span>
                   </div>
                 </div>
 
@@ -1652,7 +1688,7 @@ function App() {
                         <div
                           key={marker.val}
                           className="absolute text-center"
-                          style={{ left: `${(marker.val / giftBoxProducts.length) * 100}%`, transform: 'translateX(-50%)' }}
+                          style={{ left: `${(marker.val / TOTAL_AVAILABLE_TYPES) * 100}%`, transform: 'translateX(-50%)' }}
                         >
                           <span
                             className="font-sans font-bold text-base sm:text-xl block leading-none"
@@ -1673,7 +1709,7 @@ function App() {
                     <div
                       className="absolute top-0 left-0 h-full rounded-full"
                       style={{
-                        width: `${Math.min((giftBoxUniqueTypes / giftBoxProducts.length) * 100, 100)}%`,
+                        width: `${Math.min((giftBoxUniqueTypes / TOTAL_AVAILABLE_TYPES) * 100, 100)}%`,
                         backgroundColor: '#8bd0e0',
                         transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
                         boxShadow: giftBoxUniqueTypes > 0 ? '0 2px 8px rgba(139,208,224,0.4)' : 'none'
@@ -1685,7 +1721,7 @@ function App() {
                         key={tick}
                         className="absolute top-0 h-full"
                         style={{
-                          left: `${(tick / giftBoxProducts.length) * 100}%`,
+                          left: `${(tick / TOTAL_AVAILABLE_TYPES) * 100}%`,
                           width: '3px',
                           backgroundColor: giftBoxUniqueTypes >= tick ? 'rgba(255, 255, 255, 0.87)' : 'rgba(255, 255, 255, 0.48)'
                         }}
@@ -1703,7 +1739,7 @@ function App() {
                       <div
                         key={marker.val}
                         className="absolute text-center"
-                        style={{ left: `${(marker.val / giftBoxProducts.length) * 100}%`, transform: 'translateX(-50%)' }}
+                        style={{ left: `${(marker.val / TOTAL_AVAILABLE_TYPES) * 100}%`, transform: 'translateX(-50%)' }}
                       >
                         <span
                           className="font-sans font-bold text-xs sm:text-sm"
@@ -1959,8 +1995,8 @@ function App() {
                             : <><span className="font-sans" style={{ color: '#8bd0e0' }}>{(TIER_2_DISCOUNT * 100).toFixed(0)}</span>% Discount Applied</>
                       }
                     </p>
-                    <span className="font-sans font-bold text-lg tracking-tight" style={{ color: '#22223b' }}>
-                      {giftBoxUniqueTypes}<span className="text-xs font-semibold" style={{ color: '#7d838dff', fontFamily: 'Outfit, sans-serif' }}>/{giftBoxProducts.length}</span>
+                    <span className="font-sans font-bold text-lg tracking-tight whitespace-nowrap tabular-nums" style={{ color: '#22223b' }}>
+                      {giftBoxUniqueTypes}<span className="text-xs font-semibold" style={{ color: '#7d838dff', fontFamily: 'Outfit, sans-serif' }}>/{TOTAL_AVAILABLE_TYPES}</span>
                     </span>
                   </div>
 
@@ -1970,7 +2006,7 @@ function App() {
                       <div
                         className="absolute top-0 left-0 h-full rounded-full"
                         style={{
-                          width: `${Math.min((giftBoxUniqueTypes / giftBoxProducts.length) * 100, 100)}%`,
+                          width: `${Math.min((giftBoxUniqueTypes / TOTAL_AVAILABLE_TYPES) * 100, 100)}%`,
                           backgroundColor: '#8bd0e0',
                           transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
                         }}
@@ -1980,7 +2016,7 @@ function App() {
                           key={tick}
                           className="absolute top-0 h-full"
                           style={{
-                            left: `${(tick / giftBoxProducts.length) * 100}%`,
+                            left: `${(tick / TOTAL_AVAILABLE_TYPES) * 100}%`,
                             width: '2px',
                             backgroundColor: giftBoxUniqueTypes >= tick ? 'rgba(167, 162, 162, 0.82)' : 'rgba(0,0,0,0.08)'
                           }}
@@ -1997,7 +2033,7 @@ function App() {
                         <div
                           key={marker.val}
                           className="absolute text-center"
-                          style={{ left: `${(marker.val / giftBoxProducts.length) * 100}%`, transform: 'translateX(-50%)' }}
+                          style={{ left: `${(marker.val / TOTAL_AVAILABLE_TYPES) * 100}%`, transform: 'translateX(-50%)' }}
                         >
                           <span
                             className="font-sans font-bold text-[13px]"
@@ -2608,6 +2644,12 @@ function App() {
                       <span className="font-sans font-semibold text-surface">Subtotal:</span>
                       <span className="font-sans font-bold" style={{ color: '#c5a880' }}>৳{confirmOrderProduct.originalSubtotal}</span>
                     </div>
+                    {confirmOrderProduct.uniqueGiftTypes > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="font-sans font-semibold text-surface">Items Selected:</span>
+                        <span className="font-sans font-bold whitespace-nowrap tabular-nums" style={{ color: '#c5a880' }}>{confirmOrderProduct.uniqueGiftTypes} / {TOTAL_AVAILABLE_TYPES}</span>
+                      </div>
+                    )}
                     {confirmOrderProduct.appliedBulkDiscount > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-surface/70">Bulk Discount (<span className="font-sans" style={{ color: '#ef4444' }}>{(confirmOrderProduct.appliedBulkDiscount * 100).toFixed(0)}</span>%):</span>
