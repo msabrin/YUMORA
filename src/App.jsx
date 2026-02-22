@@ -36,220 +36,220 @@ const mysteryBoxOptions = [
 const giftBoxProducts = [
   {
     id: 'gift-1',
-    name: 'Finger Ring',
-    description: 'Elegant and stylish finger ring perfect for any occasion. Features a delicate design that adds charm to your everyday look.',
+    name: 'Elegant Adjustable Stone Ring',
+    description: 'Upgrade your look instantly with this stunning adjustable finger ring featuring a dazzling center stone that shines beautifully in every light 💎 Perfect for daily wear, parties, dates, or special occasions, it’s lightweight, comfortable, and effortlessly luxurious. A timeless and classy gift choice for birthdays, anniversaries, or someone special 🎁💍',
     image: '/assets/ring01.png',
     images: ['/assets/ring01.png', '/assets/1ring01.png', '/assets/2ring01.png'],
-    price: 100,
+    price: 82,
     colors: ['Red', 'Pink', 'Blue', 'Yellow', 'Green', 'Purple'],
     availableColors: ['Red', 'Pink', 'Blue', 'Yellow', 'Green', 'Purple'],
     inStock: true
   },
   {
     id: 'gift-2',
-    name: 'Premium Earring',
-    description: 'Premium quality earrings with intricate details. Lightweight and comfortable for all-day wear, perfect for special events.',
+    name: 'Luxe Spark Premium Earring',
+    description: 'Turn heads instantly with these stunning, light-catching earrings designed to add effortless glamour to any look ✨ Perfect for parties, weddings, dates, or elevating your everyday style, they’re lightweight, comfortable, and beautifully radiant 💎 A classy and unforgettable gift choice for birthdays, anniversaries, or someone special 🎁💕',
     image: '/assets/earring.png',
     images: ['/assets/earring.png', '/assets/earring1.png', '/assets/Earring2.png'],
-    price: 250,
+    price: 333,
     colors: ['Red', 'Pink', 'Green', 'Blue'],
     availableColors: ['Red', 'Pink', 'Green', 'Blue'],
     inStock: true
   },
   {
     id: 'gift-3',
-    name: 'Earring & Locket Set',
-    description: 'Beautiful matching earring and locket set. Coordinated design that creates a sophisticated and cohesive look.',
+    name: 'Pearl Luxe Stone Earring & Locket Set',
+    description: 'Shine with effortless grace in this beautifully designed earring and locket set, delicately crafted with sparkling little stones and elegant pearls 🤍💎 Perfect for weddings, parties, festive events, or elevating your everyday look, it adds instant sophistication and charm. A luxurious, ready-to-gift set for birthdays, anniversaries, or someone truly special 🎁✨',
     image: '/assets/earringlocket.png',
     images: ['/assets/earringlocket.png', '/assets/earringlocket1.png', '/assets/earringlocket2.png', '/assets/earringlocket3.png', '/assets/earringlocket4.png', '/assets/earringlocket5.png', '/assets/earringlocket6.png', '/assets/earringlocket7.png', '/assets/earringlocket8.png'],
-    price: 300,
+    price: 192,
     colors: ['Silver', 'Golden'],
     availableColors: ['Silver', 'Golden'],
     inStock: true
   },
   {
     id: 'gift-4',
-    name: 'Stone Earring & Locket Set',
-    description: 'Stunning stone-studded earring and locket set. Features premium quality stones that sparkle and shine beautifully.',
+    name: 'Imperial Spark Stone Set',
+    description: 'Stunning stone-studded earring and locket set. Features premium quality stones that sparkle and shine beautifully.Turn heads instantly with this breathtaking earring and locket set, beautifully designed with one bold, radiant center stone that shines with pure luxury 💎 Perfect for weddings, parties, anniversaries, or elevating your everyday elegance, this premium set adds royal charm to any outfit. An unforgettable gift choice for someone special 🎁✨💖',
     image: '/assets/stoneearringlocket.png',
     images: ['/assets/stoneearringlocket.png', '/assets/stoneearringlocket1.png', '/assets/stoneearringlocket2.png'],
-    price: 400,
+    price: 364,
     colors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black'],
     availableColors: ['Red', 'Blue', 'Green', 'Pink', 'Purple'], // Yellow unavailable
     inStock: true
   },
   {
     id: 'gift-5',
-    name: 'Unique Erasser',
-    description: 'Creative and fun erasers in various unique designs. Perfect for students or as collectible items.',
+    name: 'Premium CuteShape Erasers',
+    description: 'Make studying fun and stylish with these high-quality erasers in different adorable shapes and sizes ✏️✨ Designed for smooth, clean erasing without damaging paper, they’re perfect for school, art, journaling, or office use. Cute, colorful, and super practical, they also make a sweet and affordable gift for students and stationery lovers 🎁💖',
     image: '/assets/eraser.jpg',
     images: ['/assets/eraser.jpg', '/assets/eraser1.png', '/assets/eraser2.png', '/assets/eraser3.png', '/assets/eraser4.png', '/assets/eraser5.png', '/assets/eraser6.png'],
-    price: 100,
+    price: 195,
     colors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black', 'White'],
     availableColors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black', 'White'],
     inStock: true
   },
   {
     id: 'gift-6',
-    name: 'Elegant Bag',
-    description: 'Stylish and practical bag with multiple compartments. Perfect for daily use with a touch of elegance.',
+    name: 'Luxe Aura Premium Handbag',
+    description: 'Elevate your style instantly with this medium-size high-quality handbag, crafted with a sleek premium finish that radiates elegance and confidence 👜✨ Perfect for office, dates, shopping, parties, or daily outings, it offers the ideal balance of space and sophistication. A classy must-have for every modern woman and a luxurious gift choice she’ll absolutely love 🎁💖',
     image: '/assets/bag.png',
     images: ['/assets/bag.png', '/assets/bag1.jpg'],
-    price: 700,
+    price: 349,
     colors: ['Black', 'Pink', 'White', 'Purple'],
     availableColors: ['Black', 'Pink', 'White', 'Purple'],
     inStock: true
   },
   {
     id: 'gift-7',
-    name: 'Beauty Blender',
-    description: 'Professional-grade beauty blender for flawless makeup application. Soft, durable, and perfect for blending foundation and concealer.',
+    name: 'Blend Pro Beauty Sponge',
+    description: 'Achieve a flawless, airbrushed finish with this ultra-soft, high-quality beauty blender designed for smooth foundation and blush application 💄✨ Its premium texture blends makeup seamlessly without streaks, giving your skin a natural, radiant glow every time. Perfect for daily glam or professional looks — a must-have in every makeup kit 💕💎',
     image: '/assets/Beautyblander.png',
     images: ['/assets/Beautyblander.png', '/assets/Beautyblender1.png'],
-    price: 100,
-    colors: ['Marron', 'Pink', 'Green', 'Cream', 'Light Pink', 'Orange'],
-    availableColors: ['Marron', 'Pink', 'Green', 'Cream', 'Light Pink', 'Orange'],
+    price: 66,
+    colors: ['Marron', 'Pink', 'Green', 'Cream', 'Light-Pink', 'Orange'],
+    availableColors: ['Marron', 'Pink', 'Green', 'Cream', 'Light-Pink', 'Orange'],
     inStock: true
   },
   {
     id: 'gift-8',
-    name: 'Crunchy Hair Band',
-    description: 'Trendy and comfortable scrunchies that hold your hair gently without damage. Available in a variety of colors to match any outfit.',
+    name: 'Elegance Crunchy Hair Band',
+    description: 'Elevate your style with these premium soft and crunchy hair bands, crafted for comfort, durability, and a flawless look 🌸 Available in a variety of colors and chic designs, they perfectly complement every outfit while keeping your hair stylishly in place. The perfect everyday accessory or thoughtful gift for someone who loves elegance 🎁💖✨',
     image: '/assets/Crunchy.png',
     images: ['/assets/Crunchy.png', '/assets/Chunchy1.png'],
-    price: 60,
+    price: 82,
     colors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black', 'White', 'Orange', 'Maroon', 'Silver', 'Cream'],
     availableColors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black', 'White', 'Orange', 'Maroon', 'Silver', 'Cream'],
     inStock: true
   },
   {
     id: 'gift-9',
-    name: 'Braclet',
-    description: 'Chic bracelet that adds a modern touch to any outfit. Adjustable and comfortable for everyday wear.',
+    name: 'Regal Charm Hand Bracelet',
+    description: 'Elevate your style instantly with this high-quality hand bracelet, designed to sparkle with elegance and grace 💎 Perfect for daily wear, parties, or special occasions, its premium finish adds a timeless touch to any outfit. A stunning gift choice for someone you love 🎁✨💖',
     image: '/assets/braslet.png',
     images: ['/assets/braslet.png', '/assets/braclet1.png', '/assets/braclet2.png', '/assets/braclet3.png'],
-    price: 100,
+    price: 114,
     colors: ['Black', 'Rainbow'],
     availableColors: ['Black', 'Rainbow'],
     inStock: true
   },
   {
     id: 'gift-10',
-    name: 'Minicher Mug',
-    description: 'Adorable miniature mug charm perfect for keychains or decorative purposes. A cute and unique accessory.',
+    name: 'Dreamy MiniChar Collectibles',
+    description: 'Bring magic to your space with these adorable, high-quality MiniChar figures 🌟 Tiny, cute, and irresistibly charming, they’re perfect for desks, shelves, or display corners to add a dreamy, playful vibe. Collect them all or gift someone special 🎁💖 – a must-have for every cute-lover!',
     image: '/assets/Charm.png',
     images: ['/assets/Charm.png'],
-    price: 60,
+    price: 50,
     colors: ['Green', 'Pink', 'Blue'],
     availableColors: ['Green', 'Pink', 'Blue'],
     inStock: true
   },
   {
     id: 'gift-11',
-    name: 'Hair CLips',
-    description: 'Decorative hair clips that securely hold your hair in place. Stylish and functional for various hairstyles.',
+    name: 'Signature Shine Hair Clips',
+    description: 'Elevate your hairstyle instantly with this premium and high-quality hair clips and pins, featuring unique designs to match every mood and outfit ✨ Durable, chic, and effortlessly stylish, they add a polished touch to casual days or special occasions. Perfect gift for trendsetters who love to shine 🎁💖💫. Decorative hair clips that securely hold your hair in place. Stylish and functional for various hairstyles.',
     image: '/assets/hairpin.png',
     images: ['/assets/hairpin.png', '/assets/hairpin1.png'],
-    price: 100,
+    price: 82,
     colors: ['Green', 'Blue', 'Yellow', 'Pink', 'Purple', 'White'],
     availableColors: ['Green', 'Blue', 'Yellow', 'Pink', 'Purple', 'White'],
     inStock: true
   },
   {
     id: 'gift-12',
-    name: 'Premium Lip Stick',
-    description: 'Long-lasting premium lipstick with rich color and smooth application. Moisturizing formula for beautiful, comfortable lips.',
+    name: 'Velvet Kiss Lipstick',
+    description: 'Experience rich, creamy color that glides on effortlessly and stays flawless all day 💄 Available in stunning shades to match every mood and outfit, this premium, high-quality lipstick adds a touch of elegance to your look. Perfect for gifting someone who loves beauty and style 🎁💖✨',
     image: '/assets/Lipstick.png',
     images: ['/assets/Lipstick.png', '/assets/Lipstick1.png', '/assets/lipstick2.png'],
-    price: 500,
-    colors: ['Red', 'Pink', 'Maroon', 'Nude', 'Light Pink'],
-    availableColors: ['Red', 'Pink', 'Maroon', 'Nude', 'Light Pink'],
+    price: 239,
+    colors: ['Red', 'Pink', 'Maroon', 'Nude', 'Light-Pink'],
+    availableColors: ['Red', 'Pink', 'Maroon', 'Nude', 'Light-Pink'],
     inStock: true
   },
   {
     id: 'gift-13',
-    name: 'Floral Lip Gel',
-    description: 'Moisturizing lip gel infused with floral extracts. Provides a glossy finish while keeping your lips hydrated and soft.',
+    name: 'Bloom Crystal Lip Gel',
+    description: 'Add a touch of magic to your lips with this premium, crystal-clear lip gel, featuring a tiny, delicate flower inside 💐 Each shade showcases a unique bloom, making every lip pop with charm. Creamy, hydrating, and long-lasting, it keeps your lips soft and radiant all day. Perfect for gifting or treating yourself to a truly enchanting touch 🎁✨💖',
     image: '/assets/Lipgel.jpg',
     images: ['/assets/Lipgel.jpg'],
-    price: 300,
+    price: 333,
     colors: ['Red', 'Pink', 'Orange'],
     availableColors: ['Red', 'Pink', 'Orange'],
     inStock: true
   },
   {
     id: 'gift-14',
-    name: 'Beauty Lip Gloss',
-    description: 'High-shine lip gloss that adds volume and dimension to your lips. Non-sticky formula for comfortable all-day wear.',
+    name: 'Golden Glimmer Lip Gloss',
+    description: 'Get irresistible, glossy lips with this premium, creamy lip gloss infused with sparkling gold flecks ✨ Hydrating and long-lasting, it keeps your lips soft, smooth, and radiant all day 💖 Perfect for adding a touch of glamour to any look or gifting someone who loves luxury in every detail 🎁💄✨ High-shine lip gloss that adds volume and dimension to your lips. Non-sticky formula for comfortable all-day wear.',
     image: '/assets/Lipgloss.png',
     images: ['/assets/Lipgloss.png'],
-    price: 200,
+    price: 222,
     colors: ['Pink'],
     availableColors: ['Pink'],
     inStock: true
   },
   {
     id: 'gift-15',
-    name: 'Modern Nails',
-    description: 'Premium press-on nails with modern designs. Easy to apply and remove, perfect for a quick nail makeover.',
+    name: 'Elite Glam Press-On Nails',
+    description: 'Transform your nails instantly with this premium fake nail set, featuring a variety of stunning colors and designs 💅 High-quality, long-lasting, and reusable, they stay flawless all day while adding an elegant, polished look to any outfit. Perfect gift for nail lovers who crave style and sophistication 🎁✨💖. Premium press-on nails with modern designs. Easy to apply and remove, perfect for a quick nail makeover.',
     image: '/assets/Fakenails.png',
     images: ['/assets/Fakenails.png'],
-    price: 300,
-    colors: ['Cream', 'Pink', 'Maroon', 'Blue', 'Light Brown'],
-    availableColors: ['Cream', 'Pink', 'Maroon', 'Blue', 'Light Brown'],
+    price: 333,
+    colors: ['Cream', 'Pink', 'Maroon', 'Blue', 'Light-Brown'],
+    availableColors: ['Cream', 'Pink', 'Maroon', 'Blue', 'Light-Brown'],
     inStock: true
   },
   {
     id: 'gift-16',
-    name: 'Face Mask',
-    description: 'Comfortable and breathable face mask in trendy colors. Washable and reusable for everyday protection.',
+    name: 'Radiance Boost Sheet Mask',
+    description: 'Pamper your skin with this premium sheet mask available in refreshing flavors 🍓💧 Instantly hydrates, nourishes, and rejuvenates your face, leaving it healthy, glowing, and elegant all day ✨ Perfect for skincare routines or prepping your skin before makeup. A thoughtful self-care treat or gift for anyone who loves flawless skin 🎁💖',
     image: '/assets/Facemask.png',
     images: ['/assets/Facemask.png'],
-    price: 100,
+    price: 145,
     colors: ['Red', 'Pink', 'Black', 'Blue', 'White', 'Green', 'Purple'],
     availableColors: ['Red', 'Pink', 'Black', 'Blue', 'White', 'Green', 'Purple'],
     inStock: true
   },
   {
     id: 'gift-17',
-    name: 'Mud Mask',
-    description: 'Purifying mud mask that deeply cleanses pores and removes impurities. Leaves skin feeling refreshed and revitalized.',
+    name: 'Radiance Boost Mud Mask',
+    description: 'Revitalize your skin with this premium high-quality mud face mask, available in different delightful flavors 🌿💧 Enriched to hydrate, nourish, and enhance your natural glow, it leaves your skin healthy, refreshed, and elegant all day ✨ Just mix the powder with water, apply, let it dry, and rinse for a spa-like skincare experience at home. Perfect self-care treat or gift for glowing, radiant skin 🎁💖 Purifying mud mask that deeply cleanses pores and removes impurities. Leaves skin feeling refreshed and revitalized.',
     image: '/assets/Mudmask.jpg',
     images: ['/assets/Mudmask.jpg'],
-    price: 80,
+    price: 66,
     colors: ['Pink'],
     availableColors: ['Pink'],
     inStock: true
   },
   {
     id: 'gift-18',
-    name: 'Candy Mask',
-    description: 'Sweet-scented beauty mask with nourishing ingredients. Treats your skin while providing a delightful aromatherapy experience.',
+    name: 'Glow Candy Hydrating Face Mask',
+    description: 'Transform your skincare routine with this premium candy-inspired face mask 💖 Each packet contains a magic tablet that turns any liquid—water, serum, or toner—into a soothing, hydrating mask. Reusable, washable, and easy to use anywhere, it deeply nourishes, boosts glow, and keeps your skin radiant and healthy all day ✨ Perfect for self-care or gifting to someone who loves pampering 🎁💦🌸',
     image: '/assets/candymask.jpeg',
     images: ['/assets/candymask.jpeg', '/assets/candymask1.jpeg', '/assets/candymask2.jpeg'],
-    price: 20,
+    price: 37,
     colors: ['Pink'],
     availableColors: ['Pink'],
     inStock: true
   },
   {
     id: 'gift-19',
-    name: 'Mirror',
-    description: 'Compact handheld mirror perfect for on-the-go touch-ups. Clear reflection with an elegant design.',
+    name: 'Elegance Pocket Mirror',
+    description: 'Carry beauty with you wherever you go 💖 This premium, high-quality pocket mirror is sleek, stylish, and perfect for quick touch-ups anytime, anywhere. Lightweight and durable, it fits effortlessly in your bag or pocket, making it an ideal gift for yourself or someone special 🎁✨💎 Compact handheld mirror perfect for on-the-go touch-ups. Clear reflection with an elegant design.',
     image: '/assets/Mirror.png',
     images: ['/assets/Mirror.png'],
-    price: 250,
+    price: 333,
     colors: ['Cream', 'Pink', 'Black', 'Silver'],
     availableColors: ['Cream', 'Pink', 'Black', 'Silver'],
     inStock: true
   },
   {
     id: 'gift-20',
-    name: 'Companion Mug',
-    description: 'Charming ceramic mug perfect for your favorite hot beverages. Comfortable handle and generous capacity.',
+    name: 'Serene Charm Companion Mug',
+    description: 'Sip in style with this premium, high-quality ceramic mug ☕✨ Designed to keep your favorite drinks close, it’s perfect for coffee, tea, or milk. Elegant, durable, and believed to bring good luck, this luxurious mug adds a touch of charm to every sip — a perfect gift for yourself or someone special 🎁💖🍵 Charming ceramic mug perfect for your favorite hot beverages. Comfortable handle and generous capacity.',
     image: '/assets/Mug.png',
     images: ['/assets/Mug.png', '/assets/mug1.png'],
-    price: 300,
+    price: 364,
     colors: ['Pink', 'Green', 'Blue'],
     availableColors: ['Green', 'Pink', 'Blue'],
     inStock: true
@@ -257,51 +257,51 @@ const giftBoxProducts = [
   {
     id: 'gift-21',
     name: 'Diary To Keep Your Secrets Secure',
-    description: 'Beautiful diary with lock and key to keep your thoughts private. Quality paper perfect for daily journaling.',
+    description: 'Keep your thoughts, notes, and secrets safe in this cute, high-quality diary 📝💖 Compact at 4.5" height and 3.5" width, it’s the perfect companion for daily life. Stylish, premium, and always by your side, it’s like a best friend who never lets you feel alone — ideal for journaling, planning, or heartfelt memories 🎁✨📖. Beautiful diary to keep your thoughts private. Quality paper perfect for daily journaling.',
     image: '/assets/dairy.png',
     images: ['/assets/dairy.png', '/assets/dairy1.png'],
-    price: 200,
+    price: 206,
     colors: ['Blue', 'Pink', 'Purple'],
     availableColors: ['Blue', 'Pink', 'Purple'],
     inStock: true
   },
   {
     id: 'gift-22',
-    name: 'Washi Type',
-    description: 'Decorative washi tape perfect for crafts, journals, and gift wrapping. Easy to tear and reposition.',
+    name: 'Washi Tape',
+    description: 'Decorative washi tape perfect for crafts, journals, and gift wrapping. Easy to tear and reposition. Add instant charm to your notebooks, planners, and crafts with this premium, high-quality washi tape 💖 Cute, stylish, and designed to stick perfectly without leaving residue, it’s ideal for decorating and matching any aesthetic. Durable, barely sticky, and effortlessly elegant — a must-have for creative souls and perfect for gifting 🎁✨🖌️',
     image: '/assets/Washitape.png',
     images: ['/assets/Washitape.png'],
-    price: 40,
+    price: 50,
     colors: ['White', 'Pink', 'Red', 'Blue', 'Green'],
     availableColors: ['White', 'Pink', 'Red', 'Blue', 'Green'],
     inStock: true
   },
   {
     id: 'gift-23',
-    name: 'Nail Sticker',
-    description: 'Easy-to-apply nail stickers in trendy designs. Long-lasting and perfect for quick nail art.',
+    name: 'Enchanté Nail Sticker Set',
+    description: 'Upgrade your nails instantly with these premium, high-quality nail stickers 💅✨ Cute, stylish, and long-lasting, they stick perfectly to create flawless nail art anytime, anywhere. Perfect for self-expression or gifting to someone who loves trendy, chic nails 🎁💖🌸. Easy-to-apply nail stickers in trendy designs. Long-lasting and perfect for quick nail art.',
     image: '/assets/Nailsticker.png',
     images: ['/assets/Nailsticker.png'],
-    price: 100,
+    price: 195,
     colors: ['Pink', 'Yellow'],
     availableColors: ['Pink'],
     inStock: true
   },
   {
     id: 'gift-24',
-    name: 'High Lighter',
-    description: 'Vibrant highlighter markers perfect for studying and organizing notes. Chisel tip for both thick and thin lines.',
+    name: 'Radiant Glow Highlighter',
+    description: 'Make studying fun and stylish with this premium highlighter 🌈✨ Perfect for marking important words, decorating books or notebooks, and adding a pop of color to your notes. Cute, vibrant, and high-quality — study with style and keep your notes looking as beautiful as they are organized 🎁📚💖. Vibrant highlighter markers perfect for studying and organizing notes. Chisel tip for both thick and thin lines.',
     image: '/assets/Highlighter.png',
     images: ['/assets/Highlighter.png', '/assets/Highlighter1.png'],
-    price: 40,
+    price: 114,
     colors: ['Orange', 'Pink', 'Green', 'Blue', 'Purple', 'Yellow'],
     availableColors: ['Orange', 'Pink', 'Green', 'Blue', 'Purple', 'Yellow'],
     inStock: true
   },
   {
     id: 'gift-25',
-    name: 'Tip',
-    description: 'Colorful decorative tip perfect for personalizing your stationery and accessories. Fun and creative design.',
+    name: 'Radiant Tip',
+    description: 'Add the perfect finishing touch to your traditional look with this premium Tip Dot set 🌸✨ Featuring a variety of vibrant, high-quality colors, these cute sticky dots are perfect for matching your sari or Bengali dress. Easy to apply, reusable, and irresistibly charming — a must-have for festivals, weddings, or gifting someone special 🎁💖💫',
     image: '/assets/Tip.png',
     images: ['/assets/Tip.png'],
     price: 20,
@@ -311,35 +311,35 @@ const giftBoxProducts = [
   },
   {
     id: 'gift-26',
-    name: 'Plushy',
-    description: 'Colorful decorative tip perfect for personalizing your stationery and accessories. Fun and creative design.',
+    name: 'CuddleJoy Plushy',
+    description: 'Snuggle up with these ultra-soft, high-quality plushies in adorable shapes and vibrant colors 🧸💖 Perfect as a cozy sleeping buddy, bedside companion, or charming decor for your bed and car, they stay close and bring comfort wherever you go. A delightful gift for loved ones or yourself 🎁✨💤',
     image: '/assets/plushy.jpeg',
     images: ['/assets/plushy.jpeg', '/assets/plushy1.jpeg', '/assets/plushy2.jpeg'],
-    price: 20,
-    colors: ['Rainbow'],
-    availableColors: ['Rainbow'],
+    price: 364,
+    colors: ['Purple', 'Pink', 'Red', 'Yellow', 'Blue'],
+    availableColors: ['Purple', 'Pink', 'Red', 'Yellow', 'Blue'],
     inStock: true
   },
   {
     id: 'gift-27',
-    name: 'Big Teddy',
-    description: 'Colorful decorative tip perfect for personalizing your stationery and accessories. Fun and creative design.',
+    name: 'CuddleMate 5ft Giant Teddy',
+    description: 'Bring home endless comfort with this super soft, high-quality 5-feet teddy 🧸💖 Available in vibrant colors, it’s perfect as a cozy sleeping buddy, a charming room decoration, or to keep close on your bed. Hug, relax, and add a touch of warmth and joy — an adorable gift for yourself or someone special 🎁✨💤',
     image: '/assets/Teddy.png',
     images: ['/assets/Teddy.png'],
-    price: 20,
-    colors: ['Rainbow'],
-    availableColors: ['Rainbow'],
+    price: 3473,
+    colors: ['Brown', 'Masterd-Yellow', 'Pink', 'Red'],
+    availableColors: ['Brown', 'Masterd-Yellow', 'Pink', 'Red'],
     inStock: true
   },
   {
     id: 'gift-28',
-    name: 'Flowers',
-    description: 'Colorful decorative tip perfect for personalizing your stationery and accessories. Fun and creative design.',
+    name: 'Eternal Bloom Handmade Flowers',
+    description: 'Bring everlasting beauty to any space with these premium, handmade pipe cleaner flowers 🌸✨ Available in a variety of vibrant colors and designs, they never wilt, stay elegant forever, and make a stunning, luxurious gift. Perfect for decorating, gifting, or adding a touch of charm to your home 🎁💖🌿',
     image: '/assets/flower.png',
     images: ['/assets/flower.png', '/assets/flower1.png', '/assets/flower2.png', '/assets/flower3.png', '/assets/flower4.png', '/assets/flower5.png', '/assets/flower6.png', '/assets/flower7.png', '/assets/flower8.png'],
-    price: 20,
-    colors: ['Rainbow'],
-    availableColors: ['Rainbow'],
+    price: 490,
+    colors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black', 'White', 'Orange', 'Maroon', 'Golden', 'Cream', 'Brown', 'Masterd-Yellow', 'Light-Pink', 'Light-Brown'],
+    availableColors: ['Red', 'Blue', 'Yellow', 'Green', 'Pink', 'Purple', 'Black', 'White', 'Orange', 'Maroon', 'Golden', 'Cream', 'Brown', 'Masterd-Yellow', 'Light-Pink', 'Light-Brown'],
     inStock: true
   }
 ];
@@ -362,13 +362,15 @@ const PRODUCT_COLORS = [
   { name: 'Silver', hex: '#C0C0C0' },
   { name: 'Golden', hex: '#cca72dff' },
   { name: 'Orange', hex: '#f06400ff' },
-  { name: 'Light Pink', hex: '#f799baff' },
+  { name: 'Light-Pink', hex: '#f799baff' },
   { name: 'Cream', hex: '#fcf799ff' },
   { name: 'Black', hex: '#000000ff' },
-  { name: 'Light Brown', hex: '#8d6c4eff' },
+  { name: 'Light-Brown', hex: '#8d6c4eff' },
   { name: 'White', hex: '#FFFFFF' },
   { name: 'Nude', hex: '#dcb28cff' },
   { name: 'Maroon', hex: '#800020' },
+  { name: 'Brown', hex: '#34131bff' },
+  { name: 'Masterd-Yellow', hex: '#cba005ff' }
   
 ];
 
@@ -1560,8 +1562,8 @@ function App() {
                   fallback.className = 'absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center';
                   fallback.innerHTML = `
                     <div class="text-center p-8">
-                      <h4 class="text-4xl font-display font-bold text-surface mb-4">Since 1985</h4>
-                      <p class="text-surface/70 font-sans">Crafting Excellence</p>
+                      <h4 class="text-4xl font-display font-bold text-surface mb-4">Since 2026</h4>
+                      <p class="text-surface/70 font-sans">Excellence</p>
                     </div>
                   `;
                   e.target.parentElement.appendChild(fallback);
@@ -1581,15 +1583,21 @@ function App() {
 
               <div className="space-y-4 font-sans leading-relaxed" style={{ color: '#eedfe3', opacity: 0.8 }}>
                 <p>
-                  For generations, Yumora has been synonymous with exceptional craftsmanship and
-                  unparalleled elegance. Our journey began with a simple vision: to create jewelry
-                  that transcends fleeting trends and becomes cherished heirlooms.
+                  Welcome to YUMORA 💖✨
                 </p>
                 <p>
-                  Each piece in our collection is meticulously handcrafted by master artisans
-                  who pour their passion and expertise into every detail. We source only the
-                  finest materials, ensuring that every creation meets our exacting standards
-                  of quality and beauty.
+                  YUMORA was created with a dream to bring you luxury, premium, and modern products that truly stand out. 
+                  From cute makeup and skincare to stylish accessories, soft teddies, 
+                  and handmade gifts — every item you see is carefully and personally selected by us with love and dedication.
+                </p>
+                <p>
+                  We don’t just choose products randomly. We spend time researching, comparing quality, checking details, 
+                  and even walking long distances to collect the perfect pieces. We focus on elegance, durability, 
+                  beauty, and that special “wow” feeling — so when you receive your order, you feel confident and happy.
+                </p>
+                <p>
+                  Our goal is simple: high quality, trustworthy products, and a brand you can rely on. At YUMORA, 
+                  we work hard behind the scenes to make sure you get nothing less than premium perfection 💎🎁💕
                 </p>
               </div>
 
