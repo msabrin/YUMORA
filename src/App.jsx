@@ -446,6 +446,7 @@ function App() {
   const [deliveryType, setDeliveryType] = useState('inside'); // 'inside' or 'outside'
   const [paymentMethod, setPaymentMethod] = useState('half'); // 'full', 'half', 'cod'
   const [copiedNumber, setCopiedNumber] = useState(null);
+  const [customerRequest, setCustomerRequest] = useState('');
 
   // Payment numbers
   const paymentNumbers = {
@@ -486,8 +487,8 @@ function App() {
     },
     {
       title: "Luxury Redefined",
-      headline: "Exquisite Craftsmanship",
-      description: "Each piece is meticulously handcrafted by master artisans, ensuring unparalleled quality and timeless beauty.",
+      headline: "Exquisite Products",
+      description: "Each piece is meticulously selected by master artisans, ensuring unparalleled quality and timeless beauty.",
       image: "/assets/earring&locket01.png",
     },
     {
@@ -517,7 +518,7 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 3000); // Change slide every 3 seconds
+    }, 4000); // Change slide every 4 seconds
     return () => clearInterval(interval);
   }, [heroSlides.length]);
 
@@ -557,20 +558,27 @@ function App() {
     }
   };
 
-  // Apply discount code function
+  // Apply discount code function (one code per order, reusable across customers)
   const applyDiscountCode = (code) => {
     const upperCode = code.toUpperCase().trim();
 
-    if (VALID_CODES[upperCode]) {
-      setDiscount(VALID_CODES[upperCode]);
-      setDiscountCode(upperCode);
-      setDiscountMessage(`Code Applied! You save ${(VALID_CODES[upperCode] * 100).toFixed(0)}%`);
-      return true;
-    } else {
+    if (!VALID_CODES[upperCode]) {
       setDiscountMessage('Invalid discount code');
       setTimeout(() => setDiscountMessage(''), 3000);
       return false;
     }
+
+    // Only one promo code allowed per order (no stacking)
+    if (discountCode && discountCode !== upperCode) {
+      setDiscountMessage('Only one promo code can be used per order');
+      setTimeout(() => setDiscountMessage(''), 3000);
+      return false;
+    }
+
+    setDiscount(VALID_CODES[upperCode]);
+    setDiscountCode(upperCode);
+    setDiscountMessage(`Code Applied! You save ${(VALID_CODES[upperCode] * 100).toFixed(0)}%`);
+    return true;
   };
 
   // Remove discount
@@ -786,9 +794,6 @@ function App() {
         if (item.color) details += `\n   🎨 Color: ${item.color}`;
         details += `\n   📦 Qty: ${item.quantity}`;
         details += `\n   💵 Price: ৳${item.price * item.quantity}`;
-        if (item.selectedImageUrl) {
-          details += `\n   🖼️ Image: ${item.selectedImageUrl}`;
-        }
         return details;
       }).join('\n');
     } else {
@@ -806,9 +811,6 @@ function App() {
       if (confirmOrderProduct.color) productDetails += `\n*🎨 Color:* ${confirmOrderProduct.color}`;
       productDetails += `\n*📦 Quantity:* ${confirmOrderProduct.quantity}`;
       productDetails += `\n*💵 Unit Price:* ৳${confirmOrderProduct.price}`;
-      if (confirmOrderProduct.selectedImageUrl) {
-        productDetails += `\n*🖼️ Selected Image:* ${confirmOrderProduct.selectedImageUrl}`;
-      }
     }
 
     // Calculate final total based on payment method
@@ -843,8 +845,13 @@ function App() {
     message += `*Name:* ${customerName}\n`;
     message += `*Phone:* ${customerPhone}\n`;
     message += `*Address:* ${customerAddress}\n`;
-    message += `*Delivery:* ${deliveryType === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka'}\n\n`;
-    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `*Delivery:* ${deliveryType === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka'}\n`;
+    if (customerRequest.trim()) {
+      message += `\n✍️ *SPECIAL REQUEST*\n`;
+      message += `━━━━━━━━━━━━━━━━━━━━\n`;
+      message += `${customerRequest.trim()}\n`;
+    }
+    message += `\n━━━━━━━━━━━━━━━━━━━━\n`;
     message += `💰 *PRICE BREAKDOWN*\n`;
     message += `━━━━━━━━━━━━━━━━━━━━\n`;
     message += `*Subtotal:* ৳${productPrice}\n`;
@@ -900,6 +907,7 @@ function App() {
     setCustomerPhone('');
     setPhoneError('');
     setCustomerAddress('');
+    setCustomerRequest('');
     setDeliveryType('inside');
     setPaymentMethod('half');
     setDiscount(0);
@@ -1387,7 +1395,7 @@ function App() {
             <div id="custom-gift-box" className="bg-white/10 backdrop-blur-xl rounded-sm p-6 md:p-10 border border-white/20 shadow-xl hover:shadow-2xl transition-shadow duration-300">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
-                  <h4 className="text-3xl md:text-4xl font-display font-bold" style={{ color: '#eedfe3' }}>
+                  <h4 className="text-3xl md:text-5xl font-display font-bold" style={{ color: '#eedfe3' }}>
                     Custom Gift Box
                   </h4>
 
@@ -1448,7 +1456,7 @@ function App() {
                 </div>
 
                 <div className="space-y-6 order-1 lg:order-2">
-                  <h4 className="text-3xl md:text-4xl font-display font-bold" style={{ color: '#eedfe3' }}>
+                  <h4 className="text-3xl md:text-5xl font-display font-bold" style={{ color: '#eedfe3' }}>
                     Mystery Color Cup
                   </h4>
 
@@ -1603,9 +1611,9 @@ function App() {
 
               <div className="font-sans grid grid-cols-3 gap-6 pt-10">
                 {[
-                  { value: '38+', label: 'Years' },
+                  { value: '28+', label: 'Items' },
                   { value: '50K+', label: 'Customers' },
-                  { value: '100%', label: 'Handcrafted' }
+                  { value: '100%', label: 'Trusted' }
                 ].map((stat, i) => (
                   <div key={i} className="text-center p-6 rounded-sm bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <p className="text-4xl font-sans mb-2" style={{ color: '#c5a880' }}>{stat.value}</p>
@@ -1805,7 +1813,7 @@ function App() {
                       )}
                     </div>
                     <div className="p-3 md:p-4">
-                      <h5 className="font-sans font-bold text-base md:text-[23px] truncate mb-1 leading-tight tracking-tight" style={{ color: '#eedfe3' }}>{product.name}</h5>
+                      <h5 className="font-sans font-bold text-base md:text-[20px] truncate mb-1 leading-tight" style={{ color: '#eedfe3' }}>{product.name}</h5>
                       <p className="font-sans font-bold text-xl md:text-2xl flex items-baseline tracking-tight" style={{ color: '#c5a880' }}>
                         <span className="text-base md:text-lg mr-0.5 font-display" style={{ color: '#c5a880', opacity: 0.8 }}>৳</span>
                         <span>{product.price}</span>
@@ -2599,6 +2607,7 @@ function App() {
                 setCustomerPhone('');
                 setPhoneError('');
                 setCustomerAddress('');
+                setCustomerRequest('');
                 setDeliveryType('inside');
                 setPaymentMethod('half');
               }}
@@ -2795,6 +2804,17 @@ function App() {
                     value={customerAddress}
                     onChange={(e) => setCustomerAddress(e.target.value)}
                     placeholder="Enter your complete delivery address"
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-sm border-2 border-primary/20 text-surface font-sans focus:outline-none focus:border-primary resize-none"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-surface font-sans font-semibold text-sm">Special Request (Optional)</label>
+                  <textarea
+                    value={customerRequest}
+                    onChange={(e) => setCustomerRequest(e.target.value)}
+                    placeholder="e.g., I'd like all product colors to be the same, or I'd like to add a letter..."
                     rows={3}
                     className="w-full px-4 py-3 rounded-sm border-2 border-primary/20 text-surface font-sans focus:outline-none focus:border-primary resize-none"
                   />
