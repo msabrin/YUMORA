@@ -28,9 +28,9 @@ const URGENT_FEE_BASE = 150;        // Base fee for urgent 24-hour delivery (var
 
 // Product data with availability
 const mysteryBoxOptions = [
-  { scoops: 1, price: 15 },
-  { scoops: 2, price: 28 },
-  { scoops: 3, price: 40 }
+  { scoops: 1, price: 1550 },
+  { scoops: 2, price: 3000 },
+  { scoops: 3, price: 4200 }
 ];
 
 const giftBoxProducts = [
@@ -1463,8 +1463,13 @@ function App() {
                   <p className="font-sans leading-relaxed text-base" style={{ color: '#eedfe3', opacity: 0.8 }}>
                     Choose your perfect shade from our vibrant collection. Each color tells a different story.
                   </p>
+                  <p>
+                    Each cup is carefully curated to include 6 premium items chosen to delight and surprise. Inside you’ll find a combination of: 
+                    locket and earring set or earrings, eraser, highlighter or lipstick, ring, candy or mud mask, and hairpin — perfectly paired 
+                    together for a stylish and fun experience. Every cup is designed to make gifting simple, thoughtful, and memorable.
+                  </p>
 
-                  <p className="font-sans font-semibold text-5xl flex items-baseline" style={{ color: '#c5a880' }}><span>৳ 12</span></p>
+                  <p className="font-sans font-semibold text-5xl flex items-baseline" style={{ color: '#c5a880' }}><span>৳ 650</span></p>
 
                   {/* Color Selector - Using Inline Styles for Build Safety */}
                   <div className="space-y-4">
