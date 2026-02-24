@@ -489,7 +489,7 @@ function App() {
       title: "Luxury Redefined",
       headline: "Exquisite Products",
       description: "Each piece is meticulously selected by master artisans, ensuring unparalleled quality and timeless beauty.",
-      image: "/assets/hero1.png",
+      image: "/assets/hero01.png",
     },
     {
       title: "Premium Collection",
@@ -1566,7 +1566,7 @@ function App() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="relative aspect-[4/5] rounded-sm overflow-hidden border border-white/20 shadow-2xl">
               <img
-                src="/assets/earring&locket11.png"
+                src="/assets/aboutus.png"
                 alt="About Yumora"
                 className="w-full h-full object-cover"
                 onError={(e) => {
