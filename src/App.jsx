@@ -483,25 +483,25 @@ function App() {
       title: "Timeless Elegance",
       headline: "Discover Hidden Treasures",
       description: "Experience the thrill of mystery with our curated collection of surprise boxes, custom gift sets, and enchanted color cups.",
-      image: "/assets/ring01.png",
+      image: "/assets/hero3.png",
     },
     {
       title: "Luxury Redefined",
       headline: "Exquisite Products",
       description: "Each piece is meticulously selected by master artisans, ensuring unparalleled quality and timeless beauty.",
-      image: "/assets/earring&locket01.png",
+      image: "/assets/hero1.png",
     },
     {
       title: "Premium Collection",
       headline: "Curated Perfection",
       description: "From mystery boxes to elegant jewelry, every item is carefully selected to exceed your expectations.",
-      image: "/assets/2ring01.png",
+      image: "/assets/hero2.png",
     },
     {
       title: "Exclusive Gifts",
       headline: "Moments of Wonder",
       description: "Create unforgettable memories with our unique gift collections designed for those who appreciate luxury.",
-      image: "/assets/earring&locket11.png",
+      image: "/assets/hero4.png",
     },
   ];
 
@@ -1197,7 +1197,7 @@ function App() {
                 >
                   <div className="relative w-full aspect-square rounded-lg overflow-hidden border-2 md:border-4 border-[#c5a880]/40 shadow-lg group-hover:shadow-2xl group-hover:border-[#c5a880] transition-all duration-300">
                     <img
-                      src="/assets/earring&locket11.png"
+                      src="/assets/shop1.png"
                       alt="Charm Mystery Box"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
@@ -1221,7 +1221,7 @@ function App() {
                 >
                   <div className="relative w-full aspect-square rounded-lg overflow-hidden border-2 md:border-4 border-[#c5a880]/40 shadow-lg group-hover:shadow-2xl group-hover:border-[#c5a880] transition-all duration-300">
                     <img
-                      src="/assets/earring&locket01.png"
+                      src="/assets/shop3.png"
                       alt="Custom Gift Box"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
@@ -1245,7 +1245,7 @@ function App() {
                 >
                   <div className="relative w-full aspect-square rounded-lg overflow-hidden border-2 md:border-4 border-[#c5a880]/40 shadow-lg group-hover:shadow-2xl group-hover:border-[#c5a880] transition-all duration-300">
                     <img
-                      src="/assets/1earring&locket11.png"
+                      src="/assets/shop2.png"
                       alt="Color Cup"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
@@ -1376,7 +1376,7 @@ function App() {
 
                 <div className="relative aspect-square rounded-sm overflow-hidden border border-white/20 shadow-xl">
                   <img
-                    src="/assets/earring&locket11.png"
+                    src="/assets/shop1.png"
                     alt="Mystery Box"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -1422,7 +1422,7 @@ function App() {
 
                 <div className="relative aspect-square rounded-sm overflow-hidden border border-white/20 shadow-xl">
                   <img
-                    src="/assets/earring&locket01.png"
+                    src="/assets/shop3.png"
                     alt="Gift Box Collection"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -1442,7 +1442,7 @@ function App() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div className="relative aspect-square rounded-sm overflow-hidden border border-white/20 shadow-xl order-2 lg:order-1">
                   <img
-                    src="/assets/1earring&locket11.png"
+                    src="/assets/pic3.png"
                     alt="Color Cup"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -1465,11 +1465,11 @@ function App() {
                   </p>
                   <p>
                     Each cup is carefully curated to include 6 premium items chosen to delight and surprise. Inside you’ll find a combination of: 
-                    locket and earring set or earrings, eraser, highlighter or lipstick, ring, candy or mud mask, and hairpin — perfectly paired 
-                    together for a stylish and fun experience. Every cup is designed to make gifting simple, thoughtful, and memorable.
+                    locket and earring set or earrings, eraser, highlighter or lipstick or beauty blander, ring, candy or mud mask, hair crunchy or bracelet, 
+                    and hairpin — perfectly paired together for a stylish and fun experience. Every cup is designed to make gifting simple, thoughtful, and memorable.
                   </p>
 
-                  <p className="font-sans font-semibold text-5xl flex items-baseline" style={{ color: '#c5a880' }}><span>৳ 650</span></p>
+                  <p className="font-sans font-semibold text-5xl flex items-baseline" style={{ color: '#c5a880' }}><span>৳ 720</span></p>
 
                   {/* Color Selector - Using Inline Styles for Build Safety */}
                   <div className="space-y-4">
