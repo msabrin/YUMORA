@@ -304,7 +304,7 @@ const giftBoxProducts = [
     description: 'Add the perfect finishing touch to your traditional look with this premium Tip Dot set 🌸✨ Featuring a variety of vibrant, high-quality colors, these cute sticky dots are perfect for matching your sari or Bengali dress. Easy to apply, reusable, and irresistibly charming — a must-have for festivals, weddings, or gifting someone special 🎁💖💫',
     image: '/assets/Tip.png',
     images: ['/assets/Tip.png'],
-    price: 20,
+    price: 66,
     colors: ['Rainbow'],
     availableColors: ['Rainbow'],
     inStock: true
@@ -951,7 +951,7 @@ function App() {
   const openGiftBoxModal = (product) => {
     setSelectedGiftBox(product);
     setGiftBoxColor(product.availableColors[0] || product.colors[0]);
-    setGiftBoxQuantity(1);
+    setGiftBoxQuantity(product.name === 'Radiant Tip' ? 3 : 1);
     setSelectedGalleryImage(0);
     setSelectedImageIndex(0); // Initialize with first image selected
   };
@@ -2217,9 +2217,12 @@ function App() {
                     <label className="text-surface font-sans font-semibold block mb-2">Quantity:</label>
                     <input
                       type="number"
-                      min="1"
+                      min={selectedGiftBox?.name === 'Radiant Tip' ? 3 : 1}
                       value={giftBoxQuantity}
-                      onChange={(e) => setGiftBoxQuantity(parseInt(e.target.value) || 1)}
+                      onChange={(e) => {
+                        const minQty = selectedGiftBox?.name === 'Radiant Tip' ? 3 : 1;
+                        setGiftBoxQuantity(Math.max(minQty, parseInt(e.target.value) || minQty));
+                      }}
                       disabled={!selectedGiftBox.inStock}
                       className="w-full px-4 py-3 rounded-sm bg-white border-2 border-primary/20 text-surface font-sans focus:outline-none focus:border-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
                     />
