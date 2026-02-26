@@ -26,12 +26,16 @@ const COD_EXTRA_FEE = 200;          // Extra fee for Cash on Delivery
 const URGENT_FEE_BASE = 150;        // Base fee for urgent 24-hour delivery (variable by location)
 // ============================================
 
-// Product data with availability
+// ============================================
+// MYSTERY BOX SCOOP PRICES - UPDATE HERE TO CHANGE PRICES GLOBALLY
+// ============================================
+const SCOOP_PRICE_PER_UNIT = 1500; // Price per scoop for custom scoop count (4+ scoops)
 const mysteryBoxOptions = [
   { scoops: 1, price: 1550 },
   { scoops: 2, price: 3000 },
   { scoops: 3, price: 4200 }
 ];
+// ============================================
 
 const giftBoxProducts = [
   {
@@ -617,11 +621,8 @@ function App() {
       return;
     }
 
-    let price;
-    if (scoops === 1) price = 15;
-    else if (scoops === 2) price = 28;
-    else if (scoops === 3) price = 40;
-    else price = scoops * 15;
+    const option = mysteryBoxOptions.find(o => o.scoops === scoops);
+    const price = option ? option.price : scoops * SCOOP_PRICE_PER_UNIT;
 
     const item = {
       id: `mystery-box-${scoops}`,
@@ -698,11 +699,8 @@ function App() {
       return;
     }
 
-    let price;
-    if (scoops === 1) price = 15;
-    else if (scoops === 2) price = 28;
-    else if (scoops === 3) price = 40;
-    else price = scoops * 15;
+    const option = mysteryBoxOptions.find(o => o.scoops === scoops);
+    const price = option ? option.price : scoops * SCOOP_PRICE_PER_UNIT;
 
     setConfirmOrderProduct({
       name: 'Charm Mystery Box',
